@@ -264,7 +264,7 @@ class Generator:
             securitySchemes = None
 
         return Document(
-            openapi="3.0.0",
+            openapi="3.0.3",
             info=options.info,
             servers=[options.server],
             paths=paths,

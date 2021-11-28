@@ -15,3 +15,10 @@
 * recursively converts composite types into JSON schemas
 * groups frequently used composite types into a separate section and re-uses them with `$ref`
 * displays generated OpenAPI specification in HTML with [ReDoc](https://github.com/Redocly/redoc)
+
+## Examples
+
+* [Endpoint definition in Python](https://hunyadi.github.io/pyopenapi/examples/python/index.html)
+* [Generated OpenAPI specification in JSON](https://hunyadi.github.io/pyopenapi/examples/json/index.html)
+* [Generated OpenAPI specification in YAML](https://hunyadi.github.io/pyopenapi/examples/yaml/index.html)
+* [Generated OpenAPI specification in HTML with ReDoc](https://hunyadi.github.io/pyopenapi/examples/index.html)

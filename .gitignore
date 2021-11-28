@@ -1,6 +1,7 @@
 /.env
 /build
 /dist
+/examples
 /*.egg-info
 __pycache__
 *.pyc
