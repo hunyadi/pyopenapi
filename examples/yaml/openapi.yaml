@@ -1,0 +1,285 @@
+components:
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            additionalProperties: false
+            properties:
+              error:
+                additionalProperties: false
+                properties:
+                  id:
+                    title: A machine-processable identifier for the error.
+                    type: string
+                  message:
+                    title: A human-readable description for the error.
+                    type: string
+                required:
+                - id
+                - message
+                title: Details related to the error.
+                type: object
+            required:
+            - error
+            title: Encapsulates an error response from an endpoint.
+            type: object
+  schemas:
+    Description:
+      additionalProperties: false
+      properties:
+        format:
+          enum:
+          - text/html
+          - text/plain
+          - text/markdown
+          title: The representation format for the text.
+          type: string
+        text:
+          title: The text string.
+          type: string
+      required:
+      - format
+      - text
+      title: A textual description as plain text or a well-known markup format.
+      type: object
+    EventObject:
+      additionalProperties: false
+      properties:
+        description:
+          title: Textual description of the event.
+          type: string
+        id:
+          format: uuid
+          title: Uniquely identifies the job which the event corresponds to.
+          type: string
+      required:
+      - id
+      - description
+      title: Triggered when an out-of-band event takes place.
+      type: object
+    Job:
+      additionalProperties: false
+      properties:
+        description:
+          $ref: '#/components/schemas/Description'
+        id:
+          format: uuid
+          type: string
+        started_at:
+          format: date-time
+          type: string
+        status:
+          enum:
+          - created
+          - running
+          - stopped
+          title: An enumeration.
+          type: string
+      required:
+      - id
+      - status
+      - started_at
+      - description
+      title: 'Job(id: uuid.UUID, status: endpoint.Status, started_at: datetime.datetime,
+        description: endpoint.Description)'
+      type: object
+    Person:
+      additionalProperties: false
+      properties:
+        family_name:
+          type: string
+        given_name:
+          type: string
+      required:
+      - family_name
+      - given_name
+      title: 'Person(family_name: str, given_name: str)'
+      type: object
+    URL:
+      format: uri
+      pattern: ^https?://
+      title: A Uniform Resource Locator (URL).
+      type: string
+info:
+  title: Example specification
+  version: '1.0'
+openapi: 3.0.3
+paths:
+  /job:
+    post:
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              items:
+                $ref: '#/components/schemas/URL'
+              type: array
+        description: A set of URLs to resources used to initiate the job.
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                format: uuid
+                type: string
+          description: The unique identifier of the newly created job.
+        default:
+          $ref: '#/components/responses/BadRequest'
+      summary: Creates a new job with the given data as input.
+      tags:
+      - JobManagement
+  /job/{job_id}:
+    delete:
+      parameters:
+      - description: Unique identifier for the job to terminate.
+        in: path
+        name: job_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      responses:
+        '200': {}
+        default:
+          $ref: '#/components/responses/BadRequest'
+      summary: Terminates a job.
+      tags:
+      - JobManagement
+    get:
+      parameters:
+      - description: Unique identifier for the job to query.
+        in: path
+        name: job_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      - in: query
+        name: format
+        required: true
+        schema:
+          enum:
+          - text/html
+          - text/plain
+          - text/markdown
+          title: An enumeration.
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Job'
+          description: Status information about the job.
+        default:
+          $ref: '#/components/responses/BadRequest'
+      summary: Query status information about a job.
+      tags:
+      - JobManagement
+    patch:
+      description: May cause the job to be stopped and restarted.
+      parameters:
+      - description: Unique identifier for the job to update.
+        in: path
+        name: job_id
+        required: true
+        schema:
+          format: uuid
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Job'
+        description: Data to update the job with.
+        required: true
+      responses:
+        '200': {}
+        default:
+          $ref: '#/components/responses/BadRequest'
+      summary: Updates information related to a job.
+      tags:
+      - JobManagement
+  /person/id/{id}:
+    get:
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        default:
+          $ref: '#/components/responses/BadRequest'
+      summary: Find a person by their identifier.
+      tags:
+      - PeopleCatalog
+  /person/name/{family}/{given}:
+    get:
+      parameters:
+      - in: path
+        name: family
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: given
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        default:
+          $ref: '#/components/responses/BadRequest'
+      summary: Find a person by their name.
+      tags:
+      - PeopleCatalog
+security:
+- Default: []
+servers:
+- url: /api
+tags:
+- name: PeopleCatalog
+  x-displayName: Operations related to people.
+- description: Operations to create, inspect, update and terminate jobs.
+  name: JobManagement
+  x-displayName: Job management.
+- description: <SchemaDefinition schemaRef="#/components/schemas/Job" />
+  name: Job
+- description: <SchemaDefinition schemaRef="#/components/schemas/EventObject" />
+  name: EventObject
+- description: <SchemaDefinition schemaRef="#/components/schemas/URL" />
+  name: URL
+- description: <SchemaDefinition schemaRef="#/components/schemas/Description" />
+  name: Description
+- description: <SchemaDefinition schemaRef="#/components/schemas/Job" />
+  name: Job
+- description: <SchemaDefinition schemaRef="#/components/schemas/Person" />
+  name: Person
+x-tagGroups:
+- name: Operations
+  tags:
+  - PeopleCatalog
+  - JobManagement
+- name: Events
+  tags:
+  - Job
+  - EventObject
+- name: Types
+  tags:
+  - URL
+  - Description
+  - Job
+  - Person

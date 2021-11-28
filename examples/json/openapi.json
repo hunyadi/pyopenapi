@@ -1,0 +1,440 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Example specification",
+        "version": "1.0"
+    },
+    "servers": [
+        {
+            "url": "/api"
+        }
+    ],
+    "paths": {
+        "/job": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "The unique identifier of the newly created job.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "uuid"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                },
+                "tags": [
+                    "JobManagement"
+                ],
+                "summary": "Creates a new job with the given data as input.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/URL"
+                                }
+                            }
+                        }
+                    },
+                    "description": "A set of URLs to resources used to initiate the job.",
+                    "required": true
+                }
+            }
+        },
+        "/job/{job_id}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Status information about the job.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Job"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                },
+                "tags": [
+                    "JobManagement"
+                ],
+                "summary": "Query status information about a job.",
+                "parameters": [
+                    {
+                        "name": "job_id",
+                        "in": "path",
+                        "description": "Unique identifier for the job to query.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    {
+                        "name": "format",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "text/html",
+                                "text/plain",
+                                "text/markdown"
+                            ],
+                            "title": "An enumeration."
+                        }
+                    }
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {},
+                    "default": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                },
+                "tags": [
+                    "JobManagement"
+                ],
+                "summary": "Terminates a job.",
+                "parameters": [
+                    {
+                        "name": "job_id",
+                        "in": "path",
+                        "description": "Unique identifier for the job to terminate.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ]
+            },
+            "patch": {
+                "responses": {
+                    "200": {},
+                    "default": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                },
+                "tags": [
+                    "JobManagement"
+                ],
+                "summary": "Updates information related to a job.",
+                "description": "May cause the job to be stopped and restarted.",
+                "parameters": [
+                    {
+                        "name": "job_id",
+                        "in": "path",
+                        "description": "Unique identifier for the job to update.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Job"
+                            }
+                        }
+                    },
+                    "description": "Data to update the job with.",
+                    "required": true
+                }
+            }
+        },
+        "/person/id/{id}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                },
+                "tags": [
+                    "PeopleCatalog"
+                ],
+                "summary": "Find a person by their identifier.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "/person/name/{family}/{given}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Person"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "$ref": "#/components/responses/BadRequest"
+                    }
+                },
+                "tags": [
+                    "PeopleCatalog"
+                ],
+                "summary": "Find a person by their name.",
+                "parameters": [
+                    {
+                        "name": "family",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "given",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "URL": {
+                "type": "string",
+                "format": "uri",
+                "pattern": "^https?://",
+                "title": "A Uniform Resource Locator (URL)."
+            },
+            "Description": {
+                "type": "object",
+                "properties": {
+                    "format": {
+                        "type": "string",
+                        "enum": [
+                            "text/html",
+                            "text/plain",
+                            "text/markdown"
+                        ],
+                        "title": "The representation format for the text."
+                    },
+                    "text": {
+                        "type": "string",
+                        "title": "The text string."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "format",
+                    "text"
+                ],
+                "title": "A textual description as plain text or a well-known markup format."
+            },
+            "Job": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "created",
+                            "running",
+                            "stopped"
+                        ],
+                        "title": "An enumeration."
+                    },
+                    "started_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "description": {
+                        "$ref": "#/components/schemas/Description"
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "status",
+                    "started_at",
+                    "description"
+                ],
+                "title": "Job(id: uuid.UUID, status: endpoint.Status, started_at: datetime.datetime, description: endpoint.Description)"
+            },
+            "Person": {
+                "type": "object",
+                "properties": {
+                    "family_name": {
+                        "type": "string"
+                    },
+                    "given_name": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "family_name",
+                    "given_name"
+                ],
+                "title": "Person(family_name: str, given_name: str)"
+            },
+            "EventObject": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Uniquely identifies the job which the event corresponds to."
+                    },
+                    "description": {
+                        "type": "string",
+                        "title": "Textual description of the event."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "description"
+                ],
+                "title": "Triggered when an out-of-band event takes place."
+            }
+        },
+        "responses": {
+            "BadRequest": {
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "error": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string",
+                                            "title": "A machine-processable identifier for the error."
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "title": "A human-readable description for the error."
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "id",
+                                        "message"
+                                    ],
+                                    "title": "Details related to the error."
+                                }
+                            },
+                            "additionalProperties": false,
+                            "required": [
+                                "error"
+                            ],
+                            "title": "Encapsulates an error response from an endpoint."
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "security": [
+        {
+            "Default": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "PeopleCatalog",
+            "x-displayName": "Operations related to people."
+        },
+        {
+            "name": "JobManagement",
+            "description": "Operations to create, inspect, update and terminate jobs.",
+            "x-displayName": "Job management."
+        },
+        {
+            "name": "Job",
+            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/Job\" />"
+        },
+        {
+            "name": "EventObject",
+            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/EventObject\" />"
+        },
+        {
+            "name": "URL",
+            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/URL\" />"
+        },
+        {
+            "name": "Description",
+            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/Description\" />"
+        },
+        {
+            "name": "Job",
+            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/Job\" />"
+        },
+        {
+            "name": "Person",
+            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/Person\" />"
+        }
+    ],
+    "x-tagGroups": [
+        {
+            "name": "Operations",
+            "tags": [
+                "PeopleCatalog",
+                "JobManagement"
+            ]
+        },
+        {
+            "name": "Events",
+            "tags": [
+                "Job",
+                "EventObject"
+            ]
+        },
+        {
+            "name": "Types",
+            "tags": [
+                "URL",
+                "Description",
+                "Job",
+                "Person"
+            ]
+        }
+    ]
+}
