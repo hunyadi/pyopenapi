@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Type
+from typing import Any, Dict, Type, Union
 
 import docstring_parser
 from strong_typing import (
@@ -25,6 +25,7 @@ from .specification import (
     RequestBody,
     Response,
     ResponseRef,
+    SchemaRef,
     Tag,
     TagGroup,
 )
@@ -43,12 +44,33 @@ class Generator:
         self.schemas = {}
 
     def _classdef_to_schema(self, typ: Type) -> Schema:
-        type_schema, type_definitions = self.schema_generator.classdef_to_schema(typ)
+        """
+        Converts a type to a JSON schema.
+        For nested types found in the type hierarchy, adds the type to the schema registry in the OpenAPI specification section `components`.
+        """
+
+        type_schema, type_definitions = self.schema_generator.classdef_to_schema(
+            typ, force_expand=True
+        )
 
         # append schema to list of known schemas, to be used in OpenAPI's Components Object section
         self.schemas.update(type_definitions)
 
         return type_schema
+
+    def _classdef_to_schemaref(self, typ: Type) -> Union[Schema, SchemaRef]:
+        """
+        Converts a type to a JSON schema, and if possible, returns a schema reference.
+        For composite types (such as classes), adds the type to the schema registry in the OpenAPI specification section `components`.
+        """
+
+        type_schema = self._classdef_to_schema(typ)
+        type_name = getattr(typ, "__name__", None)
+        if typ is str or typ is int or typ is float or type_name is None:
+            return type_schema
+        else:
+            self.schemas[type_name] = type_schema
+            return SchemaRef(type_name)
 
     def _build_content(self, payload_type: Type) -> Dict[str, MediaType]:
         if is_generic_list(payload_type):
@@ -58,7 +80,7 @@ class Generator:
             media_type = "application/json"
             item_type = payload_type
 
-        return {media_type: MediaType(schema=self._classdef_to_schema(item_type))}
+        return {media_type: MediaType(schema=self._classdef_to_schemaref(item_type))}
 
     def _build_response(self, response_type: Type, description: str) -> Response:
         if response_type is not None:
@@ -85,7 +107,7 @@ class Generator:
                     in_=ParameterLocation.Path,
                     description=doc_params.get(param_name),
                     required=True,
-                    schema=self._classdef_to_schema(param_type),
+                    schema=self._classdef_to_schemaref(param_type),
                 )
                 for param_name, param_type in op.path_params
             ]
@@ -97,7 +119,7 @@ class Generator:
                         in_=ParameterLocation.Query,
                         description=doc_params.get(param_name),
                         required=False,
-                        schema=self._classdef_to_schema(
+                        schema=self._classdef_to_schemaref(
                             unwrap_optional_type(param_type)
                         ),
                     )
@@ -107,7 +129,7 @@ class Generator:
                         in_=ParameterLocation.Query,
                         description=doc_params.get(param_name),
                         required=True,
-                        schema=self._classdef_to_schema(param_type),
+                        schema=self._classdef_to_schemaref(param_type),
                     )
                 query_parameters.append(query_parameter)
 
@@ -118,7 +140,7 @@ class Generator:
                 requestBody = RequestBody(
                     content={
                         "application/json": MediaType(
-                            schema=self._classdef_to_schema(request_type)
+                            schema=self._classdef_to_schemaref(request_type)
                         )
                     },
                     description=doc_params.get(request_name),
@@ -135,7 +157,7 @@ class Generator:
                     "200": self._build_response(
                         response_type=op.event_type, description=response_description
                     ),
-                    "default": ResponseRef("BadRequest"),
+                    "400": ResponseRef("BadRequest"),
                 }
 
                 callbacks = {
@@ -156,7 +178,7 @@ class Generator:
                     "200": self._build_response(
                         response_type=op.response_type, description=response_description
                     ),
-                    "default": ResponseRef("BadRequest"),
+                    "400": ResponseRef("BadRequest"),
                 }
                 callbacks = None
 
@@ -247,12 +269,13 @@ class Generator:
                 TagGroup(name="Types", tags=[tag.name for tag in schema_tags])
             )
 
+        # error response
         responses = {
             "BadRequest": Response(
-                description=None,
+                description="The server cannot process the request due a client error (e.g. malformed request syntax).",
                 content={
                     "application/json": MediaType(
-                        schema=self._classdef_to_schema(ErrorResponse)
+                        schema=self._classdef_to_schemaref(ErrorResponse)
                     )
                 },
             )
