@@ -90,6 +90,17 @@ class Generator:
         else:
             return Response(description=description)
 
+    def _build_type_tag(self, ref: str, schema: Schema) -> Tag:
+        definition = f'<SchemaDefinition schemaRef="#/components/schemas/{ref}" />'
+        title = schema.get("title")
+        description = schema.get("description")
+        return Tag(
+            name=ref,
+            description="\n\n".join(
+                s for s in (title, description, definition) if s is not None
+            ),
+        )
+
     def generate(self, options: Options) -> Document:
         paths = {}
         endpoint_classes = set()
@@ -211,7 +222,7 @@ class Generator:
             else:
                 paths[route] = pathItem
 
-        operation_tags = []
+        operation_tags: List[Tag] = []
         for cls in endpoint_classes:
             doc_string = docstring_parser.parse(cls.__doc__)
             operation_tags.append(
@@ -222,51 +233,54 @@ class Generator:
                 )
             )
 
-        # types that are explicitly declared
-        if options.extra_types is not None:
-            for extra_type in options.extra_types:
-                type_schema = self._classdef_to_schema(extra_type)
-                self.schemas[extra_type.__name__] = type_schema
-
         # types that are produced/consumed by operations
-        schema_tags = [
-            Tag(
-                name=ref,
-                description=f'<SchemaDefinition schemaRef="#/components/schemas/{ref}" />',
-            )
-            for ref in self.schemas.keys()
+        type_tags = [
+            self._build_type_tag(ref, schema) for ref, schema in self.schemas.items()
         ]
 
         # types that are emitted by events
+        event_tags: List[Tag] = []
         events = get_endpoint_events(self.endpoint)
-        for event_type in events.values():
-            self._classdef_to_schema(event_type)
-        event_tags = [
-            Tag(
-                name=ref,
-                description=f'<SchemaDefinition schemaRef="#/components/schemas/{ref}" />',
-            )
-            for ref in events.keys()
-        ]
+        for ref, event_type in events.items():
+            event_schema = self._classdef_to_schema(event_type)
+            event_tags.append(self._build_type_tag(ref, event_schema))
+
+        # types that are explicitly declared
+        extra_tags: List[Tag] = []
+        if options.extra_types is not None:
+            for extra_type in options.extra_types:
+                ref = extra_type.__name__
+                type_schema = self._classdef_to_schema(extra_type)
+                self.schemas[ref] = type_schema
+                extra_tags.append(self._build_type_tag(ref, type_schema))
 
         # list all operations and types
-        tags = []
+        tags: List[Tag] = []
         tags.extend(operation_tags)
+        tags.extend(type_tags)
         tags.extend(event_tags)
-        tags.extend(schema_tags)
+        tags.extend(extra_tags)
 
         tag_groups = []
         if operation_tags:
             tag_groups.append(
-                TagGroup(name="Operations", tags=[tag.name for tag in operation_tags])
+                TagGroup(
+                    name="Operations", tags=sorted(tag.name for tag in operation_tags)
+                )
+            )
+        if type_tags:
+            tag_groups.append(
+                TagGroup(name="Types", tags=sorted(tag.name for tag in type_tags))
             )
         if event_tags:
             tag_groups.append(
-                TagGroup(name="Events", tags=[tag.name for tag in event_tags])
+                TagGroup(name="Events", tags=sorted(tag.name for tag in event_tags))
             )
-        if schema_tags:
+        if extra_tags:
             tag_groups.append(
-                TagGroup(name="Types", tags=[tag.name for tag in schema_tags])
+                TagGroup(
+                    name="Additional types", tags=sorted(tag.name for tag in extra_tags)
+                )
             )
 
         # error response
