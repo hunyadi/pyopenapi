@@ -49,16 +49,16 @@ class Generator:
         For nested types found in the type hierarchy, adds the type to the schema registry in the OpenAPI specification section `components`.
         """
 
-        type_schema, type_definitions = self.schema_generator.classdef_to_schema(
-            typ, force_expand=True
-        )
+        type_schema, type_definitions = self.schema_generator.classdef_to_schema(typ)
 
         # append schema to list of known schemas, to be used in OpenAPI's Components Object section
-        self.schemas.update(type_definitions)
+        for ref, schema in type_definitions.items():
+            if ref not in self.schemas:
+                self.schemas[ref] = schema
 
         return type_schema
 
-    def _classdef_to_schemaref(self, typ: Type) -> Union[Schema, SchemaRef]:
+    def _classdef_to_ref(self, typ: Type) -> Union[Schema, SchemaRef]:
         """
         Converts a type to a JSON schema, and if possible, returns a schema reference.
         For composite types (such as classes), adds the type to the schema registry in the OpenAPI specification section `components`.
@@ -69,7 +69,8 @@ class Generator:
         if typ is str or typ is int or typ is float or type_name is None:
             return type_schema
         else:
-            self.schemas[type_name] = type_schema
+            if type_name not in self.schemas:
+                self.schemas[type_name] = type_schema
             return SchemaRef(type_name)
 
     def _build_content(self, payload_type: Type) -> Dict[str, MediaType]:
@@ -80,7 +81,7 @@ class Generator:
             media_type = "application/json"
             item_type = payload_type
 
-        return {media_type: MediaType(schema=self._classdef_to_schemaref(item_type))}
+        return {media_type: MediaType(schema=self._classdef_to_ref(item_type))}
 
     def _build_response(self, response_type: Type, description: str) -> Response:
         if response_type is not None:
@@ -118,7 +119,7 @@ class Generator:
                     in_=ParameterLocation.Path,
                     description=doc_params.get(param_name),
                     required=True,
-                    schema=self._classdef_to_schemaref(param_type),
+                    schema=self._classdef_to_ref(param_type),
                 )
                 for param_name, param_type in op.path_params
             ]
@@ -130,9 +131,7 @@ class Generator:
                         in_=ParameterLocation.Query,
                         description=doc_params.get(param_name),
                         required=False,
-                        schema=self._classdef_to_schemaref(
-                            unwrap_optional_type(param_type)
-                        ),
+                        schema=self._classdef_to_ref(unwrap_optional_type(param_type)),
                     )
                 else:
                     query_parameter = Parameter(
@@ -140,7 +139,7 @@ class Generator:
                         in_=ParameterLocation.Query,
                         description=doc_params.get(param_name),
                         required=True,
-                        schema=self._classdef_to_schemaref(param_type),
+                        schema=self._classdef_to_ref(param_type),
                     )
                 query_parameters.append(query_parameter)
 
@@ -151,7 +150,7 @@ class Generator:
                 requestBody = RequestBody(
                     content={
                         "application/json": MediaType(
-                            schema=self._classdef_to_schemaref(request_type)
+                            schema=self._classdef_to_ref(request_type)
                         )
                     },
                     description=doc_params.get(request_name),
@@ -289,7 +288,7 @@ class Generator:
                 description="The server cannot process the request due a client error (e.g. malformed request syntax).",
                 content={
                     "application/json": MediaType(
-                        schema=self._classdef_to_schemaref(ErrorResponse)
+                        schema=self._classdef_to_ref(ErrorResponse)
                     )
                 },
             )
