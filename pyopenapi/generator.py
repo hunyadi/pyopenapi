@@ -36,7 +36,7 @@ class Generator:
     schema_generator: JsonSchemaGenerator
     schemas: Dict[str, Schema]
 
-    def __init__(self, endpoint: Any):
+    def __init__(self, endpoint: Type):
         self.endpoint = endpoint
         self.schema_generator = JsonSchemaGenerator(
             SchemaOptions(definitions_path="#/components/schemas/")
@@ -168,6 +168,7 @@ class Generator:
                         response_type=op.event_type, description=response_description
                     ),
                     "400": ResponseRef("BadRequest"),
+                    "500": ResponseRef("InternalServerError"),
                 }
 
                 callbacks = {
@@ -189,6 +190,7 @@ class Generator:
                         response_type=op.response_type, description=response_description
                     ),
                     "400": ResponseRef("BadRequest"),
+                    "500": ResponseRef("InternalServerError"),
                 }
                 callbacks = None
 
@@ -264,34 +266,50 @@ class Generator:
         if operation_tags:
             tag_groups.append(
                 TagGroup(
-                    name="Operations", tags=sorted(tag.name for tag in operation_tags)
+                    name=options.map("Operations"),
+                    tags=sorted(tag.name for tag in operation_tags),
                 )
             )
         if type_tags:
             tag_groups.append(
-                TagGroup(name="Types", tags=sorted(tag.name for tag in type_tags))
+                TagGroup(
+                    name=options.map("Types"),
+                    tags=sorted(tag.name for tag in type_tags),
+                )
             )
         if event_tags:
             tag_groups.append(
-                TagGroup(name="Events", tags=sorted(tag.name for tag in event_tags))
+                TagGroup(
+                    name=options.map("Events"),
+                    tags=sorted(tag.name for tag in event_tags),
+                )
             )
         if extra_tags:
             tag_groups.append(
                 TagGroup(
-                    name="Additional types", tags=sorted(tag.name for tag in extra_tags)
+                    name=options.map("AdditionalTypes"),
+                    tags=sorted(tag.name for tag in extra_tags),
                 )
             )
 
         # error response
         responses = {
             "BadRequest": Response(
-                description="The server cannot process the request due a client error (e.g. malformed request syntax).",
+                description=options.map("BadRequest"),
                 content={
                     "application/json": MediaType(
                         schema=self._classdef_to_ref(ErrorResponse)
                     )
                 },
-            )
+            ),
+            "InternalServerError": Response(
+                description=options.map("InternalServerError"),
+                content={
+                    "application/json": MediaType(
+                        schema=self._classdef_to_ref(ErrorResponse)
+                    )
+                },
+            ),
         }
 
         if options.default_security_scheme:

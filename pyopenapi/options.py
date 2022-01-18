@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional, Type
+from typing import ClassVar, Dict, List, Optional, Type
 
 from .specification import (
     Info,
@@ -18,12 +18,33 @@ class Options:
     :param info: Meta-information for the endpoint specification.
     :param default_security_scheme: Security scheme to apply to endpoints, unless overridden on a per-endpoint basis.
     :param extra_types: Extra types to list in the type catalog in addition to those found in operation signatures.
+    :param captions: User-defined captions for sections such as "Operations" or "Types".
     """
 
     server: Server
     info: Info
     default_security_scheme: Optional[SecurityScheme] = None
     extra_types: Optional[List[Type]] = None
+    captions: Dict[str, str] = None
+
+    default_captions: ClassVar[Dict[str, str]] = {
+        "Operations": "Operations",
+        "Types": "Types",
+        "Events": "Events",
+        "AdditionalTypes": "Additional types",
+        "BadRequest": "The server cannot process the request due a client error (e.g. malformed request syntax).",
+        "InternalServerError": "The server encountered an unexpected error when processing the request.",
+    }
+
+    def map(self, id: str) -> str:
+        "Maps a language-neutral placeholder string to language-dependent text."
+
+        if self.captions is not None:
+            text = self.captions.get(id)
+            if text is not None:
+                return text
+
+        return __class__.default_captions[id]
 
 
 @dataclass
