@@ -19,6 +19,7 @@
             options = {
                 expandResponses: "200",
                 expandSingleSchemaField: true,
+                schemaExpansionLevel: "all",
             };
             element = document.getElementById("openapi-container");
             Redoc.init(spec, options, element);

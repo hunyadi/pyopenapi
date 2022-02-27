@@ -1,6 +1,6 @@
 import json
 import os.path
-from typing import Callable, TextIO, Type
+from typing import Callable, TextIO, TypeVar
 
 from strong_typing import JsonType, object_to_json
 
@@ -10,10 +10,13 @@ from .options import *
 from .specification import Document
 
 
-def webmethod(route: str):
+T = TypeVar("T")
+
+
+def webmethod(route: str) -> Callable[[T], T]:
     "Decorator that supplies additional metadata to an endpoint operation function."
 
-    def wrap(cls: Callable):
+    def wrap(cls: T) -> T:
         cls.__webmethod__ = WebMethod(route=route)
         return cls
 
@@ -23,7 +26,7 @@ def webmethod(route: str):
 class Specification:
     document: Document
 
-    def __init__(self, endpoint: Type, options: Options):
+    def __init__(self, endpoint: type, options: Options):
         generator = Generator(endpoint)
         self.document = generator.generate(options)
 

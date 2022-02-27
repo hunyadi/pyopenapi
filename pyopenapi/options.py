@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import ClassVar, Dict, List, Optional, Type
+from typing import ClassVar, Dict, List, Optional
 
 from .specification import (
     Info,
@@ -24,7 +24,7 @@ class Options:
     server: Server
     info: Info
     default_security_scheme: Optional[SecurityScheme] = None
-    extra_types: Optional[List[Type]] = None
+    extra_types: Optional[List[type]] = None
     captions: Dict[str, str] = None
 
     default_captions: ClassVar[Dict[str, str]] = {

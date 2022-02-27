@@ -5,18 +5,7 @@ import sys
 import typing
 import uuid
 from dataclasses import dataclass
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Iterable,
-    Iterator,
-    List,
-    Optional,
-    Tuple,
-    Type,
-    Union,
-)
+from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
 from strong_typing import is_type_enum, is_type_optional, unwrap_optional_type
 
@@ -67,7 +56,11 @@ class HTTPMethod(enum.Enum):
     PATCH = "PATCH"
 
 
-OperationParameter = Tuple[str, Type]
+OperationParameter = Tuple[str, type]
+
+
+class ValidationError(TypeError):
+    pass
 
 
 @dataclass
@@ -88,7 +81,7 @@ class EndpointOperation:
     :param http_method: The HTTP method used to invoke the endpoint such as POST, GET or PUT.
     """
 
-    defining_class: Type
+    defining_class: type
     name: str
     func_name: str
     func_ref: Callable[..., Any]
@@ -96,8 +89,8 @@ class EndpointOperation:
     path_params: List[OperationParameter]
     query_params: List[OperationParameter]
     request_param: Optional[OperationParameter]
-    event_type: Type
-    response_type: Type
+    event_type: type
+    response_type: type
     http_method: HTTPMethod
 
     def get_route(self) -> str:
@@ -130,11 +123,11 @@ def _get_route_parameters(route: str) -> List[str]:
 
 
 def _get_endpoint_functions(
-    endpoint: Type, prefixes: List[str]
+    endpoint: type, prefixes: List[str]
 ) -> Iterator[Tuple[str, str, str, Callable]]:
 
     if not inspect.isclass(endpoint):
-        raise TypeError(f"object is not a class type: {endpoint}")
+        raise ValidationError(f"object is not a class type: {endpoint}")
 
     functions = inspect.getmembers(endpoint, inspect.isfunction)
     for func_name, func_ref in functions:
@@ -145,7 +138,7 @@ def _get_endpoint_functions(
         yield prefix, operation_name, func_name, func_ref
 
 
-def _get_defining_class(member_fn: str, derived_cls: Type) -> Type:
+def _get_defining_class(member_fn: str, derived_cls: type) -> type:
     "Find the class in which a member function is first defined in a class inheritance hierarchy."
 
     # iterate in reverse member resolution order to find most specific class first
@@ -154,10 +147,19 @@ def _get_defining_class(member_fn: str, derived_cls: Type) -> Type:
             if name == member_fn:
                 return cls
 
-    raise ValueError(f"cannot find defining class for {member_fn} in {derived_cls}")
+    raise ValidationError(
+        f"cannot find defining class for {member_fn} in {derived_cls}"
+    )
 
 
-def get_endpoint_operations(endpoint: Type) -> List[EndpointOperation]:
+def get_signature(fn: Callable[..., Any]) -> inspect.Signature:
+    if sys.version_info >= (3, 10):
+        return inspect.signature(fn, eval_str=True)
+    else:
+        return inspect.signature(fn)
+
+
+def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
     """
     Extracts a list of member functions in a class eligible for HTTP interface binding.
 
@@ -201,10 +203,7 @@ def get_endpoint_operations(endpoint: Type) -> List[EndpointOperation]:
             route_params = _get_route_parameters(route)
 
         # inspect function signature for path and query parameters, and request/response payload type
-        if sys.version_info >= (3, 10):
-            signature = inspect.signature(func_ref, eval_str=True)
-        else:
-            signature = inspect.signature(func_ref)
+        signature = get_signature(func_ref)
 
         path_params = []
         query_params = []
@@ -216,6 +215,12 @@ def get_endpoint_operations(endpoint: Type) -> List[EndpointOperation]:
             # omit "self" for instance methods
             if param_name == "self" and param_type is inspect.Parameter.empty:
                 continue
+
+            # check if all parameters have explicit type
+            if parameter.annotation is inspect.Parameter.empty:
+                raise ValidationError(
+                    f"parameter '{param_name}' in function '{func_name}' has no type annotation"
+                )
 
             if is_type_optional(param_type):
                 inner_type = unwrap_optional_type(param_type)
@@ -232,7 +237,7 @@ def get_endpoint_operations(endpoint: Type) -> List[EndpointOperation]:
             ):
                 if parameter.kind == inspect.Parameter.POSITIONAL_ONLY:
                     if route_params is not None and param_name not in route_params:
-                        raise TypeError(
+                        raise ValidationError(
                             f"positional parameter '{param_name}' absent from user-defined route '{route}' for function '{func_name}'"
                         )
 
@@ -240,7 +245,7 @@ def get_endpoint_operations(endpoint: Type) -> List[EndpointOperation]:
                     path_params.append((param_name, param_type))
                 else:
                     if route_params is not None and param_name in route_params:
-                        raise TypeError(
+                        raise ValidationError(
                             f"query parameter '{param_name}' found in user-defined route '{route}' for function '{func_name}'"
                         )
 
@@ -248,22 +253,35 @@ def get_endpoint_operations(endpoint: Type) -> List[EndpointOperation]:
                     query_params.append((param_name, param_type))
             else:
                 if route_params is not None and param_name in route_params:
-                    raise TypeError(
+                    raise ValidationError(
                         f"user-defined route '{route}' for function '{func_name}' has parameter '{param_name}' of composite type: {param_type}"
                     )
 
                 if request_param is not None:
                     param = (param_name, param_type)
-                    raise TypeError(
+                    raise ValidationError(
                         f"only a single composite type is permitted in a signature but multiple composite types found in function '{func_name}': {request_param} and {param}"
                     )
 
                 # composite types are read from body
                 request_param = (param_name, param_type)
 
+        # check if function has explicit return type
+        if signature.return_annotation is inspect.Signature.empty:
+            raise ValidationError(
+                f"function '{func_name}' has no return type annotation"
+            )
+
         return_type = _get_annotation_type(signature.return_annotation, func_ref)
+
+        # operations that produce events are labeled as Generator[YieldType, SendType, ReturnType]
+        # where YieldType is the event type, SendType is None, and ReturnType is the immediate response type to the request
         if typing.get_origin(return_type) is collections.abc.Generator:
-            event_type, _, response_type = typing.get_args(return_type)
+            event_type, send_type, response_type = typing.get_args(return_type)
+            if send_type is not None:
+                raise ValidationError(
+                    f"function '{func_name}' has a return type Generator[Y,S,R] and therefore looks like an event but has an explicit send type"
+                )
         else:
             event_type = None
             response_type = return_type
@@ -299,12 +317,12 @@ def get_endpoint_operations(endpoint: Type) -> List[EndpointOperation]:
         )
 
     if not result:
-        raise TypeError(f"no eligible endpoint operations in type {endpoint}")
+        raise ValidationError(f"no eligible endpoint operations in type {endpoint}")
 
     return result
 
 
-def get_endpoint_events(endpoint: Type) -> Dict[str, Type]:
+def get_endpoint_events(endpoint: type) -> Dict[str, type]:
     results = {}
 
     for name, decl in typing.get_type_hints(endpoint).items():

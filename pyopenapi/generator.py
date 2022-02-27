@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Type, Union
+from typing import Dict, Union
 
 import docstring_parser
 from strong_typing import (
@@ -32,18 +32,18 @@ from .specification import (
 
 
 class Generator:
-    endpoint: Type
+    endpoint: type
     schema_generator: JsonSchemaGenerator
     schemas: Dict[str, Schema]
 
-    def __init__(self, endpoint: Type):
+    def __init__(self, endpoint: type):
         self.endpoint = endpoint
         self.schema_generator = JsonSchemaGenerator(
             SchemaOptions(definitions_path="#/components/schemas/")
         )
         self.schemas = {}
 
-    def _classdef_to_schema(self, typ: Type) -> Schema:
+    def _classdef_to_schema(self, typ: type) -> Schema:
         """
         Converts a type to a JSON schema.
         For nested types found in the type hierarchy, adds the type to the schema registry in the OpenAPI specification section `components`.
@@ -58,7 +58,7 @@ class Generator:
 
         return type_schema
 
-    def _classdef_to_ref(self, typ: Type) -> Union[Schema, SchemaRef]:
+    def _classdef_to_ref(self, typ: type) -> Union[Schema, SchemaRef]:
         """
         Converts a type to a JSON schema, and if possible, returns a schema reference.
         For composite types (such as classes), adds the type to the schema registry in the OpenAPI specification section `components`.
@@ -73,7 +73,7 @@ class Generator:
                 self.schemas[type_name] = type_schema
             return SchemaRef(type_name)
 
-    def _build_content(self, payload_type: Type) -> Dict[str, MediaType]:
+    def _build_content(self, payload_type: type) -> Dict[str, MediaType]:
         if is_generic_list(payload_type):
             media_type = "application/jsonl"
             item_type = unwrap_generic_list(payload_type)
@@ -83,7 +83,7 @@ class Generator:
 
         return {media_type: MediaType(schema=self._classdef_to_ref(item_type))}
 
-    def _build_response(self, response_type: Type, description: str) -> Response:
+    def _build_response(self, response_type: type, description: str) -> Response:
         if response_type is not None:
             return Response(
                 description=description, content=self._build_content(response_type)
@@ -215,7 +215,7 @@ class Generator:
             elif op.http_method is HTTPMethod.PATCH:
                 pathItem = PathItem(patch=operation)
             else:
-                raise NotImplementedError()
+                raise NotImplementedError(f"unknown HTTP method: {op.http_method}")
 
             route = op.get_route()
             if route in paths:
