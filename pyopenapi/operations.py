@@ -92,6 +92,7 @@ class EndpointOperation:
     event_type: type
     response_type: type
     http_method: HTTPMethod
+    public: bool
 
     def get_route(self) -> str:
         if self.route is not None:
@@ -185,6 +186,7 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
         [
             "create",
             "delete",
+            "do",
             "get",
             "post",
             "put",
@@ -195,12 +197,15 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
     ):
 
         # extract routing information from function metadata
-        route = None
-        route_params = None
         webmethod: Optional[WebMethod] = getattr(func_ref, "__webmethod__", None)
         if webmethod is not None:
             route = webmethod.route
             route_params = _get_route_parameters(route)
+            public = webmethod.public
+        else:
+            route = None
+            route_params = None
+            public = False
 
         # inspect function signature for path and query parameters, and request/response payload type
         signature = get_signature(func_ref)
@@ -313,6 +318,7 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
                 event_type=event_type,
                 response_type=response_type,
                 http_method=http_method,
+                public=public,
             )
         )
 

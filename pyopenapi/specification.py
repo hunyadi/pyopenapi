@@ -108,6 +108,7 @@ class Operation:
     parameters: Optional[List[Parameter]] = None
     requestBody: Optional[RequestBody] = None
     callbacks: Optional[Dict[str, "Callback"]] = None
+    security: Optional[List[SecurityRequirement]] = None
 
 
 @dataclass

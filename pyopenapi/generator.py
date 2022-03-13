@@ -202,6 +202,7 @@ class Generator:
                 requestBody=requestBody,
                 responses=responses,
                 callbacks=callbacks,
+                security=[] if op.public else None,
             )
 
             if op.http_method is HTTPMethod.GET:

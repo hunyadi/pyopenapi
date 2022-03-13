@@ -13,11 +13,11 @@ from .specification import Document
 T = TypeVar("T")
 
 
-def webmethod(route: str) -> Callable[[T], T]:
+def webmethod(route: str, public: bool = False) -> Callable[[T], T]:
     "Decorator that supplies additional metadata to an endpoint operation function."
 
     def wrap(cls: T) -> T:
-        cls.__webmethod__ = WebMethod(route=route)
+        cls.__webmethod__ = WebMethod(route=route, public=public)
         return cls
 
     return wrap
