@@ -2,7 +2,7 @@ import json
 import os.path
 from typing import Callable, TextIO, TypeVar
 
-from strong_typing import JsonType, object_to_json
+from strong_typing.schema import StrictJsonType, object_to_json
 
 from .generator import Generator
 from .metadata import WebMethod
@@ -30,7 +30,7 @@ class Specification:
         generator = Generator(endpoint)
         self.document = generator.generate(options)
 
-    def get_json(self) -> JsonType:
+    def get_json(self) -> StrictJsonType:
         """
         Returns the OpenAPI specification as a Python data type (e.g. `dict` for an object, `list` for an array).
 

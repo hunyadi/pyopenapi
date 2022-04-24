@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from typing import Callable, List
 
 from pyopenapi import webmethod
-from strong_typing import json_schema_type
+from strong_typing.schema import json_schema_type
 
 
 @json_schema_type(schema={"type": "string", "format": "uri", "pattern": "^https?://"})

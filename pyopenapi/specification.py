@@ -5,7 +5,7 @@ import enum
 from dataclasses import dataclass
 from typing import Any, ClassVar, Dict, List, Optional, Union
 
-from strong_typing import JsonType, Schema
+from strong_typing.schema import StrictJsonType, Schema
 
 URL = str
 
@@ -15,7 +15,7 @@ class Ref:
     ref_type: ClassVar[str]
     id: str
 
-    def to_json(self) -> JsonType:
+    def to_json(self) -> StrictJsonType:
         return {"$ref": f"#/components/{self.ref_type}/{self.id}"}
 
 

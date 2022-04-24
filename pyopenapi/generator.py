@@ -2,14 +2,18 @@ from dataclasses import dataclass
 from typing import Dict, Union
 
 import docstring_parser
-from strong_typing import (
-    JsonSchemaGenerator,
-    Schema,
-    SchemaOptions,
+from strong_typing.inspection import (
     is_generic_list,
     is_type_optional,
     unwrap_generic_list,
     unwrap_optional_type,
+)
+from strong_typing.name import python_type_to_name
+from strong_typing.schema import (
+    JsonSchemaGenerator,
+    Schema,
+    SchemaOptions,
+    get_schema_identifier,
 )
 
 from .operations import HTTPMethod, get_endpoint_events, get_endpoint_operations
@@ -65,13 +69,26 @@ class Generator:
         """
 
         type_schema = self._classdef_to_schema(typ)
-        type_name = getattr(typ, "__name__", None)
-        if typ is str or typ is int or typ is float or type_name is None:
+        if typ is str or typ is int or typ is float:
+            # represent simple types as themselves
             return type_schema
-        else:
-            if type_name not in self.schemas:
-                self.schemas[type_name] = type_schema
-            return SchemaRef(type_name)
+
+        type_name = get_schema_identifier(typ)
+        if type_name is not None:
+            return self._build_ref(type_name, type_schema)
+
+        try:
+            type_name = python_type_to_name(typ)
+            return self._build_ref(type_name, type_schema)
+        except TypeError:
+            pass
+
+        return type_schema
+
+    def _build_ref(self, type_name: str, type_schema: Schema) -> SchemaRef:
+        if type_name not in self.schemas:
+            self.schemas[type_name] = type_schema
+        return SchemaRef(type_name)
 
     def _build_content(self, payload_type: type) -> Dict[str, MediaType]:
         if is_generic_list(payload_type):

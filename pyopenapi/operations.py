@@ -7,7 +7,11 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
-from strong_typing import is_type_enum, is_type_optional, unwrap_optional_type
+from strong_typing.inspection import (
+    is_type_enum,
+    is_type_optional,
+    unwrap_optional_type,
+)
 
 from .metadata import WebMethod
 
