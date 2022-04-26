@@ -10,7 +10,7 @@ with open(os.path.join(ROOT, "README.md"), "r") as f:
 
 setup(
     name="python-openapi",
-    version="0.1.2",
+    version="0.1.3",
     description="Generate an OpenAPI specification from a Python class definition",
     long_description=README,
     long_description_content_type="text/markdown",
