@@ -27,8 +27,8 @@ class Specification:
     document: Document
 
     def __init__(self, endpoint: type, options: Options):
-        generator = Generator(endpoint)
-        self.document = generator.generate(options)
+        generator = Generator(endpoint, options)
+        self.document = generator.generate()
 
     def get_json(self) -> StrictJsonType:
         """

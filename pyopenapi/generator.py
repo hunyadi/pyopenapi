@@ -40,10 +40,14 @@ class Generator:
     schema_generator: JsonSchemaGenerator
     schemas: Dict[str, Schema]
 
-    def __init__(self, endpoint: type):
+    def __init__(self, endpoint: type, options: Options):
         self.endpoint = endpoint
+        self.options = options
         self.schema_generator = JsonSchemaGenerator(
-            SchemaOptions(definitions_path="#/components/schemas/")
+            SchemaOptions(
+                definitions_path="#/components/schemas/",
+                property_description_fun=options.property_description_fun,
+            )
         )
         self.schemas = {}
 
@@ -119,7 +123,7 @@ class Generator:
             ),
         )
 
-    def generate(self, options: Options) -> Document:
+    def generate(self) -> Document:
         paths = {}
         endpoint_classes = set()
         for op in get_endpoint_operations(self.endpoint):
@@ -266,8 +270,8 @@ class Generator:
 
         # types that are explicitly declared
         extra_tags: List[Tag] = []
-        if options.extra_types is not None:
-            for extra_type in options.extra_types:
+        if self.options.extra_types is not None:
+            for extra_type in self.options.extra_types:
                 ref = extra_type.__name__
                 type_schema = self._classdef_to_schema(extra_type)
                 self.schemas[ref] = type_schema
@@ -284,28 +288,28 @@ class Generator:
         if operation_tags:
             tag_groups.append(
                 TagGroup(
-                    name=options.map("Operations"),
+                    name=self.options.map("Operations"),
                     tags=sorted(tag.name for tag in operation_tags),
                 )
             )
         if type_tags:
             tag_groups.append(
                 TagGroup(
-                    name=options.map("Types"),
+                    name=self.options.map("Types"),
                     tags=sorted(tag.name for tag in type_tags),
                 )
             )
         if event_tags:
             tag_groups.append(
                 TagGroup(
-                    name=options.map("Events"),
+                    name=self.options.map("Events"),
                     tags=sorted(tag.name for tag in event_tags),
                 )
             )
         if extra_tags:
             tag_groups.append(
                 TagGroup(
-                    name=options.map("AdditionalTypes"),
+                    name=self.options.map("AdditionalTypes"),
                     tags=sorted(tag.name for tag in extra_tags),
                 )
             )
@@ -313,7 +317,7 @@ class Generator:
         # error response
         responses = {
             "BadRequest": Response(
-                description=options.map("BadRequest"),
+                description=self.options.map("BadRequest"),
                 content={
                     "application/json": MediaType(
                         schema=self._classdef_to_ref(ErrorResponse)
@@ -321,7 +325,7 @@ class Generator:
                 },
             ),
             "InternalServerError": Response(
-                description=options.map("InternalServerError"),
+                description=self.options.map("InternalServerError"),
                 content={
                     "application/json": MediaType(
                         schema=self._classdef_to_ref(ErrorResponse)
@@ -330,15 +334,15 @@ class Generator:
             ),
         }
 
-        if options.default_security_scheme:
-            securitySchemes = {"Default": options.default_security_scheme}
+        if self.options.default_security_scheme:
+            securitySchemes = {"Default": self.options.default_security_scheme}
         else:
             securitySchemes = None
 
         return Document(
             openapi="3.0.3",
-            info=options.info,
-            servers=[options.server],
+            info=self.options.info,
+            servers=[self.options.server],
             paths=paths,
             components=Components(
                 schemas=self.schemas,
