@@ -2,11 +2,12 @@
     "openapi": "3.0.3",
     "info": {
         "title": "Example specification",
-        "version": "1.0"
+        "version": "1.0",
+        "description": "# Introduction\n\nThis is introductory text for the API. You can write a Markdown document, save it in a separate file and import the file as a global description by passing it as a parameter to the initializer of the `Specification` class.\n"
     },
     "servers": [
         {
-            "url": "/api"
+            "url": "http://example.com/api"
         }
     ],
     "paths": {
@@ -18,14 +19,16 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "string",
-                                    "format": "uuid"
+                                    "$ref": "#/components/schemas/UUID"
                                 }
                             }
                         }
                     },
-                    "default": {
+                    "400": {
                         "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
                     }
                 },
                 "tags": [
@@ -62,8 +65,11 @@
                             }
                         }
                     },
-                    "default": {
+                    "400": {
                         "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
                     }
                 },
                 "tags": [
@@ -77,8 +83,7 @@
                         "description": "Unique identifier for the job to query.",
                         "required": true,
                         "schema": {
-                            "type": "string",
-                            "format": "uuid"
+                            "$ref": "#/components/schemas/UUID"
                         }
                     },
                     {
@@ -86,13 +91,7 @@
                         "in": "query",
                         "required": true,
                         "schema": {
-                            "type": "string",
-                            "enum": [
-                                "text/html",
-                                "text/plain",
-                                "text/markdown"
-                            ],
-                            "title": "An enumeration."
+                            "$ref": "#/components/schemas/Format"
                         }
                     }
                 ]
@@ -100,8 +99,11 @@
             "delete": {
                 "responses": {
                     "200": {},
-                    "default": {
+                    "400": {
                         "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
                     }
                 },
                 "tags": [
@@ -115,8 +117,7 @@
                         "description": "Unique identifier for the job to terminate.",
                         "required": true,
                         "schema": {
-                            "type": "string",
-                            "format": "uuid"
+                            "$ref": "#/components/schemas/UUID"
                         }
                     }
                 ]
@@ -124,8 +125,11 @@
             "patch": {
                 "responses": {
                     "200": {},
-                    "default": {
+                    "400": {
                         "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
                     }
                 },
                 "tags": [
@@ -140,8 +144,7 @@
                         "description": "Unique identifier for the job to update.",
                         "required": true,
                         "schema": {
-                            "type": "string",
-                            "format": "uuid"
+                            "$ref": "#/components/schemas/UUID"
                         }
                     }
                 ],
@@ -170,14 +173,18 @@
                             }
                         }
                     },
-                    "default": {
+                    "400": {
                         "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
                     }
                 },
                 "tags": [
                     "PeopleCatalog"
                 ],
                 "summary": "Find a person by their identifier.",
+                "description": "This operation has a custom route associated with it.",
                 "parameters": [
                     {
                         "name": "id",
@@ -202,14 +209,18 @@
                             }
                         }
                     },
-                    "default": {
+                    "400": {
                         "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
                     }
                 },
                 "tags": [
                     "PeopleCatalog"
                 ],
                 "summary": "Find a person by their name.",
+                "description": "This operation has a custom route associated with it.",
                 "parameters": [
                     {
                         "name": "family",
@@ -229,6 +240,64 @@
                     }
                 ]
             }
+        },
+        "/status/{job_id}": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StatusResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "$ref": "#/components/responses/BadRequest"
+                    },
+                    "500": {
+                        "$ref": "#/components/responses/InternalServerError"
+                    }
+                },
+                "tags": [
+                    "JobManagement"
+                ],
+                "summary": "Provides asynchronous status information about a job.",
+                "description": "This operation is defined with the special return type of `Generator`. `Generator[Y,S,R]` has the yield type\n`Y`, the send type `S` of `None`, and the return type `R`. `R` is the response type immediately returned by\na call to this operation. However, the client will receive out-of-band events of type `Y` over a different\nchannel, e.g. a websocket connection or an HTTP callback.",
+                "parameters": [
+                    {
+                        "name": "job_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/components/schemas/UUID"
+                        }
+                    }
+                ],
+                "callbacks": {
+                    "get_status_callback": {
+                        "{$request.query.callback}": {
+                            "post": {
+                                "responses": {
+                                    "200": {
+                                        "description": "OK"
+                                    }
+                                },
+                                "requestBody": {
+                                    "content": {
+                                        "application/json": {
+                                            "schema": {
+                                                "$ref": "#/components/schemas/StatusEvent"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -238,6 +307,19 @@
                 "format": "uri",
                 "pattern": "^https?://",
                 "title": "A Uniform Resource Locator (URL)."
+            },
+            "UUID": {
+                "type": "string",
+                "format": "uuid"
+            },
+            "Format": {
+                "type": "string",
+                "enum": [
+                    "text/html",
+                    "text/plain",
+                    "text/markdown"
+                ],
+                "title": "Possible representation formats."
             },
             "Description": {
                 "type": "object",
@@ -268,7 +350,8 @@
                 "properties": {
                     "id": {
                         "type": "string",
-                        "format": "uuid"
+                        "format": "uuid",
+                        "title": "Job identifier."
                     },
                     "status": {
                         "type": "string",
@@ -277,14 +360,16 @@
                             "running",
                             "stopped"
                         ],
-                        "title": "An enumeration."
+                        "title": "Current job status."
                     },
                     "started_at": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "title": "The timestamp (in UTC) when the job was started."
                     },
                     "description": {
-                        "$ref": "#/components/schemas/Description"
+                        "$ref": "#/components/schemas/Description",
+                        "title": "Additional information associated with the job."
                     }
                 },
                 "additionalProperties": false,
@@ -294,16 +379,18 @@
                     "started_at",
                     "description"
                 ],
-                "title": "Job(id: uuid.UUID, status: endpoint.Status, started_at: datetime.datetime, description: endpoint.Description)"
+                "title": "A unit of execution."
             },
             "Person": {
                 "type": "object",
                 "properties": {
                     "family_name": {
-                        "type": "string"
+                        "type": "string",
+                        "title": "The person's family name (typically last name)."
                     },
                     "given_name": {
-                        "type": "string"
+                        "type": "string",
+                        "title": "The person's given name (typically first name)."
                     }
                 },
                 "additionalProperties": false,
@@ -311,19 +398,19 @@
                     "family_name",
                     "given_name"
                 ],
-                "title": "Person(family_name: str, given_name: str)"
+                "title": "Represents a real person."
             },
-            "EventObject": {
+            "StatusResponse": {
                 "type": "object",
                 "properties": {
                     "id": {
                         "type": "string",
                         "format": "uuid",
-                        "title": "Uniquely identifies the job which the event corresponds to."
+                        "title": "Uniquely identifies the job which the response corresponds to."
                     },
                     "description": {
                         "type": "string",
-                        "title": "Textual description of the event."
+                        "title": "Textual description associated with the response."
                     }
                 },
                 "additionalProperties": false,
@@ -331,44 +418,147 @@
                     "id",
                     "description"
                 ],
-                "title": "Triggered when an out-of-band event takes place."
+                "title": "Triggered synchronously as the immediate response to an asynchronous operation.",
+                "description": "This response serves as an acknowledgment, and may be followed by several out-of-band events, transmitted e.g. over a websocket connection."
+            },
+            "StatusEvent": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Uniquely identifies the job which the event corresponds to."
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "created",
+                            "running",
+                            "stopped"
+                        ],
+                        "title": "The current status of the job."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "id",
+                    "status"
+                ],
+                "title": "Triggered when an out-of-band event takes place.",
+                "description": "This message is typically transmitted in a separate channel, e.g. over a websocket connection."
+            },
+            "DataEvent": {
+                "type": "object",
+                "properties": {
+                    "data": {
+                        "type": "string",
+                        "contentEncoding": "base64"
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "data"
+                ]
+            },
+            "ExampleType": {
+                "type": "object",
+                "properties": {
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Uniquely identifies this instance."
+                    },
+                    "count": {
+                        "type": "integer",
+                        "title": "A sample property of an integer type."
+                    },
+                    "value": {
+                        "type": "string",
+                        "title": "A sample property of a string type."
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "A timestamp. The date type is identified with OpenAPI's format string."
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "A timestamp."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "uuid",
+                    "count",
+                    "value",
+                    "created_at",
+                    "updated_at"
+                ],
+                "title": "An example type with a few properties."
+            },
+            "UnreferencedType": {
+                "type": "object",
+                "title": "A type not referenced from anywhere else but passed as an additional type to the initializer of the class `Specification`."
+            },
+            "ErrorResponse": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "object",
+                        "properties": {
+                            "id": {
+                                "type": "string",
+                                "title": "A machine-processable identifier for the error."
+                            },
+                            "message": {
+                                "type": "string",
+                                "title": "A human-readable description for the error."
+                            }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                            "id",
+                            "message"
+                        ],
+                        "title": "Details related to the error."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "error"
+                ],
+                "title": "Encapsulates an error response from an endpoint."
             }
         },
         "responses": {
             "BadRequest": {
+                "description": "The server cannot process the request due a client error (e.g. malformed request syntax).",
                 "content": {
                     "application/json": {
                         "schema": {
-                            "type": "object",
-                            "properties": {
-                                "error": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "string",
-                                            "title": "A machine-processable identifier for the error."
-                                        },
-                                        "message": {
-                                            "type": "string",
-                                            "title": "A human-readable description for the error."
-                                        }
-                                    },
-                                    "additionalProperties": false,
-                                    "required": [
-                                        "id",
-                                        "message"
-                                    ],
-                                    "title": "Details related to the error."
-                                }
-                            },
-                            "additionalProperties": false,
-                            "required": [
-                                "error"
-                            ],
-                            "title": "Encapsulates an error response from an endpoint."
+                            "$ref": "#/components/schemas/ErrorResponse"
                         }
                     }
                 }
+            },
+            "InternalServerError": {
+                "description": "The server encountered an unexpected error when processing the request.",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "Default": {
+                "type": "http",
+                "description": "Authenticates a request by verifying a JWT (JSON Web Token) passed in the `Authorization` HTTP header.",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
             }
         }
     },
@@ -388,52 +578,82 @@
             "x-displayName": "Job management."
         },
         {
-            "name": "Job",
-            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/Job\" />"
-        },
-        {
-            "name": "EventObject",
-            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/EventObject\" />"
-        },
-        {
             "name": "URL",
-            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/URL\" />"
+            "description": "A Uniform Resource Locator (URL).\n\n<SchemaDefinition schemaRef=\"#/components/schemas/URL\" />"
+        },
+        {
+            "name": "UUID",
+            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/UUID\" />"
+        },
+        {
+            "name": "Format",
+            "description": "Possible representation formats.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/Format\" />"
         },
         {
             "name": "Description",
-            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/Description\" />"
+            "description": "A textual description as plain text or a well-known markup format.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/Description\" />"
         },
         {
             "name": "Job",
-            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/Job\" />"
+            "description": "A unit of execution.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/Job\" />"
         },
         {
             "name": "Person",
-            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/Person\" />"
+            "description": "Represents a real person.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/Person\" />"
+        },
+        {
+            "name": "StatusResponse",
+            "description": "Triggered synchronously as the immediate response to an asynchronous operation.\n\nThis response serves as an acknowledgment, and may be followed by several out-of-band events, transmitted e.g. over a websocket connection.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/StatusResponse\" />"
+        },
+        {
+            "name": "StatusEvent",
+            "description": "Triggered when an out-of-band event takes place.\n\nThis message is typically transmitted in a separate channel, e.g. over a websocket connection.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/StatusEvent\" />"
+        },
+        {
+            "name": "DataEvent",
+            "description": "<SchemaDefinition schemaRef=\"#/components/schemas/DataEvent\" />"
+        },
+        {
+            "name": "ExampleType",
+            "description": "An example type with a few properties.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/ExampleType\" />"
+        },
+        {
+            "name": "UnreferencedType",
+            "description": "A type not referenced from anywhere else but passed as an additional type to the initializer of the class `Specification`.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/UnreferencedType\" />"
         }
     ],
     "x-tagGroups": [
         {
             "name": "Operations",
             "tags": [
-                "PeopleCatalog",
-                "JobManagement"
-            ]
-        },
-        {
-            "name": "Events",
-            "tags": [
-                "Job",
-                "EventObject"
+                "JobManagement",
+                "PeopleCatalog"
             ]
         },
         {
             "name": "Types",
             "tags": [
-                "URL",
                 "Description",
+                "Format",
                 "Job",
-                "Person"
+                "Person",
+                "StatusEvent",
+                "StatusResponse",
+                "URL",
+                "UUID"
+            ]
+        },
+        {
+            "name": "Events",
+            "tags": [
+                "DataEvent"
+            ]
+        },
+        {
+            "name": "Additional types",
+            "tags": [
+                "ExampleType",
+                "UnreferencedType"
             ]
         }
     ]

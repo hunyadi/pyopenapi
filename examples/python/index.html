@@ -75,16 +75,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span> <span class="nn">enum</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">from</span> <span class="nn">pyopenapi</span> <span class="kn">import</span> <span class="n">webmethod</span>
-<span class="kn">from</span> <span class="nn">strong_typing</span> <span class="kn">import</span> <span class="n">json_schema_type</span>
+<span class="kn">from</span> <span class="nn">strong_typing.schema</span> <span class="kn">import</span> <span class="n">json_schema_type</span>
 
 
 <span class="nd">@json_schema_type</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uri&quot;</span><span class="p">,</span> <span class="s2">&quot;pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;^https?://&quot;</span><span class="p">})</span>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">URL</span><span class="p">:</span>
-    <span class="s2">&quot;A Uniform Resource Locator (URL).&quot;</span>
+    <span class="sd">&quot;&quot;&quot;A Uniform Resource Locator (URL).</span>
+
+<span class="sd">    :param url: The URL encapsulated in this object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
 
@@ -93,12 +96,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 <span class="k">class</span> <span class="nc">Status</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="s2">&quot;Status of a job.&quot;</span>
+
     <span class="n">Created</span> <span class="o">=</span> <span class="s2">&quot;created&quot;</span>
     <span class="n">Running</span> <span class="o">=</span> <span class="s2">&quot;running&quot;</span>
     <span class="n">Stopped</span> <span class="o">=</span> <span class="s2">&quot;stopped&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="s2">&quot;Possible representation formats.&quot;</span>
+
     <span class="n">HTML</span> <span class="o">=</span> <span class="s2">&quot;text/html&quot;</span>
     <span class="n">Plain</span> <span class="o">=</span> <span class="s2">&quot;text/plain&quot;</span>
     <span class="n">Markdown</span> <span class="o">=</span> <span class="s2">&quot;text/markdown&quot;</span>
@@ -121,6 +128,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">Job</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A unit of execution.</span>
+
+<span class="sd">    :param id: Job identifier.</span>
+<span class="sd">    :param status: Current job status.</span>
+<span class="sd">    :param started_at: The timestamp (in UTC) when the job was started.</span>
+<span class="sd">    :param description: Additional information associated with the job.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="nb">id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
     <span class="n">status</span><span class="p">:</span> <span class="n">Status</span>
     <span class="n">started_at</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
@@ -129,12 +145,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">EventObject</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">StatusResponse</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Triggered when an out-of-band event takes place.</span>
+<span class="sd">    Triggered synchronously as the immediate response to an asynchronous operation.</span>
 
-<span class="sd">    :param id: Uniquely identifies the job which the event corresponds to.</span>
-<span class="sd">    :param description: Textual description of the event.</span>
+<span class="sd">    This response serves as an acknowledgment, and may be followed by several out-of-band events, transmitted e.g. over a websocket connection.</span>
+
+<span class="sd">    :param id: Uniquely identifies the job which the response corresponds to.</span>
+<span class="sd">    :param description: Textual description associated with the response.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nb">id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
@@ -143,7 +161,35 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">StatusEvent</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Triggered when an out-of-band event takes place.</span>
+
+<span class="sd">    This message is typically transmitted in a separate channel, e.g. over a websocket connection.</span>
+
+<span class="sd">    :param id: Uniquely identifies the job which the event corresponds to.</span>
+<span class="sd">    :param status: The current status of the job.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
+    <span class="n">status</span><span class="p">:</span> <span class="n">Status</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">DataEvent</span><span class="p">:</span>
+    <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span>
+
+
+<span class="nd">@json_schema_type</span>
+<span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">Person</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a real person.</span>
+
+<span class="sd">    :param family_name: The person&#39;s family name (typically last name).</span>
+<span class="sd">    :param given_name: The person&#39;s given name (typically first name).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">family_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">given_name</span><span class="p">:</span> <span class="nb">str</span>
 
@@ -192,9 +238,20 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
-    <span class="c1"># a list of events triggered by the endpoint asynchronously</span>
-    <span class="n">job_event</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Job</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
-    <span class="n">data_event</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">EventObject</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="o">/</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">StatusEvent</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">StatusResponse</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides asynchronous status information about a job.</span>
+
+<span class="sd">        This operation is defined with the special return type of `Generator`. `Generator[Y,S,R]` has the yield type</span>
+<span class="sd">        `Y`, the send type `S` of `None`, and the return type `R`. `R` is the response type immediately returned by</span>
+<span class="sd">        a call to this operation. However, the client will receive out-of-band events of type `Y` over a different</span>
+<span class="sd">        channel, e.g. a websocket connection or an HTTP callback.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c1"># a list of out-of-band events triggered by the endpoint asynchronously</span>
+    <span class="n">data_event</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DataEvent</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
 
 
 <span class="k">class</span> <span class="nc">PeopleCatalog</span><span class="p">:</span>
@@ -206,6 +263,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="k">def</span> <span class="nf">get_person_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find a person by their identifier.</span>
+
+<span class="sd">        This operation has a custom route associated with it.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
@@ -213,6 +272,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="k">def</span> <span class="nf">get_person_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">given</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find a person by their name.</span>
+
+<span class="sd">        This operation has a custom route associated with it.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 

@@ -75,11 +75,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="nt">&quot;openapi&quot;</span><span class="p">:</span> <span class="s2">&quot;3.0.3&quot;</span><span class="p">,</span>
     <span class="nt">&quot;info&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Example specification&quot;</span><span class="p">,</span>
-        <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span>
+        <span class="nt">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+        <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;# Introduction\n\nThis is introductory text for the API. You can write a Markdown document, save it in a separate file and import the file as a global description by passing it as a parameter to the initializer of the `Specification` class.\n&quot;</span>
     <span class="p">},</span>
     <span class="nt">&quot;servers&quot;</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
-            <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;/api&quot;</span>
+            <span class="nt">&quot;url&quot;</span><span class="p">:</span> <span class="s2">&quot;http://example.com/api&quot;</span>
         <span class="p">}</span>
     <span class="p">],</span>
     <span class="nt">&quot;paths&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -91,14 +92,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
                             <span class="nt">&quot;application/json&quot;</span><span class="p">:</span> <span class="p">{</span>
                                 <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                                    <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span>
+                                    <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/UUID&quot;</span>
                                 <span class="p">}</span>
                             <span class="p">}</span>
                         <span class="p">}</span>
                     <span class="p">},</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;400&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/BadRequest&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;500&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/InternalServerError&quot;</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
@@ -135,8 +138,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                             <span class="p">}</span>
                         <span class="p">}</span>
                     <span class="p">},</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;400&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/BadRequest&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;500&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/InternalServerError&quot;</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
@@ -150,8 +156,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Unique identifier for the job to query.&quot;</span><span class="p">,</span>
                         <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
                         <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                            <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span>
+                            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/UUID&quot;</span>
                         <span class="p">}</span>
                     <span class="p">},</span>
                     <span class="p">{</span>
@@ -159,13 +164,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         <span class="nt">&quot;in&quot;</span><span class="p">:</span> <span class="s2">&quot;query&quot;</span><span class="p">,</span>
                         <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
                         <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                            <span class="nt">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span>
-                                <span class="s2">&quot;text/html&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
-                                <span class="s2">&quot;text/markdown&quot;</span>
-                            <span class="p">],</span>
-                            <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;An enumeration.&quot;</span>
+                            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/Format&quot;</span>
                         <span class="p">}</span>
                     <span class="p">}</span>
                 <span class="p">]</span>
@@ -173,8 +172,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <span class="nt">&quot;delete&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="nt">&quot;responses&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="nt">&quot;200&quot;</span><span class="p">:</span> <span class="p">{},</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;400&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/BadRequest&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;500&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/InternalServerError&quot;</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
@@ -188,8 +190,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Unique identifier for the job to terminate.&quot;</span><span class="p">,</span>
                         <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
                         <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                            <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span>
+                            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/UUID&quot;</span>
                         <span class="p">}</span>
                     <span class="p">}</span>
                 <span class="p">]</span>
@@ -197,8 +198,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <span class="nt">&quot;patch&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="nt">&quot;responses&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="nt">&quot;200&quot;</span><span class="p">:</span> <span class="p">{},</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;400&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/BadRequest&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;500&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/InternalServerError&quot;</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
@@ -213,8 +217,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                         <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Unique identifier for the job to update.&quot;</span><span class="p">,</span>
                         <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
                         <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                            <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span>
+                            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/UUID&quot;</span>
                         <span class="p">}</span>
                     <span class="p">}</span>
                 <span class="p">],</span>
@@ -243,14 +246,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                             <span class="p">}</span>
                         <span class="p">}</span>
                     <span class="p">},</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;400&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/BadRequest&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;500&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/InternalServerError&quot;</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
                     <span class="s2">&quot;PeopleCatalog&quot;</span>
                 <span class="p">],</span>
                 <span class="nt">&quot;summary&quot;</span><span class="p">:</span> <span class="s2">&quot;Find a person by their identifier.&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;This operation has a custom route associated with it.&quot;</span><span class="p">,</span>
                 <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">[</span>
                     <span class="p">{</span>
                         <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span>
@@ -275,14 +282,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                             <span class="p">}</span>
                         <span class="p">}</span>
                     <span class="p">},</span>
-                    <span class="nt">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;400&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/BadRequest&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;500&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/InternalServerError&quot;</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
                     <span class="s2">&quot;PeopleCatalog&quot;</span>
                 <span class="p">],</span>
                 <span class="nt">&quot;summary&quot;</span><span class="p">:</span> <span class="s2">&quot;Find a person by their name.&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;This operation has a custom route associated with it.&quot;</span><span class="p">,</span>
                 <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">[</span>
                     <span class="p">{</span>
                         <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;family&quot;</span><span class="p">,</span>
@@ -302,6 +313,64 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     <span class="p">}</span>
                 <span class="p">]</span>
             <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;/status/{job_id}&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;get&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;responses&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;200&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;application/json&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/StatusResponse&quot;</span>
+                                <span class="p">}</span>
+                            <span class="p">}</span>
+                        <span class="p">}</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;400&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/BadRequest&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;500&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/responses/InternalServerError&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;JobManagement&quot;</span>
+                <span class="p">],</span>
+                <span class="nt">&quot;summary&quot;</span><span class="p">:</span> <span class="s2">&quot;Provides asynchronous status information about a job.&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;This operation is defined with the special return type of `Generator`. `Generator[Y,S,R]` has the yield type\n`Y`, the send type `S` of `None`, and the return type `R`. `R` is the response type immediately returned by\na call to this operation. However, the client will receive out-of-band events of type `Y` over a different\nchannel, e.g. a websocket connection or an HTTP callback.&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;parameters&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                        <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;job_id&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;in&quot;</span><span class="p">:</span> <span class="s2">&quot;path&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+                        <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/UUID&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">],</span>
+                <span class="nt">&quot;callbacks&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;get_status_callback&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;{$request.query.callback}&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;post&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="nt">&quot;responses&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="nt">&quot;200&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;OK&quot;</span>
+                                    <span class="p">}</span>
+                                <span class="p">},</span>
+                                <span class="nt">&quot;requestBody&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="nt">&quot;application/json&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                            <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                                <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/StatusEvent&quot;</span>
+                                            <span class="p">}</span>
+                                        <span class="p">}</span>
+                                    <span class="p">}</span>
+                                <span class="p">}</span>
+                            <span class="p">}</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">},</span>
     <span class="nt">&quot;components&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -311,6 +380,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uri&quot;</span><span class="p">,</span>
                 <span class="nt">&quot;pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;^https?://&quot;</span><span class="p">,</span>
                 <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A Uniform Resource Locator (URL).&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;UUID&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;Format&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;text/html&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;text/plain&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;text/markdown&quot;</span>
+                <span class="p">],</span>
+                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Possible representation formats.&quot;</span>
             <span class="p">},</span>
             <span class="nt">&quot;Description&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
@@ -341,7 +423,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                 <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                        <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span>
+                        <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Job identifier.&quot;</span>
                     <span class="p">},</span>
                     <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
@@ -350,14 +433,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                             <span class="s2">&quot;running&quot;</span><span class="p">,</span>
                             <span class="s2">&quot;stopped&quot;</span>
                         <span class="p">],</span>
-                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;An enumeration.&quot;</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Current job status.&quot;</span>
                     <span class="p">},</span>
                     <span class="nt">&quot;started_at&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                        <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;date-time&quot;</span>
+                        <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;date-time&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;The timestamp (in UTC) when the job was started.&quot;</span>
                     <span class="p">},</span>
                     <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/Description&quot;</span>
+                        <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/Description&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Additional information associated with the job.&quot;</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
@@ -367,16 +452,18 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     <span class="s2">&quot;started_at&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;description&quot;</span>
                 <span class="p">],</span>
-                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Job(id: uuid.UUID, status: endpoint.Status, started_at: datetime.datetime, description: endpoint.Description)&quot;</span>
+                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A unit of execution.&quot;</span>
             <span class="p">},</span>
             <span class="nt">&quot;Person&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
                 <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="nt">&quot;family_name&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;The person&#39;s family name (typically last name).&quot;</span>
                     <span class="p">},</span>
                     <span class="nt">&quot;given_name&quot;</span><span class="p">:</span> <span class="p">{</span>
-                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;The person&#39;s given name (typically first name).&quot;</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
@@ -384,19 +471,19 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     <span class="s2">&quot;family_name&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;given_name&quot;</span>
                 <span class="p">],</span>
-                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Person(family_name: str, given_name: str)&quot;</span>
+                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Represents a real person.&quot;</span>
             <span class="p">},</span>
-            <span class="nt">&quot;EventObject&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;StatusResponse&quot;</span><span class="p">:</span> <span class="p">{</span>
                 <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
                 <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
                         <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
-                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Uniquely identifies the job which the event corresponds to.&quot;</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Uniquely identifies the job which the response corresponds to.&quot;</span>
                     <span class="p">},</span>
                     <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Textual description of the event.&quot;</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Textual description associated with the response.&quot;</span>
                     <span class="p">}</span>
                 <span class="p">},</span>
                 <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
@@ -404,44 +491,147 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
                     <span class="s2">&quot;id&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;description&quot;</span>
                 <span class="p">],</span>
-                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Triggered when an out-of-band event takes place.&quot;</span>
+                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Triggered synchronously as the immediate response to an asynchronous operation.&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;This response serves as an acknowledgment, and may be followed by several out-of-band events, transmitted e.g. over a websocket connection.&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;StatusEvent&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Uniquely identifies the job which the event corresponds to.&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;status&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span>
+                            <span class="s2">&quot;created&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;running&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;stopped&quot;</span>
+                        <span class="p">],</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;The current status of the job.&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;status&quot;</span>
+                <span class="p">],</span>
+                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Triggered when an out-of-band event takes place.&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;This message is typically transmitted in a separate channel, e.g. over a websocket connection.&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;DataEvent&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;data&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;contentEncoding&quot;</span><span class="p">:</span> <span class="s2">&quot;base64&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;data&quot;</span>
+                <span class="p">]</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;ExampleType&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;uuid&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Uniquely identifies this instance.&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;count&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A sample property of an integer type.&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;value&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A sample property of a string type.&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;created_at&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;date-time&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A timestamp. The date type is identified with OpenAPI&#39;s format string.&quot;</span>
+                    <span class="p">},</span>
+                    <span class="nt">&quot;updated_at&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;date-time&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A timestamp.&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;uuid&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;count&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;value&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;created_at&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;updated_at&quot;</span>
+                <span class="p">],</span>
+                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;An example type with a few properties.&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;UnreferencedType&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A type not referenced from anywhere else but passed as an additional type to the initializer of the class `Specification`.&quot;</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;ErrorResponse&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                        <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A machine-processable identifier for the error.&quot;</span>
+                            <span class="p">},</span>
+                            <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A human-readable description for the error.&quot;</span>
+                            <span class="p">}</span>
+                        <span class="p">},</span>
+                        <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                        <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
+                            <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;message&quot;</span>
+                        <span class="p">],</span>
+                        <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Details related to the error.&quot;</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
+                <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;error&quot;</span>
+                <span class="p">],</span>
+                <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Encapsulates an error response from an endpoint.&quot;</span>
             <span class="p">}</span>
         <span class="p">},</span>
         <span class="nt">&quot;responses&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="nt">&quot;BadRequest&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The server cannot process the request due a client error (e.g. malformed request syntax).&quot;</span><span class="p">,</span>
                 <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="nt">&quot;application/json&quot;</span><span class="p">:</span> <span class="p">{</span>
                         <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
-                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-                            <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                <span class="nt">&quot;error&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                    <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
-                                    <span class="nt">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                        <span class="nt">&quot;id&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                                            <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A machine-processable identifier for the error.&quot;</span>
-                                        <span class="p">},</span>
-                                        <span class="nt">&quot;message&quot;</span><span class="p">:</span> <span class="p">{</span>
-                                            <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
-                                            <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;A human-readable description for the error.&quot;</span>
-                                        <span class="p">}</span>
-                                    <span class="p">},</span>
-                                    <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-                                    <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
-                                        <span class="s2">&quot;id&quot;</span><span class="p">,</span>
-                                        <span class="s2">&quot;message&quot;</span>
-                                    <span class="p">],</span>
-                                    <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Details related to the error.&quot;</span>
-                                <span class="p">}</span>
-                            <span class="p">},</span>
-                            <span class="nt">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span>
-                            <span class="nt">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span>
-                                <span class="s2">&quot;error&quot;</span>
-                            <span class="p">],</span>
-                            <span class="nt">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Encapsulates an error response from an endpoint.&quot;</span>
+                            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/ErrorResponse&quot;</span>
                         <span class="p">}</span>
                     <span class="p">}</span>
                 <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="nt">&quot;InternalServerError&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;The server encountered an unexpected error when processing the request.&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;content&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="nt">&quot;application/json&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="nt">&quot;schema&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="nt">&quot;$ref&quot;</span><span class="p">:</span> <span class="s2">&quot;#/components/schemas/ErrorResponse&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="nt">&quot;securitySchemes&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="nt">&quot;Default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="nt">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;http&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Authenticates a request by verifying a JWT (JSON Web Token) passed in the `Authorization` HTTP header.&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;scheme&quot;</span><span class="p">:</span> <span class="s2">&quot;bearer&quot;</span><span class="p">,</span>
+                <span class="nt">&quot;bearerFormat&quot;</span><span class="p">:</span> <span class="s2">&quot;JWT&quot;</span>
             <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">},</span>
@@ -461,52 +651,82 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <span class="nt">&quot;x-displayName&quot;</span><span class="p">:</span> <span class="s2">&quot;Job management.&quot;</span>
         <span class="p">},</span>
         <span class="p">{</span>
-            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Job&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/Job\&quot; /&gt;&quot;</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;EventObject&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/EventObject\&quot; /&gt;&quot;</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
             <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;URL&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/URL\&quot; /&gt;&quot;</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A Uniform Resource Locator (URL).\n\n&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/URL\&quot; /&gt;&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;UUID&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/UUID\&quot; /&gt;&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Format&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Possible representation formats.\n\n&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/Format\&quot; /&gt;&quot;</span>
         <span class="p">},</span>
         <span class="p">{</span>
             <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Description&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/Description\&quot; /&gt;&quot;</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A textual description as plain text or a well-known markup format.\n\n&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/Description\&quot; /&gt;&quot;</span>
         <span class="p">},</span>
         <span class="p">{</span>
             <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Job&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/Job\&quot; /&gt;&quot;</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A unit of execution.\n\n&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/Job\&quot; /&gt;&quot;</span>
         <span class="p">},</span>
         <span class="p">{</span>
             <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Person&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/Person\&quot; /&gt;&quot;</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Represents a real person.\n\n&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/Person\&quot; /&gt;&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;StatusResponse&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Triggered synchronously as the immediate response to an asynchronous operation.\n\nThis response serves as an acknowledgment, and may be followed by several out-of-band events, transmitted e.g. over a websocket connection.\n\n&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/StatusResponse\&quot; /&gt;&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;StatusEvent&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Triggered when an out-of-band event takes place.\n\nThis message is typically transmitted in a separate channel, e.g. over a websocket connection.\n\n&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/StatusEvent\&quot; /&gt;&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;DataEvent&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/DataEvent\&quot; /&gt;&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;ExampleType&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;An example type with a few properties.\n\n&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/ExampleType\&quot; /&gt;&quot;</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;UnreferencedType&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;A type not referenced from anywhere else but passed as an additional type to the initializer of the class `Specification`.\n\n&lt;SchemaDefinition schemaRef=\&quot;#/components/schemas/UnreferencedType\&quot; /&gt;&quot;</span>
         <span class="p">}</span>
     <span class="p">],</span>
     <span class="nt">&quot;x-tagGroups&quot;</span><span class="p">:</span> <span class="p">[</span>
         <span class="p">{</span>
             <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Operations&quot;</span><span class="p">,</span>
             <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s2">&quot;PeopleCatalog&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;JobManagement&quot;</span>
-            <span class="p">]</span>
-        <span class="p">},</span>
-        <span class="p">{</span>
-            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Events&quot;</span><span class="p">,</span>
-            <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s2">&quot;Job&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;EventObject&quot;</span>
+                <span class="s2">&quot;JobManagement&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;PeopleCatalog&quot;</span>
             <span class="p">]</span>
         <span class="p">},</span>
         <span class="p">{</span>
             <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Types&quot;</span><span class="p">,</span>
             <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
-                <span class="s2">&quot;URL&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;Description&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Format&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;Job&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Person&quot;</span>
+                <span class="s2">&quot;Person&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;StatusEvent&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;StatusResponse&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;URL&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;UUID&quot;</span>
+            <span class="p">]</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Events&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;DataEvent&quot;</span>
+            <span class="p">]</span>
+        <span class="p">},</span>
+        <span class="p">{</span>
+            <span class="nt">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Additional types&quot;</span><span class="p">,</span>
+            <span class="nt">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;ExampleType&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;UnreferencedType&quot;</span>
             <span class="p">]</span>
         <span class="p">}</span>
     <span class="p">]</span>

@@ -77,27 +77,26 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <span class="nt">content</span><span class="p">:</span>
         <span class="nt">application/json</span><span class="p">:</span>
           <span class="nt">schema</span><span class="p">:</span>
-            <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-            <span class="nt">properties</span><span class="p">:</span>
-              <span class="nt">error</span><span class="p">:</span>
-                <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
-                <span class="nt">properties</span><span class="p">:</span>
-                  <span class="nt">id</span><span class="p">:</span>
-                    <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A machine-processable identifier for the error.</span>
-                    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-                  <span class="nt">message</span><span class="p">:</span>
-                    <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A human-readable description for the error.</span>
-                    <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-                <span class="nt">required</span><span class="p">:</span>
-                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
-                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">message</span>
-                <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Details related to the error.</span>
-                <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-            <span class="nt">required</span><span class="p">:</span>
-            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">error</span>
-            <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Encapsulates an error response from an endpoint.</span>
-            <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+            <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/ErrorResponse&#39;</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The server cannot process the request due a client error (e.g.</span>
+        <span class="l l-Scalar l-Scalar-Plain">malformed request syntax).</span>
+    <span class="nt">InternalServerError</span><span class="p">:</span>
+      <span class="nt">content</span><span class="p">:</span>
+        <span class="nt">application/json</span><span class="p">:</span>
+          <span class="nt">schema</span><span class="p">:</span>
+            <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/ErrorResponse&#39;</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The server encountered an unexpected error when processing the</span>
+        <span class="l l-Scalar l-Scalar-Plain">request.</span>
   <span class="nt">schemas</span><span class="p">:</span>
+    <span class="nt">DataEvent</span><span class="p">:</span>
+      <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">data</span><span class="p">:</span>
+          <span class="nt">contentEncoding</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">base64</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+      <span class="nt">required</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">data</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="nt">Description</span><span class="p">:</span>
       <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
       <span class="nt">properties</span><span class="p">:</span>
@@ -116,65 +115,172 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">text</span>
       <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A textual description as plain text or a well-known markup format.</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
-    <span class="nt">EventObject</span><span class="p">:</span>
+    <span class="nt">ErrorResponse</span><span class="p">:</span>
       <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
       <span class="nt">properties</span><span class="p">:</span>
-        <span class="nt">description</span><span class="p">:</span>
-          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Textual description of the event.</span>
+        <span class="nt">error</span><span class="p">:</span>
+          <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+          <span class="nt">properties</span><span class="p">:</span>
+            <span class="nt">id</span><span class="p">:</span>
+              <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A machine-processable identifier for the error.</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+            <span class="nt">message</span><span class="p">:</span>
+              <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A human-readable description for the error.</span>
+              <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">required</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">message</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Details related to the error.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+      <span class="nt">required</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">error</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Encapsulates an error response from an endpoint.</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="nt">ExampleType</span><span class="p">:</span>
+      <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">count</span><span class="p">:</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A sample property of an integer type.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">integer</span>
+        <span class="nt">created_at</span><span class="p">:</span>
+          <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">date-time</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A timestamp. The date type is identified with OpenAPI&#39;s format string.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
-        <span class="nt">id</span><span class="p">:</span>
+        <span class="nt">updated_at</span><span class="p">:</span>
+          <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">date-time</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A timestamp.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">uuid</span><span class="p">:</span>
           <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
-          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Uniquely identifies the job which the event corresponds to.</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Uniquely identifies this instance.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">value</span><span class="p">:</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A sample property of a string type.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
       <span class="nt">required</span><span class="p">:</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
-      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">description</span>
-      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Triggered when an out-of-band event takes place.</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">count</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">value</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">created_at</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">updated_at</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">An example type with a few properties.</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="nt">Format</span><span class="p">:</span>
+      <span class="nt">enum</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">text/html</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">text/plain</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">text/markdown</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Possible representation formats.</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
     <span class="nt">Job</span><span class="p">:</span>
       <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
       <span class="nt">properties</span><span class="p">:</span>
         <span class="nt">description</span><span class="p">:</span>
           <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/Description&#39;</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Additional information associated with the job.</span>
         <span class="nt">id</span><span class="p">:</span>
           <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Job identifier.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">started_at</span><span class="p">:</span>
           <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">date-time</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The timestamp (in UTC) when the job was started.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">status</span><span class="p">:</span>
           <span class="nt">enum</span><span class="p">:</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">created</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">running</span>
           <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">stopped</span>
-          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">An enumeration.</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Current job status.</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
       <span class="nt">required</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">status</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">started_at</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">description</span>
-      <span class="nt">title</span><span class="p">:</span> <span class="s">&#39;Job(id:</span><span class="nv"> </span><span class="s">uuid.UUID,</span><span class="nv"> </span><span class="s">status:</span><span class="nv"> </span><span class="s">endpoint.Status,</span><span class="nv"> </span><span class="s">started_at:</span><span class="nv"> </span><span class="s">datetime.datetime,</span>
-        <span class="s">description:</span><span class="nv"> </span><span class="s">endpoint.Description)&#39;</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A unit of execution.</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="nt">Person</span><span class="p">:</span>
       <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
       <span class="nt">properties</span><span class="p">:</span>
         <span class="nt">family_name</span><span class="p">:</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The person&#39;s family name (typically last name).</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
         <span class="nt">given_name</span><span class="p">:</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The person&#39;s given name (typically first name).</span>
           <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
       <span class="nt">required</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">family_name</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">given_name</span>
-      <span class="nt">title</span><span class="p">:</span> <span class="s">&#39;Person(family_name:</span><span class="nv"> </span><span class="s">str,</span><span class="nv"> </span><span class="s">given_name:</span><span class="nv"> </span><span class="s">str)&#39;</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Represents a real person.</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="nt">StatusEvent</span><span class="p">:</span>
+      <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">This message is typically transmitted in a separate channel, e.g.</span>
+        <span class="l l-Scalar l-Scalar-Plain">over a websocket connection.</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">id</span><span class="p">:</span>
+          <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Uniquely identifies the job which the event corresponds to.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">status</span><span class="p">:</span>
+          <span class="nt">enum</span><span class="p">:</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">created</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">running</span>
+          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">stopped</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The current status of the job.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+      <span class="nt">required</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">status</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Triggered when an out-of-band event takes place.</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+    <span class="nt">StatusResponse</span><span class="p">:</span>
+      <span class="nt">additionalProperties</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">false</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">This response serves as an acknowledgment, and may be followed</span>
+        <span class="l l-Scalar l-Scalar-Plain">by several out-of-band events, transmitted e.g. over a websocket connection.</span>
+      <span class="nt">properties</span><span class="p">:</span>
+        <span class="nt">description</span><span class="p">:</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Textual description associated with the response.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+        <span class="nt">id</span><span class="p">:</span>
+          <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
+          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Uniquely identifies the job which the response corresponds to.</span>
+          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+      <span class="nt">required</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">description</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Triggered synchronously as the immediate response to an asynchronous</span>
+        <span class="l l-Scalar l-Scalar-Plain">operation.</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
     <span class="nt">URL</span><span class="p">:</span>
       <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uri</span>
       <span class="nt">pattern</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">^https?://</span>
       <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A Uniform Resource Locator (URL).</span>
       <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+    <span class="nt">UUID</span><span class="p">:</span>
+      <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+    <span class="nt">UnreferencedType</span><span class="p">:</span>
+      <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">A type not referenced from anywhere else but passed as an additional</span>
+        <span class="l l-Scalar l-Scalar-Plain">type to the initializer of the class `Specification`.</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">object</span>
+  <span class="nt">securitySchemes</span><span class="p">:</span>
+    <span class="nt">Default</span><span class="p">:</span>
+      <span class="nt">bearerFormat</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">JWT</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Authenticates a request by verifying a JWT (JSON Web Token) passed</span>
+        <span class="l l-Scalar l-Scalar-Plain">in the `Authorization` HTTP header.</span>
+      <span class="nt">scheme</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">bearer</span>
+      <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http</span>
 <span class="nt">info</span><span class="p">:</span>
+  <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;#</span><span class="nv"> </span><span class="s">Introduction</span>
+
+
+    <span class="s">This</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">introductory</span><span class="nv"> </span><span class="s">text</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">API.</span><span class="nv"> </span><span class="s">You</span><span class="nv"> </span><span class="s">can</span><span class="nv"> </span><span class="s">write</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">Markdown</span><span class="nv"> </span><span class="s">document,</span><span class="nv"> </span><span class="s">save</span>
+    <span class="s">it</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">separate</span><span class="nv"> </span><span class="s">file</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">import</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">file</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">global</span><span class="nv"> </span><span class="s">description</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">passing</span><span class="nv"> </span><span class="s">it</span>
+    <span class="s">as</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">parameter</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">initializer</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">`Specification`</span><span class="nv"> </span><span class="s">class.</span>
+
+    <span class="s">&#39;</span>
   <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Example specification</span>
   <span class="nt">version</span><span class="p">:</span> <span class="s">&#39;1.0&#39;</span>
 <span class="nt">openapi</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">3.0.3</span>
@@ -196,11 +302,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
           <span class="nt">content</span><span class="p">:</span>
             <span class="nt">application/json</span><span class="p">:</span>
               <span class="nt">schema</span><span class="p">:</span>
-                <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
-                <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+                <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/UUID&#39;</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">The unique identifier of the newly created job.</span>
-        <span class="nt">default</span><span class="p">:</span>
+        <span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
           <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/BadRequest&#39;</span>
+        <span class="s">&#39;500&#39;</span><span class="p p-Indicator">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/InternalServerError&#39;</span>
       <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Creates a new job with the given data as input.</span>
       <span class="nt">tags</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">JobManagement</span>
@@ -212,12 +319,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">job_id</span>
         <span class="nt">required</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">schema</span><span class="p">:</span>
-          <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
-          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/UUID&#39;</span>
       <span class="nt">responses</span><span class="p">:</span>
         <span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{}</span>
-        <span class="nt">default</span><span class="p">:</span>
+        <span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
           <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/BadRequest&#39;</span>
+        <span class="s">&#39;500&#39;</span><span class="p p-Indicator">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/InternalServerError&#39;</span>
       <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Terminates a job.</span>
       <span class="nt">tags</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">JobManagement</span>
@@ -228,18 +336,12 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">job_id</span>
         <span class="nt">required</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">schema</span><span class="p">:</span>
-          <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
-          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/UUID&#39;</span>
       <span class="p p-Indicator">-</span> <span class="nt">in</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">query</span>
         <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">format</span>
         <span class="nt">required</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">schema</span><span class="p">:</span>
-          <span class="nt">enum</span><span class="p">:</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">text/html</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">text/plain</span>
-          <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">text/markdown</span>
-          <span class="nt">title</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">An enumeration.</span>
-          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/Format&#39;</span>
       <span class="nt">responses</span><span class="p">:</span>
         <span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span>
           <span class="nt">content</span><span class="p">:</span>
@@ -247,8 +349,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
               <span class="nt">schema</span><span class="p">:</span>
                 <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/Job&#39;</span>
           <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Status information about the job.</span>
-        <span class="nt">default</span><span class="p">:</span>
+        <span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
           <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/BadRequest&#39;</span>
+        <span class="s">&#39;500&#39;</span><span class="p p-Indicator">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/InternalServerError&#39;</span>
       <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Query status information about a job.</span>
       <span class="nt">tags</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">JobManagement</span>
@@ -260,8 +364,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">job_id</span>
         <span class="nt">required</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
         <span class="nt">schema</span><span class="p">:</span>
-          <span class="nt">format</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">uuid</span>
-          <span class="nt">type</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">string</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/UUID&#39;</span>
       <span class="nt">requestBody</span><span class="p">:</span>
         <span class="nt">content</span><span class="p">:</span>
           <span class="nt">application/json</span><span class="p">:</span>
@@ -271,13 +374,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="nt">required</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
       <span class="nt">responses</span><span class="p">:</span>
         <span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span> <span class="p p-Indicator">{}</span>
-        <span class="nt">default</span><span class="p">:</span>
+        <span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
           <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/BadRequest&#39;</span>
+        <span class="s">&#39;500&#39;</span><span class="p p-Indicator">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/InternalServerError&#39;</span>
       <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Updates information related to a job.</span>
       <span class="nt">tags</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">JobManagement</span>
   <span class="l l-Scalar l-Scalar-Plain">/person/id/{id}</span><span class="p p-Indicator">:</span>
     <span class="nt">get</span><span class="p">:</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">This operation has a custom route associated with it.</span>
       <span class="nt">parameters</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="nt">in</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">path</span>
         <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">id</span>
@@ -290,13 +396,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <span class="nt">application/json</span><span class="p">:</span>
               <span class="nt">schema</span><span class="p">:</span>
                 <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/Person&#39;</span>
-        <span class="nt">default</span><span class="p">:</span>
+        <span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
           <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/BadRequest&#39;</span>
+        <span class="s">&#39;500&#39;</span><span class="p p-Indicator">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/InternalServerError&#39;</span>
       <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Find a person by their identifier.</span>
       <span class="nt">tags</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">PeopleCatalog</span>
   <span class="l l-Scalar l-Scalar-Plain">/person/name/{family}/{given}</span><span class="p p-Indicator">:</span>
     <span class="nt">get</span><span class="p">:</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">This operation has a custom route associated with it.</span>
       <span class="nt">parameters</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="nt">in</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">path</span>
         <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">family</span>
@@ -314,47 +423,146 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <span class="nt">application/json</span><span class="p">:</span>
               <span class="nt">schema</span><span class="p">:</span>
                 <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/Person&#39;</span>
-        <span class="nt">default</span><span class="p">:</span>
+        <span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
           <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/BadRequest&#39;</span>
+        <span class="s">&#39;500&#39;</span><span class="p p-Indicator">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/InternalServerError&#39;</span>
       <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Find a person by their name.</span>
       <span class="nt">tags</span><span class="p">:</span>
       <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">PeopleCatalog</span>
+  <span class="l l-Scalar l-Scalar-Plain">/status/{job_id}</span><span class="p p-Indicator">:</span>
+    <span class="nt">get</span><span class="p">:</span>
+      <span class="nt">callbacks</span><span class="p">:</span>
+        <span class="nt">get_status_callback</span><span class="p">:</span>
+          <span class="s">&#39;{$request.query.callback}&#39;</span><span class="p p-Indicator">:</span>
+            <span class="nt">post</span><span class="p">:</span>
+              <span class="nt">requestBody</span><span class="p">:</span>
+                <span class="nt">content</span><span class="p">:</span>
+                  <span class="nt">application/json</span><span class="p">:</span>
+                    <span class="nt">schema</span><span class="p">:</span>
+                      <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/StatusEvent&#39;</span>
+              <span class="nt">responses</span><span class="p">:</span>
+                <span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span>
+                  <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">OK</span>
+      <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;This</span><span class="nv"> </span><span class="s">operation</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">defined</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">special</span><span class="nv"> </span><span class="s">return</span><span class="nv"> </span><span class="s">type</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">`Generator`.</span>
+        <span class="s">`Generator[Y,S,R]`</span><span class="nv"> </span><span class="s">has</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">yield</span><span class="nv"> </span><span class="s">type</span>
+
+        <span class="s">`Y`,</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">send</span><span class="nv"> </span><span class="s">type</span><span class="nv"> </span><span class="s">`S`</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">`None`,</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">return</span><span class="nv"> </span><span class="s">type</span><span class="nv"> </span><span class="s">`R`.</span><span class="nv"> </span><span class="s">`R`</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">response</span>
+        <span class="s">type</span><span class="nv"> </span><span class="s">immediately</span><span class="nv"> </span><span class="s">returned</span><span class="nv"> </span><span class="s">by</span>
+
+        <span class="s">a</span><span class="nv"> </span><span class="s">call</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">this</span><span class="nv"> </span><span class="s">operation.</span><span class="nv"> </span><span class="s">However,</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">client</span><span class="nv"> </span><span class="s">will</span><span class="nv"> </span><span class="s">receive</span><span class="nv"> </span><span class="s">out-of-band</span><span class="nv"> </span><span class="s">events</span>
+        <span class="s">of</span><span class="nv"> </span><span class="s">type</span><span class="nv"> </span><span class="s">`Y`</span><span class="nv"> </span><span class="s">over</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">different</span>
+
+        <span class="s">channel,</span><span class="nv"> </span><span class="s">e.g.</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">websocket</span><span class="nv"> </span><span class="s">connection</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">HTTP</span><span class="nv"> </span><span class="s">callback.&#39;</span>
+      <span class="nt">parameters</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="nt">in</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">path</span>
+        <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">job_id</span>
+        <span class="nt">required</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">true</span>
+        <span class="nt">schema</span><span class="p">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/UUID&#39;</span>
+      <span class="nt">responses</span><span class="p">:</span>
+        <span class="s">&#39;200&#39;</span><span class="p p-Indicator">:</span>
+          <span class="nt">content</span><span class="p">:</span>
+            <span class="nt">application/json</span><span class="p">:</span>
+              <span class="nt">schema</span><span class="p">:</span>
+                <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/schemas/StatusResponse&#39;</span>
+        <span class="s">&#39;400&#39;</span><span class="p p-Indicator">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/BadRequest&#39;</span>
+        <span class="s">&#39;500&#39;</span><span class="p p-Indicator">:</span>
+          <span class="nt">$ref</span><span class="p">:</span> <span class="s">&#39;#/components/responses/InternalServerError&#39;</span>
+      <span class="nt">summary</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Provides asynchronous status information about a job.</span>
+      <span class="nt">tags</span><span class="p">:</span>
+      <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">JobManagement</span>
 <span class="nt">security</span><span class="p">:</span>
 <span class="p p-Indicator">-</span> <span class="nt">Default</span><span class="p">:</span> <span class="p p-Indicator">[]</span>
 <span class="nt">servers</span><span class="p">:</span>
-<span class="p p-Indicator">-</span> <span class="nt">url</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/api</span>
+<span class="p p-Indicator">-</span> <span class="nt">url</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">http://example.com/api</span>
 <span class="nt">tags</span><span class="p">:</span>
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">PeopleCatalog</span>
   <span class="nt">x-displayName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Operations related to people.</span>
 <span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Operations to create, inspect, update and terminate jobs.</span>
   <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">JobManagement</span>
   <span class="nt">x-displayName</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Job management.</span>
-<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SchemaDefinition schemaRef=&quot;#/components/schemas/Job&quot; /&gt;</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Job</span>
-<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SchemaDefinition schemaRef=&quot;#/components/schemas/EventObject&quot; /&gt;</span>
-  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">EventObject</span>
-<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SchemaDefinition schemaRef=&quot;#/components/schemas/URL&quot; /&gt;</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;A</span><span class="nv"> </span><span class="s">Uniform</span><span class="nv"> </span><span class="s">Resource</span><span class="nv"> </span><span class="s">Locator</span><span class="nv"> </span><span class="s">(URL).</span>
+
+
+    <span class="s">&lt;SchemaDefinition</span><span class="nv"> </span><span class="s">schemaRef=&quot;#/components/schemas/URL&quot;</span><span class="nv"> </span><span class="s">/&gt;&#39;</span>
   <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">URL</span>
-<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SchemaDefinition schemaRef=&quot;#/components/schemas/Description&quot; /&gt;</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SchemaDefinition schemaRef=&quot;#/components/schemas/UUID&quot; /&gt;</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">UUID</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;Possible</span><span class="nv"> </span><span class="s">representation</span><span class="nv"> </span><span class="s">formats.</span>
+
+
+    <span class="s">&lt;SchemaDefinition</span><span class="nv"> </span><span class="s">schemaRef=&quot;#/components/schemas/Format&quot;</span><span class="nv"> </span><span class="s">/&gt;&#39;</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Format</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;A</span><span class="nv"> </span><span class="s">textual</span><span class="nv"> </span><span class="s">description</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">plain</span><span class="nv"> </span><span class="s">text</span><span class="nv"> </span><span class="s">or</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">well-known</span><span class="nv"> </span><span class="s">markup</span><span class="nv"> </span><span class="s">format.</span>
+
+
+    <span class="s">&lt;SchemaDefinition</span><span class="nv"> </span><span class="s">schemaRef=&quot;#/components/schemas/Description&quot;</span><span class="nv"> </span><span class="s">/&gt;&#39;</span>
   <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Description</span>
-<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SchemaDefinition schemaRef=&quot;#/components/schemas/Job&quot; /&gt;</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;A</span><span class="nv"> </span><span class="s">unit</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">execution.</span>
+
+
+    <span class="s">&lt;SchemaDefinition</span><span class="nv"> </span><span class="s">schemaRef=&quot;#/components/schemas/Job&quot;</span><span class="nv"> </span><span class="s">/&gt;&#39;</span>
   <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Job</span>
-<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SchemaDefinition schemaRef=&quot;#/components/schemas/Person&quot; /&gt;</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;Represents</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">real</span><span class="nv"> </span><span class="s">person.</span>
+
+
+    <span class="s">&lt;SchemaDefinition</span><span class="nv"> </span><span class="s">schemaRef=&quot;#/components/schemas/Person&quot;</span><span class="nv"> </span><span class="s">/&gt;&#39;</span>
   <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Person</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;Triggered</span><span class="nv"> </span><span class="s">synchronously</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">immediate</span><span class="nv"> </span><span class="s">response</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">asynchronous</span>
+    <span class="s">operation.</span>
+
+
+    <span class="s">This</span><span class="nv"> </span><span class="s">response</span><span class="nv"> </span><span class="s">serves</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">acknowledgment,</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">may</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">followed</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">several</span><span class="nv"> </span><span class="s">out-of-band</span>
+    <span class="s">events,</span><span class="nv"> </span><span class="s">transmitted</span><span class="nv"> </span><span class="s">e.g.</span><span class="nv"> </span><span class="s">over</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">websocket</span><span class="nv"> </span><span class="s">connection.</span>
+
+
+    <span class="s">&lt;SchemaDefinition</span><span class="nv"> </span><span class="s">schemaRef=&quot;#/components/schemas/StatusResponse&quot;</span><span class="nv"> </span><span class="s">/&gt;&#39;</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">StatusResponse</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;Triggered</span><span class="nv"> </span><span class="s">when</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">out-of-band</span><span class="nv"> </span><span class="s">event</span><span class="nv"> </span><span class="s">takes</span><span class="nv"> </span><span class="s">place.</span>
+
+
+    <span class="s">This</span><span class="nv"> </span><span class="s">message</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">typically</span><span class="nv"> </span><span class="s">transmitted</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">separate</span><span class="nv"> </span><span class="s">channel,</span><span class="nv"> </span><span class="s">e.g.</span><span class="nv"> </span><span class="s">over</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">websocket</span>
+    <span class="s">connection.</span>
+
+
+    <span class="s">&lt;SchemaDefinition</span><span class="nv"> </span><span class="s">schemaRef=&quot;#/components/schemas/StatusEvent&quot;</span><span class="nv"> </span><span class="s">/&gt;&#39;</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">StatusEvent</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">&lt;SchemaDefinition schemaRef=&quot;#/components/schemas/DataEvent&quot; /&gt;</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">DataEvent</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;An</span><span class="nv"> </span><span class="s">example</span><span class="nv"> </span><span class="s">type</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">few</span><span class="nv"> </span><span class="s">properties.</span>
+
+
+    <span class="s">&lt;SchemaDefinition</span><span class="nv"> </span><span class="s">schemaRef=&quot;#/components/schemas/ExampleType&quot;</span><span class="nv"> </span><span class="s">/&gt;&#39;</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ExampleType</span>
+<span class="p p-Indicator">-</span> <span class="nt">description</span><span class="p">:</span> <span class="s">&#39;A</span><span class="nv"> </span><span class="s">type</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">referenced</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">anywhere</span><span class="nv"> </span><span class="s">else</span><span class="nv"> </span><span class="s">but</span><span class="nv"> </span><span class="s">passed</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">an</span><span class="nv"> </span><span class="s">additional</span>
+    <span class="s">type</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">initializer</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">class</span><span class="nv"> </span><span class="s">`Specification`.</span>
+
+
+    <span class="s">&lt;SchemaDefinition</span><span class="nv"> </span><span class="s">schemaRef=&quot;#/components/schemas/UnreferencedType&quot;</span><span class="nv"> </span><span class="s">/&gt;&#39;</span>
+  <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">UnreferencedType</span>
 <span class="nt">x-tagGroups</span><span class="p">:</span>
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Operations</span>
   <span class="nt">tags</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">PeopleCatalog</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">JobManagement</span>
-<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Events</span>
-  <span class="nt">tags</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Job</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">EventObject</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">PeopleCatalog</span>
 <span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Types</span>
   <span class="nt">tags</span><span class="p">:</span>
-  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">URL</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Description</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Format</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Job</span>
   <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">Person</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StatusEvent</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">StatusResponse</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">URL</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">UUID</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Events</span>
+  <span class="nt">tags</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DataEvent</span>
+<span class="p p-Indicator">-</span> <span class="nt">name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">Additional types</span>
+  <span class="nt">tags</span><span class="p">:</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">ExampleType</span>
+  <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">UnreferencedType</span>
 </pre></div>
 </body></html>

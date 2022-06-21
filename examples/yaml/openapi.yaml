@@ -4,27 +4,26 @@ components:
       content:
         application/json:
           schema:
-            additionalProperties: false
-            properties:
-              error:
-                additionalProperties: false
-                properties:
-                  id:
-                    title: A machine-processable identifier for the error.
-                    type: string
-                  message:
-                    title: A human-readable description for the error.
-                    type: string
-                required:
-                - id
-                - message
-                title: Details related to the error.
-                type: object
-            required:
-            - error
-            title: Encapsulates an error response from an endpoint.
-            type: object
+            $ref: '#/components/schemas/ErrorResponse'
+      description: The server cannot process the request due a client error (e.g.
+        malformed request syntax).
+    InternalServerError:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+      description: The server encountered an unexpected error when processing the
+        request.
   schemas:
+    DataEvent:
+      additionalProperties: false
+      properties:
+        data:
+          contentEncoding: base64
+          type: string
+      required:
+      - data
+      type: object
     Description:
       additionalProperties: false
       properties:
@@ -43,65 +42,172 @@ components:
       - text
       title: A textual description as plain text or a well-known markup format.
       type: object
-    EventObject:
+    ErrorResponse:
       additionalProperties: false
       properties:
-        description:
-          title: Textual description of the event.
+        error:
+          additionalProperties: false
+          properties:
+            id:
+              title: A machine-processable identifier for the error.
+              type: string
+            message:
+              title: A human-readable description for the error.
+              type: string
+          required:
+          - id
+          - message
+          title: Details related to the error.
+          type: object
+      required:
+      - error
+      title: Encapsulates an error response from an endpoint.
+      type: object
+    ExampleType:
+      additionalProperties: false
+      properties:
+        count:
+          title: A sample property of an integer type.
+          type: integer
+        created_at:
+          format: date-time
+          title: A timestamp. The date type is identified with OpenAPI's format string.
           type: string
-        id:
+        updated_at:
+          format: date-time
+          title: A timestamp.
+          type: string
+        uuid:
           format: uuid
-          title: Uniquely identifies the job which the event corresponds to.
+          title: Uniquely identifies this instance.
+          type: string
+        value:
+          title: A sample property of a string type.
           type: string
       required:
-      - id
-      - description
-      title: Triggered when an out-of-band event takes place.
+      - uuid
+      - count
+      - value
+      - created_at
+      - updated_at
+      title: An example type with a few properties.
       type: object
+    Format:
+      enum:
+      - text/html
+      - text/plain
+      - text/markdown
+      title: Possible representation formats.
+      type: string
     Job:
       additionalProperties: false
       properties:
         description:
           $ref: '#/components/schemas/Description'
+          title: Additional information associated with the job.
         id:
           format: uuid
+          title: Job identifier.
           type: string
         started_at:
           format: date-time
+          title: The timestamp (in UTC) when the job was started.
           type: string
         status:
           enum:
           - created
           - running
           - stopped
-          title: An enumeration.
+          title: Current job status.
           type: string
       required:
       - id
       - status
       - started_at
       - description
-      title: 'Job(id: uuid.UUID, status: endpoint.Status, started_at: datetime.datetime,
-        description: endpoint.Description)'
+      title: A unit of execution.
       type: object
     Person:
       additionalProperties: false
       properties:
         family_name:
+          title: The person's family name (typically last name).
           type: string
         given_name:
+          title: The person's given name (typically first name).
           type: string
       required:
       - family_name
       - given_name
-      title: 'Person(family_name: str, given_name: str)'
+      title: Represents a real person.
+      type: object
+    StatusEvent:
+      additionalProperties: false
+      description: This message is typically transmitted in a separate channel, e.g.
+        over a websocket connection.
+      properties:
+        id:
+          format: uuid
+          title: Uniquely identifies the job which the event corresponds to.
+          type: string
+        status:
+          enum:
+          - created
+          - running
+          - stopped
+          title: The current status of the job.
+          type: string
+      required:
+      - id
+      - status
+      title: Triggered when an out-of-band event takes place.
+      type: object
+    StatusResponse:
+      additionalProperties: false
+      description: This response serves as an acknowledgment, and may be followed
+        by several out-of-band events, transmitted e.g. over a websocket connection.
+      properties:
+        description:
+          title: Textual description associated with the response.
+          type: string
+        id:
+          format: uuid
+          title: Uniquely identifies the job which the response corresponds to.
+          type: string
+      required:
+      - id
+      - description
+      title: Triggered synchronously as the immediate response to an asynchronous
+        operation.
       type: object
     URL:
       format: uri
       pattern: ^https?://
       title: A Uniform Resource Locator (URL).
       type: string
+    UUID:
+      format: uuid
+      type: string
+    UnreferencedType:
+      title: A type not referenced from anywhere else but passed as an additional
+        type to the initializer of the class `Specification`.
+      type: object
+  securitySchemes:
+    Default:
+      bearerFormat: JWT
+      description: Authenticates a request by verifying a JWT (JSON Web Token) passed
+        in the `Authorization` HTTP header.
+      scheme: bearer
+      type: http
 info:
+  description: '# Introduction
+
+
+    This is introductory text for the API. You can write a Markdown document, save
+    it in a separate file and import the file as a global description by passing it
+    as a parameter to the initializer of the `Specification` class.
+
+    '
   title: Example specification
   version: '1.0'
 openapi: 3.0.3
@@ -123,11 +229,12 @@ paths:
           content:
             application/json:
               schema:
-                format: uuid
-                type: string
+                $ref: '#/components/schemas/UUID'
           description: The unique identifier of the newly created job.
-        default:
+        '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       summary: Creates a new job with the given data as input.
       tags:
       - JobManagement
@@ -139,12 +246,13 @@ paths:
         name: job_id
         required: true
         schema:
-          format: uuid
-          type: string
+          $ref: '#/components/schemas/UUID'
       responses:
         '200': {}
-        default:
+        '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       summary: Terminates a job.
       tags:
       - JobManagement
@@ -155,18 +263,12 @@ paths:
         name: job_id
         required: true
         schema:
-          format: uuid
-          type: string
+          $ref: '#/components/schemas/UUID'
       - in: query
         name: format
         required: true
         schema:
-          enum:
-          - text/html
-          - text/plain
-          - text/markdown
-          title: An enumeration.
-          type: string
+          $ref: '#/components/schemas/Format'
       responses:
         '200':
           content:
@@ -174,8 +276,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Job'
           description: Status information about the job.
-        default:
+        '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       summary: Query status information about a job.
       tags:
       - JobManagement
@@ -187,8 +291,7 @@ paths:
         name: job_id
         required: true
         schema:
-          format: uuid
-          type: string
+          $ref: '#/components/schemas/UUID'
       requestBody:
         content:
           application/json:
@@ -198,13 +301,16 @@ paths:
         required: true
       responses:
         '200': {}
-        default:
+        '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       summary: Updates information related to a job.
       tags:
       - JobManagement
   /person/id/{id}:
     get:
+      description: This operation has a custom route associated with it.
       parameters:
       - in: path
         name: id
@@ -217,13 +323,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Person'
-        default:
+        '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       summary: Find a person by their identifier.
       tags:
       - PeopleCatalog
   /person/name/{family}/{given}:
     get:
+      description: This operation has a custom route associated with it.
       parameters:
       - in: path
         name: family
@@ -241,45 +350,144 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Person'
-        default:
+        '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
       summary: Find a person by their name.
       tags:
       - PeopleCatalog
+  /status/{job_id}:
+    get:
+      callbacks:
+        get_status_callback:
+          '{$request.query.callback}':
+            post:
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/StatusEvent'
+              responses:
+                '200':
+                  description: OK
+      description: 'This operation is defined with the special return type of `Generator`.
+        `Generator[Y,S,R]` has the yield type
+
+        `Y`, the send type `S` of `None`, and the return type `R`. `R` is the response
+        type immediately returned by
+
+        a call to this operation. However, the client will receive out-of-band events
+        of type `Y` over a different
+
+        channel, e.g. a websocket connection or an HTTP callback.'
+      parameters:
+      - in: path
+        name: job_id
+        required: true
+        schema:
+          $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+      summary: Provides asynchronous status information about a job.
+      tags:
+      - JobManagement
 security:
 - Default: []
 servers:
-- url: /api
+- url: http://example.com/api
 tags:
 - name: PeopleCatalog
   x-displayName: Operations related to people.
 - description: Operations to create, inspect, update and terminate jobs.
   name: JobManagement
   x-displayName: Job management.
-- description: <SchemaDefinition schemaRef="#/components/schemas/Job" />
-  name: Job
-- description: <SchemaDefinition schemaRef="#/components/schemas/EventObject" />
-  name: EventObject
-- description: <SchemaDefinition schemaRef="#/components/schemas/URL" />
+- description: 'A Uniform Resource Locator (URL).
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/URL" />'
   name: URL
-- description: <SchemaDefinition schemaRef="#/components/schemas/Description" />
+- description: <SchemaDefinition schemaRef="#/components/schemas/UUID" />
+  name: UUID
+- description: 'Possible representation formats.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/Format" />'
+  name: Format
+- description: 'A textual description as plain text or a well-known markup format.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/Description" />'
   name: Description
-- description: <SchemaDefinition schemaRef="#/components/schemas/Job" />
+- description: 'A unit of execution.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/Job" />'
   name: Job
-- description: <SchemaDefinition schemaRef="#/components/schemas/Person" />
+- description: 'Represents a real person.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/Person" />'
   name: Person
+- description: 'Triggered synchronously as the immediate response to an asynchronous
+    operation.
+
+
+    This response serves as an acknowledgment, and may be followed by several out-of-band
+    events, transmitted e.g. over a websocket connection.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/StatusResponse" />'
+  name: StatusResponse
+- description: 'Triggered when an out-of-band event takes place.
+
+
+    This message is typically transmitted in a separate channel, e.g. over a websocket
+    connection.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/StatusEvent" />'
+  name: StatusEvent
+- description: <SchemaDefinition schemaRef="#/components/schemas/DataEvent" />
+  name: DataEvent
+- description: 'An example type with a few properties.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/ExampleType" />'
+  name: ExampleType
+- description: 'A type not referenced from anywhere else but passed as an additional
+    type to the initializer of the class `Specification`.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/UnreferencedType" />'
+  name: UnreferencedType
 x-tagGroups:
 - name: Operations
   tags:
-  - PeopleCatalog
   - JobManagement
-- name: Events
-  tags:
-  - Job
-  - EventObject
+  - PeopleCatalog
 - name: Types
   tags:
-  - URL
   - Description
+  - Format
   - Job
   - Person
+  - StatusEvent
+  - StatusResponse
+  - URL
+  - UUID
+- name: Events
+  tags:
+  - DataEvent
+- name: Additional types
+  tags:
+  - ExampleType
+  - UnreferencedType
