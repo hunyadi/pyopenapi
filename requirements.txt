@@ -1,2 +1,3 @@
 aiohttp
 json_strong_typing
+pygments

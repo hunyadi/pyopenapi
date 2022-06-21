@@ -186,7 +186,7 @@ class Generator:
             if op.event_type is not None:
                 responses = {
                     "200": self._build_response(
-                        response_type=op.event_type, description=response_description
+                        response_type=op.response_type, description=response_description
                     ),
                     "400": ResponseRef("BadRequest"),
                     "500": ResponseRef("InternalServerError"),
@@ -194,10 +194,10 @@ class Generator:
 
                 callbacks = {
                     f"{op.func_name}_callback": {
-                        "{$request.query.url}": PathItem(
+                        "{$request.query.callback}": PathItem(
                             post=Operation(
                                 requestBody=RequestBody(
-                                    content=self._build_content(op.response_type)
+                                    content=self._build_content(op.event_type)
                                 ),
                                 responses={"200": Response(description="OK")},
                             )
@@ -266,6 +266,8 @@ class Generator:
         events = get_endpoint_events(self.endpoint)
         for ref, event_type in events.items():
             event_schema = self._classdef_to_schema(event_type)
+            if ref not in self.schemas:
+                self.schemas[ref] = event_schema
             event_tags.append(self._build_type_tag(ref, event_schema))
 
         # types that are explicitly declared

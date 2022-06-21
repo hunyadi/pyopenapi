@@ -287,7 +287,7 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
         # where YieldType is the event type, SendType is None, and ReturnType is the immediate response type to the request
         if typing.get_origin(return_type) is collections.abc.Generator:
             event_type, send_type, response_type = typing.get_args(return_type)
-            if send_type is not None:
+            if send_type is not type(None):
                 raise ValidationError(
                     f"function '{func_name}' has a return type Generator[Y,S,R] and therefore looks like an event but has an explicit send type"
                 )

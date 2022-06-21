@@ -1,17 +1,19 @@
 import os
 import os.path
-from typing import TextIO
 import unittest
+from datetime import datetime
+from typing import TextIO
+from uuid import UUID
 
 from pyopenapi import Info, Options, Server, Specification
+from pyopenapi.specification import SecuritySchemeHTTP
 
 from endpoint import Endpoint
 
-
 try:
     from pygments import highlight
-    from pygments.lexers import get_lexer_by_name
     from pygments.formatters import HtmlFormatter
+    from pygments.lexers import get_lexer_by_name
 
     def save_with_highlight(f: TextIO, code: str, format: str) -> None:
         lexer = get_lexer_by_name(format)
@@ -32,11 +34,32 @@ try:
         highlight(code, lexer, formatter, outfile=f)
         f.writelines(["</body>", "</html>"])
 
-
 except ImportError:
 
     def save_with_highlight(f: TextIO, code: str, format: str) -> None:
         pass
+
+
+class ExampleType:
+    """
+    An example type with a few properties.
+
+    :param uuid: Uniquely identifies this instance.
+    :param count: A sample property of an integer type.
+    :param value: A sample property of a string type.
+    :param created_at: A timestamp. The date type is identified with OpenAPI's format string.
+    :param updated_at: A timestamp.
+    """
+
+    uuid: UUID
+    count: int
+    value: str
+    created_at: datetime
+    updated_at: datetime
+
+
+class UnreferencedType:
+    "A type not referenced from anywhere else but passed as an additional type to the initializer of the class `Specification`."
 
 
 class TestOpenAPI(unittest.TestCase):
@@ -46,13 +69,26 @@ class TestOpenAPI(unittest.TestCase):
     def setUp(self) -> None:
         super().setUp()
 
+        with open(os.path.join(os.path.dirname(__file__), "endpoint.md"), "r") as f:
+            description = f.read()
+
         self.root = os.path.join(os.path.dirname(__file__), "..", "examples")
         os.makedirs(self.root, exist_ok=True)
         self.specification = Specification(
             Endpoint,
             Options(
-                server=Server(url="/api"),
-                info=Info(title="Example specification", version="1.0"),
+                server=Server(url="http://example.com/api"),
+                info=Info(
+                    title="Example specification",
+                    version="1.0",
+                    description=description,
+                ),
+                default_security_scheme=SecuritySchemeHTTP(
+                    "Authenticates a request by verifying a JWT (JSON Web Token) passed in the `Authorization` HTTP header.",
+                    "bearer",
+                    "JWT",
+                ),
+                extra_types=[ExampleType, UnreferencedType],
             ),
         )
 
