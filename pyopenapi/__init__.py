@@ -1,3 +1,4 @@
+import importlib.resources
 import json
 import os.path
 from typing import Callable, TextIO, TypeVar
@@ -9,6 +10,8 @@ from .metadata import WebMethod
 from .options import *
 from .specification import Document
 
+
+__version__ = "0.1.4"
 
 T = TypeVar("T")
 
@@ -98,8 +101,9 @@ class Specification:
         :param pretty_print: Whether to use line indents to beautify the JSON string in the HTML file.
         """
 
-        html_template_path = os.path.join(os.path.dirname(__file__), "template.html")
-        with open(html_template_path, "r") as html_template_file:
+        with importlib.resources.open_text(
+            __package__, "template.html", encoding="utf-8", errors="strict"
+        ) as html_template_file:
             html_template = html_template_file.read()
 
         html = html_template.replace(
