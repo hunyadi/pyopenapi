@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, ClassVar, Dict, List, Optional
+from typing import Callable, ClassVar, Dict, List, Optional, Union
 
 from .specification import (
     Info,
@@ -17,15 +17,15 @@ class Options:
     :param server: Base URL for the API endpoint.
     :param info: Meta-information for the endpoint specification.
     :param default_security_scheme: Security scheme to apply to endpoints, unless overridden on a per-endpoint basis.
-    :param extra_types: Extra types to list in the type catalog in addition to those found in operation signatures.
+    :param extra_types: Extra types in addition to those found in operation signatures. Use a dictionary to group related types.
     :param property_description_fun: Custom transformation function to apply to class property documentation strings.
-    :param captions: User-defined captions for sections such as "Operations" or "Types".
+    :param captions: User-defined captions for sections such as "Operations" or "Types", and (if applicable) groups of extra types.
     """
 
     server: Server
     info: Info
     default_security_scheme: Optional[SecurityScheme] = None
-    extra_types: Optional[List[type]] = None
+    extra_types: Union[List[type], Dict[str, List[type]], None] = None
     property_description_fun: Callable[[type, str, str], str] = None
     captions: Dict[str, str] = None
 
@@ -42,11 +42,15 @@ class Options:
         "Maps a language-neutral placeholder string to language-dependent text."
 
         if self.captions is not None:
-            text = self.captions.get(id)
-            if text is not None:
-                return text
+            caption = self.captions.get(id)
+            if caption is not None:
+                return caption
 
-        return __class__.default_captions[id]
+        caption = __class__.default_captions.get(id)
+        if caption is not None:
+            return caption
+
+        raise KeyError(f"no caption found for ID: {id}")
 
 
 @dataclass

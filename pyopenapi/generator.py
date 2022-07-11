@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Any, Dict, Union
 
 import docstring_parser
@@ -136,6 +135,30 @@ class Generator:
                 s for s in (title, description, definition) if s is not None
             ),
         )
+
+    def _build_extra_tag_groups(
+        self, extra_types: Dict[str, List[type]]
+    ) -> Dict[str, List[Tag]]:
+        """
+        Creates a dictionary of tag group captions as keys, and tag lists as values.
+
+        :param extra_types: A dictionary of type categories and list of types in that category.
+        """
+
+        extra_tags: Dict[str, List[Tag]] = {}
+
+        for category_name, category_items in extra_types.items():
+            tag_list: List[Tag] = []
+
+            for extra_type in category_items:
+                ref = extra_type.__name__
+                type_schema = self._classdef_to_schema(extra_type)
+                self.schemas[ref] = type_schema
+                tag_list.append(self._build_type_tag(ref, type_schema))
+
+            extra_tags[category_name] = tag_list
+
+        return extra_tags
 
     def generate(self) -> Document:
         paths = {}
@@ -285,20 +308,28 @@ class Generator:
             event_tags.append(self._build_type_tag(ref, event_schema))
 
         # types that are explicitly declared
-        extra_tags: List[Tag] = []
+        extra_tag_groups: Dict[str, List[Tag]] = {}
         if self.options.extra_types is not None:
-            for extra_type in self.options.extra_types:
-                ref = extra_type.__name__
-                type_schema = self._classdef_to_schema(extra_type)
-                self.schemas[ref] = type_schema
-                extra_tags.append(self._build_type_tag(ref, type_schema))
+            if isinstance(self.options.extra_types, list):
+                extra_tag_groups = self._build_extra_tag_groups(
+                    {"AdditionalTypes": self.options.extra_types}
+                )
+            elif isinstance(self.options.extra_types, dict):
+                extra_tag_groups = self._build_extra_tag_groups(
+                    self.options.extra_types
+                )
+            else:
+                raise TypeError(
+                    f"type mismatch for collection of extra types: {type(self.options.extra_types)}"
+                )
 
         # list all operations and types
         tags: List[Tag] = []
         tags.extend(operation_tags)
         tags.extend(type_tags)
         tags.extend(event_tags)
-        tags.extend(extra_tags)
+        for extra_tag_group in extra_tag_groups.values():
+            tags.extend(extra_tag_group)
 
         tag_groups = []
         if operation_tags:
@@ -322,11 +353,11 @@ class Generator:
                     tags=sorted(tag.name for tag in event_tags),
                 )
             )
-        if extra_tags:
+        for caption, extra_tag_group in extra_tag_groups.items():
             tag_groups.append(
                 TagGroup(
-                    name=self.options.map("AdditionalTypes"),
-                    tags=sorted(tag.name for tag in extra_tags),
+                    name=self.options.map(caption),
+                    tags=sorted(tag.name for tag in extra_tag_group),
                 )
             )
 
