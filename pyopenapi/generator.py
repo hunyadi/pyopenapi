@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
 import docstring_parser
 from strong_typing.inspection import (
@@ -15,6 +15,7 @@ from strong_typing.schema import (
     SchemaOptions,
     get_schema_identifier,
 )
+from strong_typing.serialization import object_to_json
 
 from .operations import HTTPMethod, get_endpoint_events, get_endpoint_operations
 from .options import *
@@ -94,7 +95,17 @@ class Generator:
             self.schemas[type_name] = type_schema
         return SchemaRef(type_name)
 
-    def _build_content(self, payload_type: type) -> Dict[str, MediaType]:
+    def _build_media_type(self, item_type: type, example: Any = None) -> MediaType:
+        return MediaType(
+            schema=self._classdef_to_ref(item_type),
+            example=object_to_json(example) if example is not None else None,
+        )
+
+    def _build_content(
+        self, payload_type: type, payload_example: Any = None
+    ) -> Dict[str, MediaType]:
+        "Creates the content subtree for a request or response."
+
         if is_generic_list(payload_type):
             media_type = "application/jsonl"
             item_type = unwrap_generic_list(payload_type)
@@ -102,12 +113,15 @@ class Generator:
             media_type = "application/json"
             item_type = payload_type
 
-        return {media_type: MediaType(schema=self._classdef_to_ref(item_type))}
+        return {media_type: self._build_media_type(item_type, payload_example)}
 
-    def _build_response(self, response_type: type, description: str) -> Response:
+    def _build_response(
+        self, response_type: type, description: str, payload_example: Any = None
+    ) -> Response:
         if response_type is not None:
             return Response(
-                description=description, content=self._build_content(response_type)
+                description=description,
+                content=self._build_content(response_type, payload_example),
             )
         else:
             return Response(description=description)
@@ -147,21 +161,19 @@ class Generator:
             query_parameters = []
             for param_name, param_type in op.query_params:
                 if is_type_optional(param_type):
-                    query_parameter = Parameter(
-                        name=param_name,
-                        in_=ParameterLocation.Query,
-                        description=doc_params.get(param_name),
-                        required=False,
-                        schema=self._classdef_to_ref(unwrap_optional_type(param_type)),
-                    )
+                    inner_type = unwrap_optional_type(param_type)
+                    required = False
                 else:
-                    query_parameter = Parameter(
-                        name=param_name,
-                        in_=ParameterLocation.Query,
-                        description=doc_params.get(param_name),
-                        required=True,
-                        schema=self._classdef_to_ref(param_type),
-                    )
+                    inner_type = param_type
+                    required = True
+
+                query_parameter = Parameter(
+                    name=param_name,
+                    in_=ParameterLocation.Query,
+                    description=doc_params.get(param_name),
+                    required=required,
+                    schema=self._classdef_to_ref(inner_type),
+                )
                 query_parameters.append(query_parameter)
 
             parameters = path_parameters + query_parameters
@@ -170,8 +182,8 @@ class Generator:
                 request_name, request_type = op.request_param
                 requestBody = RequestBody(
                     content={
-                        "application/json": MediaType(
-                            schema=self._classdef_to_ref(request_type)
+                        "application/json": self._build_media_type(
+                            request_type, op.request_example
                         )
                     },
                     description=doc_params.get(request_name),
@@ -208,7 +220,9 @@ class Generator:
             else:
                 responses = {
                     "200": self._build_response(
-                        response_type=op.response_type, description=response_description
+                        response_type=op.response_type,
+                        description=response_description,
+                        payload_example=op.response_example,
                     ),
                     "400": ResponseRef("BadRequest"),
                     "500": ResponseRef("InternalServerError"),
@@ -320,19 +334,11 @@ class Generator:
         responses = {
             "BadRequest": Response(
                 description=self.options.map("BadRequest"),
-                content={
-                    "application/json": MediaType(
-                        schema=self._classdef_to_ref(ErrorResponse)
-                    )
-                },
+                content={"application/json": self._build_media_type(ErrorResponse)},
             ),
             "InternalServerError": Response(
                 description=self.options.map("InternalServerError"),
-                content={
-                    "application/json": MediaType(
-                        schema=self._classdef_to_ref(ErrorResponse)
-                    )
-                },
+                content={"application/json": self._build_media_type(ErrorResponse)},
             ),
         }
 

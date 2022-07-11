@@ -83,6 +83,9 @@ class EndpointOperation:
     :param event_type: The Python type of the data that is transmitted out-of-band (e.g. via websockets) while the operation is in progress.
     :param response_type: The Python type of the data that is transmitted in the response body.
     :param http_method: The HTTP method used to invoke the endpoint such as POST, GET or PUT.
+    :param public: True if the operation can be invoked without prior authentication.
+    :param request_example: A sample request that the operation might take.
+    :param response_example: A sample response that the operation might produce.
     """
 
     defining_class: type
@@ -93,10 +96,12 @@ class EndpointOperation:
     path_params: List[OperationParameter]
     query_params: List[OperationParameter]
     request_param: Optional[OperationParameter]
-    event_type: type
+    event_type: Optional[type]
     response_type: type
     http_method: HTTPMethod
     public: bool
+    request_example: Any
+    response_example: Any
 
     def get_route(self) -> str:
         if self.route is not None:
@@ -206,10 +211,14 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
             route = webmethod.route
             route_params = _get_route_parameters(route)
             public = webmethod.public
+            request_example = webmethod.request_example
+            response_example = webmethod.response_example
         else:
             route = None
             route_params = None
             public = False
+            request_example = None
+            response_example = None
 
         # inspect function signature for path and query parameters, and request/response payload type
         signature = get_signature(func_ref)
@@ -323,6 +332,8 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
                 response_type=response_type,
                 http_method=http_method,
                 public=public,
+                request_example=request_example,
+                response_example=response_example,
             )
         )
 
