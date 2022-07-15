@@ -11,14 +11,17 @@
             margin: 0;
             padding: 0;
         }
+
     </style>
-    <script defer="defer" src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
+    <script defer="defer" src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
     <script defer="defer">
         document.addEventListener("DOMContentLoaded", function () {
             spec = { /* OPENAPI_SPECIFICATION */ };
             options = {
+                downloadFileName: "openapi.json",
                 expandResponses: "200",
                 expandSingleSchemaField: true,
+                jsonSampleExpandLevel: "all",
                 schemaExpansionLevel: "all",
             };
             element = document.getElementById("openapi-container");
