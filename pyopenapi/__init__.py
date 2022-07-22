@@ -10,7 +10,7 @@ from .options import *
 from .specification import Document
 
 
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 
 T = TypeVar("T")
 
