@@ -205,6 +205,10 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Person"
+                                },
+                                "example": {
+                                    "family_name": "Hunyadi",
+                                    "given_name": "Levente"
                                 }
                             }
                         }

@@ -268,7 +268,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
-    <span class="nd">@webmethod</span><span class="p">(</span><span class="n">route</span><span class="o">=</span><span class="s2">&quot;/person/name/</span><span class="si">{family}</span><span class="s2">/</span><span class="si">{given}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nd">@webmethod</span><span class="p">(</span>
+        <span class="n">route</span><span class="o">=</span><span class="s2">&quot;/person/name/</span><span class="si">{family}</span><span class="s2">/</span><span class="si">{given}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">response_example</span><span class="o">=</span><span class="n">Person</span><span class="p">(</span><span class="s2">&quot;Hunyadi&quot;</span><span class="p">,</span> <span class="s2">&quot;Levente&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_person_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">given</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find a person by their name.</span>

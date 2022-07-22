@@ -195,7 +195,10 @@ class PeopleCatalog:
         """
         ...
 
-    @webmethod(route="/person/name/{family}/{given}")
+    @webmethod(
+        route="/person/name/{family}/{given}",
+        response_example=Person("Hunyadi", "Levente"),
+    )
     def get_person_by_name(self, family: str, given: str, /) -> Person:
         """
         Find a person by their name.

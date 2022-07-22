@@ -348,6 +348,9 @@ paths:
         '200':
           content:
             application/json:
+              example:
+                family_name: Hunyadi
+                given_name: Levente
               schema:
                 $ref: '#/components/schemas/Person'
         '400':
