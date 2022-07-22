@@ -1,6 +1,5 @@
 import importlib.resources
 import json
-import os.path
 from typing import Any, Callable, TextIO, TypeVar
 
 from strong_typing.schema import StrictJsonType, object_to_json
@@ -32,11 +31,15 @@ def webmethod(
     """
 
     def wrap(cls: T) -> T:
-        cls.__webmethod__ = WebMethod(
-            route=route,
-            public=public,
-            request_example=request_example,
-            response_example=response_example,
+        setattr(
+            cls,
+            "__webmethod__",
+            WebMethod(
+                route=route,
+                public=public,
+                request_example=request_example,
+                response_example=response_example,
+            ),
         )
         return cls
 

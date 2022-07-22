@@ -1,6 +1,6 @@
-from typing import Any, Dict, Union
+from typing import Any, Dict, Set, Union
 
-import docstring_parser
+from strong_typing.docstring import parse_type
 from strong_typing.inspection import (
     is_generic_list,
     is_type_optional,
@@ -16,7 +16,12 @@ from strong_typing.schema import (
 )
 from strong_typing.serialization import object_to_json
 
-from .operations import HTTPMethod, get_endpoint_events, get_endpoint_operations
+from .operations import (
+    EndpointOperation,
+    HTTPMethod,
+    get_endpoint_events,
+    get_endpoint_operations,
+)
 from .options import *
 from .specification import (
     Components,
@@ -160,108 +165,117 @@ class Generator:
 
         return extra_tags
 
+    def _build_operation(self, op: EndpointOperation) -> Operation:
+        doc_string = parse_type(op.func_ref)
+        doc_params = dict(
+            (param.name, param.description) for param in doc_string.params.values()
+        )
+
+        # parameters passed in URL component path
+        path_parameters = [
+            Parameter(
+                name=param_name,
+                in_=ParameterLocation.Path,
+                description=doc_params.get(param_name),
+                required=True,
+                schema=self._classdef_to_ref(param_type),
+            )
+            for param_name, param_type in op.path_params
+        ]
+
+        # parameters passed in URL component query string
+        query_parameters = []
+        for param_name, param_type in op.query_params:
+            if is_type_optional(param_type):
+                inner_type = unwrap_optional_type(param_type)
+                required = False
+            else:
+                inner_type = param_type
+                required = True
+
+            query_parameter = Parameter(
+                name=param_name,
+                in_=ParameterLocation.Query,
+                description=doc_params.get(param_name),
+                required=required,
+                schema=self._classdef_to_ref(inner_type),
+            )
+            query_parameters.append(query_parameter)
+
+        # parameters passed anywhere
+        parameters = path_parameters + query_parameters
+
+        # data passed in payload
+        if op.request_param:
+            request_name, request_type = op.request_param
+            requestBody = RequestBody(
+                content={
+                    "application/json": self._build_media_type(
+                        request_type, op.request_example
+                    )
+                },
+                description=doc_params.get(request_name),
+                required=True,
+            )
+        else:
+            requestBody = None
+
+        response_description = (
+            doc_string.returns.description if doc_string.returns else None
+        )
+        responses: Dict[str, Union[Response, ResponseRef]]
+        if op.event_type is not None:
+            responses = {
+                "200": self._build_response(
+                    response_type=op.response_type, description=response_description
+                ),
+                "400": ResponseRef("BadRequest"),
+                "500": ResponseRef("InternalServerError"),
+            }
+
+            callbacks = {
+                f"{op.func_name}_callback": {
+                    "{$request.query.callback}": PathItem(
+                        post=Operation(
+                            requestBody=RequestBody(
+                                content=self._build_content(op.event_type)
+                            ),
+                            responses={"200": Response(description="OK")},
+                        )
+                    )
+                }
+            }
+
+        else:
+            responses = {
+                "200": self._build_response(
+                    response_type=op.response_type,
+                    description=response_description,
+                    payload_example=op.response_example,
+                ),
+                "400": ResponseRef("BadRequest"),
+                "500": ResponseRef("InternalServerError"),
+            }
+            callbacks = None
+
+        return Operation(
+            tags=[op.defining_class.__name__],
+            summary=doc_string.short_description,
+            description=doc_string.long_description,
+            parameters=parameters,
+            requestBody=requestBody,
+            responses=responses,
+            callbacks=callbacks,
+            security=[] if op.public else None,
+        )
+
     def generate(self) -> Document:
-        paths = {}
-        endpoint_classes = set()
+        paths: Dict[str, PathItem] = {}
+        endpoint_classes: Set[type] = set()
         for op in get_endpoint_operations(self.endpoint):
             endpoint_classes.add(op.defining_class)
 
-            doc_string = docstring_parser.parse(op.func_ref.__doc__)
-            doc_params = dict(
-                (param.arg_name, param.description) for param in doc_string.params
-            )
-
-            path_parameters = [
-                Parameter(
-                    name=param_name,
-                    in_=ParameterLocation.Path,
-                    description=doc_params.get(param_name),
-                    required=True,
-                    schema=self._classdef_to_ref(param_type),
-                )
-                for param_name, param_type in op.path_params
-            ]
-            query_parameters = []
-            for param_name, param_type in op.query_params:
-                if is_type_optional(param_type):
-                    inner_type = unwrap_optional_type(param_type)
-                    required = False
-                else:
-                    inner_type = param_type
-                    required = True
-
-                query_parameter = Parameter(
-                    name=param_name,
-                    in_=ParameterLocation.Query,
-                    description=doc_params.get(param_name),
-                    required=required,
-                    schema=self._classdef_to_ref(inner_type),
-                )
-                query_parameters.append(query_parameter)
-
-            parameters = path_parameters + query_parameters
-
-            if op.request_param:
-                request_name, request_type = op.request_param
-                requestBody = RequestBody(
-                    content={
-                        "application/json": self._build_media_type(
-                            request_type, op.request_example
-                        )
-                    },
-                    description=doc_params.get(request_name),
-                    required=True,
-                )
-            else:
-                requestBody = None
-
-            response_description = (
-                doc_string.returns.description if doc_string.returns else None
-            )
-            if op.event_type is not None:
-                responses = {
-                    "200": self._build_response(
-                        response_type=op.response_type, description=response_description
-                    ),
-                    "400": ResponseRef("BadRequest"),
-                    "500": ResponseRef("InternalServerError"),
-                }
-
-                callbacks = {
-                    f"{op.func_name}_callback": {
-                        "{$request.query.callback}": PathItem(
-                            post=Operation(
-                                requestBody=RequestBody(
-                                    content=self._build_content(op.event_type)
-                                ),
-                                responses={"200": Response(description="OK")},
-                            )
-                        )
-                    }
-                }
-
-            else:
-                responses = {
-                    "200": self._build_response(
-                        response_type=op.response_type,
-                        description=response_description,
-                        payload_example=op.response_example,
-                    ),
-                    "400": ResponseRef("BadRequest"),
-                    "500": ResponseRef("InternalServerError"),
-                }
-                callbacks = None
-
-            operation = Operation(
-                tags=[op.defining_class.__name__],
-                summary=doc_string.short_description,
-                description=doc_string.long_description,
-                parameters=parameters,
-                requestBody=requestBody,
-                responses=responses,
-                callbacks=callbacks,
-                security=[] if op.public else None,
-            )
+            operation = self._build_operation(op)
 
             if op.http_method is HTTPMethod.GET:
                 pathItem = PathItem(get=operation)
@@ -284,7 +298,7 @@ class Generator:
 
         operation_tags: List[Tag] = []
         for cls in endpoint_classes:
-            doc_string = docstring_parser.parse(cls.__doc__)
+            doc_string = parse_type(cls)
             operation_tags.append(
                 Tag(
                     name=cls.__name__,

@@ -18,7 +18,7 @@ from .metadata import WebMethod
 
 def split_prefix(
     s: str, sep: str, prefix: Union[str, Iterable[str]]
-) -> Tuple[str, str]:
+) -> Tuple[Optional[str], str]:
     """
     Recognizes a prefix at the beginning of a string.
 
@@ -346,10 +346,10 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
 def get_endpoint_events(endpoint: type) -> Dict[str, type]:
     results = {}
 
-    for name, decl in typing.get_type_hints(endpoint).items():
+    for decl in typing.get_type_hints(endpoint).values():
         # check if signature is Callable[...]
         origin = typing.get_origin(decl)
-        if origin is None or not issubclass(origin, Callable):
+        if origin is None or not issubclass(origin, Callable):  # type: ignore
             continue
 
         # check if signature is Callable[[...], Any]

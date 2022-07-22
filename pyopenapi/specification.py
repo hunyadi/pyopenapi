@@ -127,7 +127,7 @@ class PathItem:
     def update(self, other: PathItem) -> None:
         "Merges another instance of this class into this object."
 
-        for field in dataclasses.fields(__class__):
+        for field in dataclasses.fields(self.__class__):
             value = getattr(other, field.name)
             if value is not None:
                 setattr(self, field.name, value)
@@ -169,7 +169,7 @@ class SecuritySchemeAPI(SecurityScheme):
     name: str
     in_: ParameterLocation
 
-    def __init__(self, description: str, name: str, in_: str) -> None:
+    def __init__(self, description: str, name: str, in_: ParameterLocation) -> None:
         super().__init__(SecuritySchemeType.ApiKey, description)
         self.name = name
         self.in_ = in_

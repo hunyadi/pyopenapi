@@ -26,8 +26,8 @@ class Options:
     info: Info
     default_security_scheme: Optional[SecurityScheme] = None
     extra_types: Union[List[type], Dict[str, List[type]], None] = None
-    property_description_fun: Callable[[type, str, str], str] = None
-    captions: Dict[str, str] = None
+    property_description_fun: Optional[Callable[[type, str, str], str]] = None
+    captions: Optional[Dict[str, str]] = None
 
     default_captions: ClassVar[Dict[str, str]] = {
         "Operations": "Operations",
@@ -46,7 +46,7 @@ class Options:
             if caption is not None:
                 return caption
 
-        caption = __class__.default_captions.get(id)
+        caption = self.__class__.default_captions.get(id)
         if caption is not None:
             return caption
 
