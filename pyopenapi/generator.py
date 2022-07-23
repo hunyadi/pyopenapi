@@ -393,7 +393,7 @@ class Generator:
             securitySchemes = None
 
         return Document(
-            openapi="3.0.3",
+            openapi="3.1.0",
             info=self.options.info,
             servers=[self.options.server],
             paths=paths,
