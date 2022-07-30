@@ -1,13 +1,13 @@
 import collections.abc
 import enum
 import inspect
-import sys
 import typing
 import uuid
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
 from strong_typing.inspection import (
+    get_signature,
     is_type_enum,
     is_type_optional,
     unwrap_optional_type,
@@ -160,13 +160,6 @@ def _get_defining_class(member_fn: str, derived_cls: type) -> type:
     raise ValidationError(
         f"cannot find defining class for {member_fn} in {derived_cls}"
     )
-
-
-def get_signature(fn: Callable[..., Any]) -> inspect.Signature:
-    if sys.version_info >= (3, 10):
-        return inspect.signature(fn, eval_str=True)
-    else:
-        return inspect.signature(fn)
 
 
 def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:

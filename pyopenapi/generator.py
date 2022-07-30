@@ -1,3 +1,4 @@
+import inspect
 from typing import Any, Dict, Set, Union
 
 from strong_typing.docstring import parse_type
@@ -223,16 +224,25 @@ class Generator:
         response_description = (
             doc_string.returns.description if doc_string.returns else None
         )
-        responses: Dict[str, Union[Response, ResponseRef]]
-        if op.event_type is not None:
-            responses = {
-                "200": self._build_response(
-                    response_type=op.response_type, description=response_description
-                ),
-                "400": ResponseRef("BadRequest"),
-                "500": ResponseRef("InternalServerError"),
-            }
+        responses: Dict[str, Union[Response, ResponseRef]] = {
+            "200": self._build_response(
+                response_type=op.response_type,
+                description=response_description,
+                payload_example=op.response_example,
+            )
+        }
 
+        defining_module = inspect.getmodule(op.defining_class)
+        if defining_module and doc_string.raises:
+            context = vars(defining_module)
+            error_types = tuple(context[name] for name in doc_string.raises)
+            error_type: type = Union[error_types]  # type: ignore
+            responses["5xx"] = self._build_response(
+                response_type=error_type,
+                description=self.options.map("InternalServerError"),
+            )
+
+        if op.event_type is not None:
             callbacks = {
                 f"{op.func_name}_callback": {
                     "{$request.query.callback}": PathItem(
@@ -247,15 +257,6 @@ class Generator:
             }
 
         else:
-            responses = {
-                "200": self._build_response(
-                    response_type=op.response_type,
-                    description=response_description,
-                    payload_example=op.response_example,
-                ),
-                "400": ResponseRef("BadRequest"),
-                "500": ResponseRef("InternalServerError"),
-            }
             callbacks = None
 
         return Operation(
