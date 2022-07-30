@@ -43,8 +43,10 @@ from .specification import (
 
 class Generator:
     endpoint: type
+    options: Options
     schema_generator: JsonSchemaGenerator
     schemas: Dict[str, Schema]
+    responses: Dict[str, Response]
 
     def __init__(self, endpoint: type, options: Options):
         self.endpoint = endpoint
@@ -56,6 +58,7 @@ class Generator:
             )
         )
         self.schemas = {}
+        self.responses = {}
 
     def _classdef_to_schema(self, typ: type) -> Schema:
         """
@@ -130,6 +133,15 @@ class Generator:
             )
         else:
             return Response(description=description)
+
+    def _build_response_ref(
+        self, response_name: str, response_type: type, description: str
+    ) -> ResponseRef:
+        if response_name not in self.responses:
+            self.responses[response_name] = self._build_response(
+                response_type, description
+            )
+        return ResponseRef(response_name)
 
     def _build_type_tag(self, ref: str, schema: Schema) -> Tag:
         definition = f'<SchemaDefinition schemaRef="#/components/schemas/{ref}" />'
@@ -235,12 +247,29 @@ class Generator:
         defining_module = inspect.getmodule(op.defining_class)
         if defining_module and doc_string.raises:
             context = vars(defining_module)
-            error_types = tuple(context[name] for name in doc_string.raises)
-            error_type: type = Union[error_types]  # type: ignore
-            responses["5xx"] = self._build_response(
-                response_type=error_type,
-                description=self.options.map("InternalServerError"),
-            )
+            exception_types: Dict[type, str] = {
+                context[name]: item.description
+                for name, item in doc_string.raises.items()
+            }
+
+            status_responses: Dict[str, List[type]] = {}
+            for exception_type in exception_types.keys():
+                status_code = str(
+                    self.options.error_responses.get(exception_type, "5xx")
+                )
+                if status_code not in status_responses:
+                    status_responses[status_code] = []
+                status_responses[status_code].append(exception_type)
+
+            for status_code, error_response_types in status_responses.items():
+                composite_error_type: type = Union[tuple(error_response_types)]  # type: ignore
+                responses[status_code] = self._build_response(
+                    response_type=composite_error_type,
+                    description=" **OR** ".join(
+                        exception_types[error_response_type]
+                        for error_response_type in error_response_types
+                    ),
+                )
 
         if op.event_type is not None:
             callbacks = {
@@ -376,18 +405,6 @@ class Generator:
                 )
             )
 
-        # error response
-        responses = {
-            "BadRequest": Response(
-                description=self.options.map("BadRequest"),
-                content={"application/json": self._build_media_type(ErrorResponse)},
-            ),
-            "InternalServerError": Response(
-                description=self.options.map("InternalServerError"),
-                content={"application/json": self._build_media_type(ErrorResponse)},
-            ),
-        }
-
         if self.options.default_security_scheme:
             securitySchemes = {"Default": self.options.default_security_scheme}
         else:
@@ -400,7 +417,7 @@ class Generator:
             paths=paths,
             components=Components(
                 schemas=self.schemas,
-                responses=responses,
+                responses=self.responses,
                 securitySchemes=securitySchemes,
             ),
             security=[{"Default": []}],

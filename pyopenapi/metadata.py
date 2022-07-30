@@ -13,7 +13,7 @@ class WebMethod:
     :param response_example: A sample response that the operation might produce.
     """
 
-    route: str
+    route: Optional[str] = None
     public: bool = False
     request_example: Optional[Any] = None
     response_example: Optional[Any] = None

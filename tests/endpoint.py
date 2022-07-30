@@ -134,6 +134,8 @@ class JobManagement:
 
         :param items: A set of URLs to resources used to initiate the job.
         :return: The unique identifier of the newly created job.
+        :raise BadRequestError: URL points to an invalid location.
+        :raise InternalServerError: Unexpected error while creating job.
         """
         ...
 
@@ -210,3 +212,26 @@ class PeopleCatalog:
 
 class Endpoint(JobManagement, PeopleCatalog):
     pass
+
+
+@dataclass
+class BaseError(Exception):
+    """
+    Encapsulates an error message from an endpoint.
+
+    :param id: A machine-processable identifier for the error.
+    :param message: A human-readable description for the error.
+    """
+
+    id: str
+    message: str
+
+
+@dataclass
+class BadRequestError(BaseError):
+    "The server cannot process the request due a client error (e.g. malformed request syntax)."
+
+
+@dataclass
+class InternalServerError(BaseError):
+    "The server encountered an unexpected error when processing the request."

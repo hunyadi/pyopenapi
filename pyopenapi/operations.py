@@ -202,7 +202,7 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
         webmethod: Optional[WebMethod] = getattr(func_ref, "__webmethod__", None)
         if webmethod is not None:
             route = webmethod.route
-            route_params = _get_route_parameters(route)
+            route_params = _get_route_parameters(route) if route is not None else None
             public = webmethod.public
             request_example = webmethod.request_example
             response_example = webmethod.response_example

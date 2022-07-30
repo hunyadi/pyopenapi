@@ -4,6 +4,7 @@ from typing import Dict
 
 from pyopenapi import webmethod
 from pyopenapi.proxy import make_proxy_class
+from strong_typing.schema import JsonType
 
 
 @dataclass
@@ -20,13 +21,21 @@ class HTTPBinResponse:
     url: str
 
 
+@dataclass
+class HTTPBinPostResponse(HTTPBinResponse):
+    data: str
+    json: JsonType
+    files: Dict[str, str]
+    form: Dict[str, str]
+
+
 class API:
     @webmethod(route="/get")
     def get_method(self, /, id: str) -> HTTPBinResponse:
         ...
 
     @webmethod(route="/put")
-    def set_method(self, /, id: str, doc: Document) -> HTTPBinResponse:
+    def set_method(self, /, id: str, doc: Document) -> HTTPBinPostResponse:
         ...
 
 
