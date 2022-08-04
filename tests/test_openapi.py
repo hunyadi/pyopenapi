@@ -8,7 +8,7 @@ from uuid import UUID
 from pyopenapi import Info, Options, Server, Specification
 from pyopenapi.specification import SecuritySchemeHTTP
 
-from endpoint import BadRequestError, Endpoint, InternalServerError
+from endpoint import BadRequestError, Endpoint, InternalServerError, Student, Teacher
 
 try:
     from pygments import highlight
@@ -89,6 +89,7 @@ class TestOpenAPI(unittest.TestCase):
                     "JWT",
                 ),
                 extra_types=[ExampleType, UnreferencedType],
+                success_responses={Student: 201, Teacher: 202},
                 error_responses={
                     BadRequestError: 400,
                     InternalServerError: 500,

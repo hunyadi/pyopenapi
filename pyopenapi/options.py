@@ -19,6 +19,7 @@ class Options:
     :param info: Meta-information for the endpoint specification.
     :param default_security_scheme: Security scheme to apply to endpoints, unless overridden on a per-endpoint basis.
     :param extra_types: Extra types in addition to those found in operation signatures. Use a dictionary to group related types.
+    :param success_responses: Associates operation response types with HTTP status codes.
     :param error_responses: Associates error response types with HTTP status codes.
     :param property_description_fun: Custom transformation function to apply to class property documentation strings.
     :param captions: User-defined captions for sections such as "Operations" or "Types", and (if applicable) groups of extra types.
@@ -28,6 +29,9 @@ class Options:
     info: Info
     default_security_scheme: Optional[SecurityScheme] = None
     extra_types: Union[List[type], Dict[str, List[type]], None] = None
+    success_responses: Dict[type, Union[int, str]] = dataclasses.field(
+        default_factory=dict
+    )
     error_responses: Dict[type, Union[int, str]] = dataclasses.field(
         default_factory=dict
     )

@@ -1,12 +1,13 @@
-import inspect
 from typing import Any, Dict, Set, Union
 
 from strong_typing.docstring import parse_type
 from strong_typing.inspection import (
     is_generic_list,
     is_type_optional,
+    is_type_union,
     unwrap_generic_list,
     unwrap_optional_type,
+    unwrap_union_types,
 )
 from strong_typing.name import python_type_to_name
 from strong_typing.schema import (
@@ -48,7 +49,7 @@ class Generator:
     schemas: Dict[str, Schema]
     responses: Dict[str, Response]
 
-    def __init__(self, endpoint: type, options: Options):
+    def __init__(self, endpoint: type, options: Options) -> None:
         self.endpoint = endpoint
         self.options = options
         self.schema_generator = JsonSchemaGenerator(
@@ -126,6 +127,8 @@ class Generator:
     def _build_response(
         self, response_type: type, description: str, payload_example: Any = None
     ) -> Response:
+        "Creates a response subtree."
+
         if response_type is not None:
             return Response(
                 description=description,
@@ -134,14 +137,65 @@ class Generator:
         else:
             return Response(description=description)
 
-    def _build_response_ref(
-        self, response_name: str, response_type: type, description: str
-    ) -> ResponseRef:
-        if response_name not in self.responses:
-            self.responses[response_name] = self._build_response(
-                response_type, description
+    def _build_response_group(
+        self,
+        response_type_descriptions: Dict[type, str],
+        response_examples: Dict[type, Any],
+        response_status_catalog: Dict[type, Union[int, str]],
+        default_status_code: Union[int, str],
+    ) -> Dict[str, Union[Response, ResponseRef]]:
+        """
+        Groups responses that have the same status code.
+
+        :param response_type_descriptions: Maps each response type to a textual description (if available).
+        :param response_examples: Maps each response type to an example (if any).
+        :param response_status_catalog: Maps each response type to an HTTP status code.
+        :param default_status_code: HTTP status code assigned to responses that have no mapping.
+        """
+
+        status_responses: Dict[str, List[type]] = {}
+        for response_type in response_type_descriptions.keys():
+            status_code = str(
+                response_status_catalog.get(response_type, default_status_code)
             )
-        return ResponseRef(response_name)
+            if status_code not in status_responses:
+                status_responses[status_code] = []
+            status_responses[status_code].append(response_type)
+
+        responses: Dict[str, Union[Response, ResponseRef]] = {}
+        for status_code, response_type_list in status_responses.items():
+            if len(response_type_list) > 1:
+                composite_response_type: type = Union[tuple(response_type_list)]  # type: ignore
+                composite_response_examples = [
+                    e for t, e in response_examples.items() if t in response_type_list
+                ]
+                composite_response_example = (
+                    composite_response_examples[0]
+                    if composite_response_examples
+                    else None
+                )
+            else:
+                response_type = response_type_list[0]
+                composite_response_type = response_type
+                composite_response_example = response_examples.get(response_type)
+
+            description = " **OR** ".join(
+                filter(
+                    None,
+                    (
+                        response_type_descriptions[response_type]
+                        for response_type in response_type_list
+                    ),
+                )
+            )
+
+            responses[status_code] = self._build_response(
+                response_type=composite_response_type,
+                description=description,
+                payload_example=composite_response_example,
+            )
+
+        return responses
 
     def _build_type_tag(self, ref: str, schema: Schema) -> Tag:
         definition = f'<SchemaDefinition schemaRef="#/components/schemas/{ref}" />'
@@ -233,43 +287,39 @@ class Generator:
         else:
             requestBody = None
 
-        response_description = (
-            doc_string.returns.description if doc_string.returns else None
-        )
-        responses: Dict[str, Union[Response, ResponseRef]] = {
-            "200": self._build_response(
-                response_type=op.response_type,
-                description=response_description,
-                payload_example=op.response_example,
-            )
-        }
-
-        defining_module = inspect.getmodule(op.defining_class)
-        if defining_module and doc_string.raises:
-            context = vars(defining_module)
-            exception_types: Dict[type, str] = {
-                context[name]: item.description
-                for name, item in doc_string.raises.items()
+        # success response types
+        if doc_string.returns is None and is_type_union(op.response_type):
+            # split union of return types into a list of response types
+            success_type_descriptions = {
+                item: parse_type(item).short_description
+                for item in unwrap_union_types(op.response_type)
+            }
+        else:
+            # use return type as a single response type
+            success_type_descriptions = {
+                op.response_type: doc_string.returns.description
+                if doc_string.returns
+                else "OK"
             }
 
-            status_responses: Dict[str, List[type]] = {}
-            for exception_type in exception_types.keys():
-                status_code = str(
-                    self.options.error_responses.get(exception_type, "5xx")
-                )
-                if status_code not in status_responses:
-                    status_responses[status_code] = []
-                status_responses[status_code].append(exception_type)
+        responses: Dict[str, Union[Response, ResponseRef]] = self._build_response_group(
+            success_type_descriptions,
+            {type(op.response_example): op.response_example},
+            self.options.success_responses,
+            "200",
+        )
 
-            for status_code, error_response_types in status_responses.items():
-                composite_error_type: type = Union[tuple(error_response_types)]  # type: ignore
-                responses[status_code] = self._build_response(
-                    response_type=composite_error_type,
-                    description=" **OR** ".join(
-                        exception_types[error_response_type]
-                        for error_response_type in error_response_types
-                    ),
+        # failure response types
+        if doc_string.raises:
+            exception_types = {
+                item.raise_type: item.description for item in doc_string.raises.values()
+            }
+
+            responses.update(
+                self._build_response_group(
+                    exception_types, {}, self.options.error_responses, "500"
                 )
+            )
 
         if op.event_type is not None:
             callbacks = {

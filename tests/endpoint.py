@@ -2,7 +2,7 @@ import datetime
 import enum
 import uuid
 from dataclasses import dataclass
-from typing import Callable, Generator, List
+from typing import Callable, Generator, List, Union
 
 from pyopenapi import webmethod
 from strong_typing.schema import json_schema_type
@@ -121,6 +121,22 @@ class Person:
     given_name: str
 
 
+@json_schema_type
+@dataclass
+class Student(Person):
+    "A student at a university."
+
+    birth_date: datetime.date
+
+
+@json_schema_type
+@dataclass
+class Teacher(Person):
+    "A lecturer at a university."
+
+    subject: str
+
+
 class JobManagement:
     """
     Job management.
@@ -206,6 +222,15 @@ class PeopleCatalog:
         Find a person by their name.
 
         This operation has a custom route associated with it.
+        """
+        ...
+
+    @webmethod(route="/member/name/{family}/{given}")
+    def get_member_by_name(self, family: str, given: str, /) -> Union[Student, Teacher]:
+        """
+        Find a member by their name.
+
+        This operation has multiple response payload types.
         """
         ...
 
