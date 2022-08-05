@@ -84,8 +84,8 @@ class EndpointOperation:
     :param response_type: The Python type of the data that is transmitted in the response body.
     :param http_method: The HTTP method used to invoke the endpoint such as POST, GET or PUT.
     :param public: True if the operation can be invoked without prior authentication.
-    :param request_example: A sample request that the operation might take.
-    :param response_example: A sample response that the operation might produce.
+    :param request_examples: Sample requests that the operation might take.
+    :param response_examples: Sample responses that the operation might produce.
     """
 
     defining_class: type
@@ -100,8 +100,8 @@ class EndpointOperation:
     response_type: type
     http_method: HTTPMethod
     public: bool
-    request_example: Any
-    response_example: Any
+    request_examples: Optional[List[Any]]
+    response_examples: Optional[List[Any]]
 
     def get_route(self) -> str:
         if self.route is not None:
@@ -204,14 +204,14 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
             route = webmethod.route
             route_params = _get_route_parameters(route) if route is not None else None
             public = webmethod.public
-            request_example = webmethod.request_example
-            response_example = webmethod.response_example
+            request_examples = webmethod.request_examples
+            response_examples = webmethod.response_examples
         else:
             route = None
             route_params = None
             public = False
-            request_example = None
-            response_example = None
+            request_examples = None
+            response_examples = None
 
         # inspect function signature for path and query parameters, and request/response payload type
         signature = get_signature(func_ref)
@@ -325,8 +325,8 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
                 response_type=response_type,
                 http_method=http_method,
                 public=public,
-                request_example=request_example,
-                response_example=response_example,
+                request_examples=request_examples,
+                response_examples=response_examples,
             )
         )
 

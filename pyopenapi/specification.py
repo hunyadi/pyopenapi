@@ -66,6 +66,7 @@ class Info:
 class MediaType:
     schema: Optional[Schema] = None
     example: Optional[Any] = None
+    examples: Optional[Dict[str, Union[Example, ExampleRef]]] = None
 
 
 @dataclass
@@ -139,10 +140,10 @@ Callback = Dict[str, PathItem]
 
 @dataclass
 class Example:
-    summary: Optional[str]
-    description: Optional[str]
-    value: Optional[Any]
-    externalValue: Optional[URL]
+    summary: Optional[str] = None
+    description: Optional[str] = None
+    value: Optional[Any] = None
+    externalValue: Optional[URL] = None
 
 
 @dataclass

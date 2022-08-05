@@ -2,7 +2,7 @@ import datetime
 import enum
 import uuid
 from dataclasses import dataclass
-from typing import Callable, Generator, List, Union
+from typing import Callable, Generator, List, Optional, Union
 
 from pyopenapi import webmethod
 from strong_typing.schema import json_schema_type
@@ -120,13 +120,16 @@ class Person:
     family_name: str
     given_name: str
 
+    def __str__(self) -> str:
+        return f"{self.given_name} {self.family_name}"
+
 
 @json_schema_type
 @dataclass
 class Student(Person):
     "A student at a university."
 
-    birth_date: datetime.date
+    birth_date: Optional[datetime.date] = None
 
 
 @json_schema_type
@@ -225,7 +228,17 @@ class PeopleCatalog:
         """
         ...
 
-    @webmethod(route="/member/name/{family}/{given}")
+    @webmethod(
+        route="/member/name/{family}/{given}",
+        response_examples=[
+            Student("Szörnyeteg", "Lajos"),
+            Student("Ló", "Szerafin"),
+            Student("Bruckner", "Szigfrid"),
+            Student("Nagy", "Zoárd"),
+            Teacher("Mikka", "Makka", "Négyszögletű Kerek Erdő"),
+            Teacher("Vacska", "Mati", "Négyszögletű Kerek Erdő"),
+        ],
+    )
     def get_member_by_name(self, family: str, given: str, /) -> Union[Student, Teacher]:
         """
         Find a member by their name.

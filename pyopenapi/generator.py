@@ -28,6 +28,8 @@ from .options import *
 from .specification import (
     Components,
     Document,
+    Example,
+    ExampleRef,
     MediaType,
     Operation,
     Parameter,
@@ -104,14 +106,29 @@ class Generator:
             self.schemas[type_name] = type_schema
         return SchemaRef(type_name)
 
-    def _build_media_type(self, item_type: type, example: Any = None) -> MediaType:
+    def _build_media_type(
+        self, item_type: type, examples: List[Any] = None
+    ) -> MediaType:
         return MediaType(
             schema=self._classdef_to_ref(item_type),
-            example=object_to_json(example) if example is not None else None,
+            examples=self._build_examples(examples),
+        )
+
+    def _build_examples(
+        self, examples: List[Any] = None
+    ) -> Optional[Dict[str, Union[Example, ExampleRef]]]:
+
+        return (
+            {
+                str(example): Example(value=object_to_json(example))
+                for example in examples
+            }
+            if examples is not None
+            else None
         )
 
     def _build_content(
-        self, payload_type: type, payload_example: Any = None
+        self, payload_type: type, examples: List[Any] = None
     ) -> Dict[str, MediaType]:
         "Creates the content subtree for a request or response."
 
@@ -122,17 +139,17 @@ class Generator:
             media_type = "application/json"
             item_type = payload_type
 
-        return {media_type: self._build_media_type(item_type, payload_example)}
+        return {media_type: self._build_media_type(item_type, examples)}
 
     def _build_response(
-        self, response_type: type, description: str, payload_example: Any = None
+        self, response_type: type, description: str, examples: List[Any] = None
     ) -> Response:
         "Creates a response subtree."
 
         if response_type is not None:
             return Response(
                 description=description,
-                content=self._build_content(response_type, payload_example),
+                content=self._build_content(response_type, examples),
             )
         else:
             return Response(description=description)
@@ -140,7 +157,7 @@ class Generator:
     def _build_response_group(
         self,
         response_type_descriptions: Dict[type, str],
-        response_examples: Dict[type, Any],
+        response_examples: Optional[List[Any]],
         response_status_catalog: Dict[type, Union[int, str]],
         default_status_code: Union[int, str],
     ) -> Dict[str, Union[Response, ResponseRef]]:
@@ -148,7 +165,7 @@ class Generator:
         Groups responses that have the same status code.
 
         :param response_type_descriptions: Maps each response type to a textual description (if available).
-        :param response_examples: Maps each response type to an example (if any).
+        :param response_examples: A list of response examples.
         :param response_status_catalog: Maps each response type to an HTTP status code.
         :param default_status_code: HTTP status code assigned to responses that have no mapping.
         """
@@ -164,35 +181,39 @@ class Generator:
 
         responses: Dict[str, Union[Response, ResponseRef]] = {}
         for status_code, response_type_list in status_responses.items():
-            if len(response_type_list) > 1:
-                composite_response_type: type = Union[tuple(response_type_list)]  # type: ignore
-                composite_response_examples = [
-                    e for t, e in response_examples.items() if t in response_type_list
-                ]
-                composite_response_example = (
-                    composite_response_examples[0]
-                    if composite_response_examples
-                    else None
-                )
+            response_type_tuple = tuple(response_type_list)
+            if len(response_type_tuple) > 1:
+                composite_response_type: type = Union[response_type_tuple]  # type: ignore
             else:
-                response_type = response_type_list[0]
+                response_type = response_type_tuple[0]
                 composite_response_type = response_type
-                composite_response_example = response_examples.get(response_type)
 
             description = " **OR** ".join(
                 filter(
                     None,
                     (
                         response_type_descriptions[response_type]
-                        for response_type in response_type_list
+                        for response_type in response_type_tuple
                     ),
                 )
             )
 
+            if response_examples:
+                if all(isinstance(t, type) for t in response_type_tuple):
+                    examples = [
+                        example
+                        for example in response_examples
+                        if isinstance(example, response_type_tuple)
+                    ]
+                else:
+                    examples = response_examples
+            else:
+                examples = []
+
             responses[status_code] = self._build_response(
                 response_type=composite_response_type,
                 description=description,
-                payload_example=composite_response_example,
+                examples=examples if examples else None,
             )
 
         return responses
@@ -278,7 +299,7 @@ class Generator:
             requestBody = RequestBody(
                 content={
                     "application/json": self._build_media_type(
-                        request_type, op.request_example
+                        request_type, op.request_examples
                     )
                 },
                 description=doc_params.get(request_name),
@@ -304,7 +325,7 @@ class Generator:
 
         responses: Dict[str, Union[Response, ResponseRef]] = self._build_response_group(
             success_type_descriptions,
-            {type(op.response_example): op.response_example},
+            op.response_examples,
             self.options.success_responses,
             "200",
         )
@@ -317,7 +338,10 @@ class Generator:
 
             responses.update(
                 self._build_response_group(
-                    exception_types, {}, self.options.error_responses, "500"
+                    exception_types,
+                    op.response_examples,
+                    self.options.error_responses,
+                    "500",
                 )
             )
 
