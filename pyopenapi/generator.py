@@ -44,26 +44,15 @@ from .specification import (
 )
 
 
-class Generator:
-    endpoint: type
-    options: Options
+class SchemaBuilder:
     schema_generator: JsonSchemaGenerator
     schemas: Dict[str, Schema]
-    responses: Dict[str, Response]
 
-    def __init__(self, endpoint: type, options: Options) -> None:
-        self.endpoint = endpoint
-        self.options = options
-        self.schema_generator = JsonSchemaGenerator(
-            SchemaOptions(
-                definitions_path="#/components/schemas/",
-                property_description_fun=options.property_description_fun,
-            )
-        )
+    def __init__(self, schema_generator: JsonSchemaGenerator) -> None:
+        self.schema_generator = schema_generator
         self.schemas = {}
-        self.responses = {}
 
-    def _classdef_to_schema(self, typ: type) -> Schema:
+    def classdef_to_schema(self, typ: type) -> Schema:
         """
         Converts a type to a JSON schema.
         For nested types found in the type hierarchy, adds the type to the schema registry in the OpenAPI specification section `components`.
@@ -73,18 +62,22 @@ class Generator:
 
         # append schema to list of known schemas, to be used in OpenAPI's Components Object section
         for ref, schema in type_definitions.items():
-            if ref not in self.schemas:
-                self.schemas[ref] = schema
+            self._add_ref(ref, schema)
 
         return type_schema
 
-    def _classdef_to_ref(self, typ: type) -> Union[Schema, SchemaRef]:
+    def classdef_to_named_schema(self, name: str, typ: type) -> Schema:
+        schema = self.classdef_to_schema(typ)
+        self._add_ref(name, schema)
+        return schema
+
+    def classdef_to_ref(self, typ: type) -> Union[Schema, SchemaRef]:
         """
         Converts a type to a JSON schema, and if possible, returns a schema reference.
         For composite types (such as classes), adds the type to the schema registry in the OpenAPI specification section `components`.
         """
 
-        type_schema = self._classdef_to_schema(typ)
+        type_schema = self.classdef_to_schema(typ)
         if typ is str or typ is int or typ is float:
             # represent simple types as themselves
             return type_schema
@@ -102,15 +95,37 @@ class Generator:
         return type_schema
 
     def _build_ref(self, type_name: str, type_schema: Schema) -> SchemaRef:
+        self._add_ref(type_name, type_schema)
+        return SchemaRef(type_name)
+
+    def _add_ref(self, type_name: str, type_schema: Schema) -> None:
         if type_name not in self.schemas:
             self.schemas[type_name] = type_schema
-        return SchemaRef(type_name)
+
+
+class Generator:
+    endpoint: type
+    options: Options
+    schema_builder: SchemaBuilder
+    responses: Dict[str, Response]
+
+    def __init__(self, endpoint: type, options: Options) -> None:
+        self.endpoint = endpoint
+        self.options = options
+        schema_generator = JsonSchemaGenerator(
+            SchemaOptions(
+                definitions_path="#/components/schemas/",
+                property_description_fun=options.property_description_fun,
+            )
+        )
+        self.schema_builder = SchemaBuilder(schema_generator)
+        self.responses = {}
 
     def _build_media_type(
         self, item_type: type, examples: List[Any] = None
     ) -> MediaType:
         return MediaType(
-            schema=self._classdef_to_ref(item_type),
+            schema=self.schema_builder.classdef_to_ref(item_type),
             examples=self._build_examples(examples),
         )
 
@@ -185,7 +200,7 @@ class Generator:
             if len(response_type_tuple) > 1:
                 composite_response_type: type = Union[response_type_tuple]  # type: ignore
             else:
-                response_type = response_type_tuple[0]
+                (response_type,) = response_type_tuple
                 composite_response_type = response_type
 
             description = " **OR** ".join(
@@ -244,10 +259,9 @@ class Generator:
             tag_list: List[Tag] = []
 
             for extra_type in category_items:
-                ref = extra_type.__name__
-                type_schema = self._classdef_to_schema(extra_type)
-                self.schemas[ref] = type_schema
-                tag_list.append(self._build_type_tag(ref, type_schema))
+                name = python_type_to_name(extra_type)
+                schema = self.schema_builder.classdef_to_named_schema(name, extra_type)
+                tag_list.append(self._build_type_tag(name, schema))
 
             extra_tags[category_name] = tag_list
 
@@ -266,7 +280,7 @@ class Generator:
                 in_=ParameterLocation.Path,
                 description=doc_params.get(param_name),
                 required=True,
-                schema=self._classdef_to_ref(param_type),
+                schema=self.schema_builder.classdef_to_ref(param_type),
             )
             for param_name, param_type in op.path_params
         ]
@@ -286,7 +300,7 @@ class Generator:
                 in_=ParameterLocation.Query,
                 description=doc_params.get(param_name),
                 required=required,
-                schema=self._classdef_to_ref(inner_type),
+                schema=self.schema_builder.classdef_to_ref(inner_type),
             )
             query_parameters.append(query_parameter)
 
@@ -318,9 +332,9 @@ class Generator:
         else:
             # use return type as a single response type
             success_type_descriptions = {
-                op.response_type: doc_string.returns.description
-                if doc_string.returns
-                else "OK"
+                op.response_type: (
+                    doc_string.returns.description if doc_string.returns else "OK"
+                )
             }
 
         responses: Dict[str, Union[Response, ResponseRef]] = self._build_response_group(
@@ -332,7 +346,7 @@ class Generator:
 
         # failure response types
         if doc_string.raises:
-            exception_types = {
+            exception_types: Dict[type, str] = {
                 item.raise_type: item.description for item in doc_string.raises.values()
             }
 
@@ -413,16 +427,15 @@ class Generator:
 
         # types that are produced/consumed by operations
         type_tags = [
-            self._build_type_tag(ref, schema) for ref, schema in self.schemas.items()
+            self._build_type_tag(ref, schema)
+            for ref, schema in self.schema_builder.schemas.items()
         ]
 
         # types that are emitted by events
         event_tags: List[Tag] = []
         events = get_endpoint_events(self.endpoint)
         for ref, event_type in events.items():
-            event_schema = self._classdef_to_schema(event_type)
-            if ref not in self.schemas:
-                self.schemas[ref] = event_schema
+            event_schema = self.schema_builder.classdef_to_named_schema(ref, event_type)
             event_tags.append(self._build_type_tag(ref, event_schema))
 
         # types that are explicitly declared
@@ -490,7 +503,7 @@ class Generator:
             servers=[self.options.server],
             paths=paths,
             components=Components(
-                schemas=self.schemas,
+                schemas=self.schema_builder.schemas,
                 responses=self.responses,
                 securitySchemes=securitySchemes,
             ),
