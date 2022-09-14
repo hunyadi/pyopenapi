@@ -103,25 +103,27 @@ class SchemaBuilder:
             self.schemas[type_name] = type_schema
 
 
-class Generator:
-    endpoint: type
-    options: Options
+class ContentBuilder:
     schema_builder: SchemaBuilder
-    responses: Dict[str, Response]
 
-    def __init__(self, endpoint: type, options: Options) -> None:
-        self.endpoint = endpoint
-        self.options = options
-        schema_generator = JsonSchemaGenerator(
-            SchemaOptions(
-                definitions_path="#/components/schemas/",
-                property_description_fun=options.property_description_fun,
-            )
-        )
-        self.schema_builder = SchemaBuilder(schema_generator)
-        self.responses = {}
+    def __init__(self, schema_builder: SchemaBuilder) -> None:
+        self.schema_builder = schema_builder
 
-    def _build_media_type(
+    def build_content(
+        self, payload_type: type, examples: List[Any] = None
+    ) -> Dict[str, MediaType]:
+        "Creates the content subtree for a request or response."
+
+        if is_generic_list(payload_type):
+            media_type = "application/jsonl"
+            item_type = unwrap_generic_list(payload_type)
+        else:
+            media_type = "application/json"
+            item_type = payload_type
+
+        return {media_type: self.build_media_type(item_type, examples)}
+
+    def build_media_type(
         self, item_type: type, examples: List[Any] = None
     ) -> MediaType:
         return MediaType(
@@ -142,59 +144,52 @@ class Generator:
             else None
         )
 
-    def _build_content(
-        self, payload_type: type, examples: List[Any] = None
-    ) -> Dict[str, MediaType]:
-        "Creates the content subtree for a request or response."
 
-        if is_generic_list(payload_type):
-            media_type = "application/jsonl"
-            item_type = unwrap_generic_list(payload_type)
-        else:
-            media_type = "application/json"
-            item_type = payload_type
+@dataclass
+class ResponseOptions:
+    """
+    Configuration options for building a response for an operation.
 
-        return {media_type: self._build_media_type(item_type, examples)}
+    :param type_descriptions: Maps each response type to a textual description (if available).
+    :param examples: A list of response examples.
+    :param status_catalog: Maps each response type to an HTTP status code.
+    :param default_status_code: HTTP status code assigned to responses that have no mapping.
+    """
 
-    def _build_response(
-        self, response_type: type, description: str, examples: List[Any] = None
-    ) -> Response:
-        "Creates a response subtree."
+    type_descriptions: Dict[type, str]
+    examples: Optional[List[Any]]
+    status_catalog: Dict[type, Union[int, str]]
+    default_status_code: Union[int, str]
 
-        if response_type is not None:
-            return Response(
-                description=description,
-                content=self._build_content(response_type, examples),
-            )
-        else:
-            return Response(description=description)
 
-    def _build_response_group(
-        self,
-        response_type_descriptions: Dict[type, str],
-        response_examples: Optional[List[Any]],
-        response_status_catalog: Dict[type, Union[int, str]],
-        default_status_code: Union[int, str],
-    ) -> Dict[str, Union[Response, ResponseRef]]:
-        """
-        Groups responses that have the same status code.
+class ResponseBuilder:
+    content_builder: ContentBuilder
 
-        :param response_type_descriptions: Maps each response type to a textual description (if available).
-        :param response_examples: A list of response examples.
-        :param response_status_catalog: Maps each response type to an HTTP status code.
-        :param default_status_code: HTTP status code assigned to responses that have no mapping.
-        """
+    def __init__(self, content_builder: ContentBuilder) -> None:
+        self.content_builder = content_builder
 
+    def _get_status_responses(self, options: ResponseOptions) -> Dict[str, List[type]]:
         status_responses: Dict[str, List[type]] = {}
-        for response_type in response_type_descriptions.keys():
+
+        for response_type in options.type_descriptions.keys():
             status_code = str(
-                response_status_catalog.get(response_type, default_status_code)
+                options.status_catalog.get(response_type, options.default_status_code)
             )
             if status_code not in status_responses:
                 status_responses[status_code] = []
             status_responses[status_code].append(response_type)
 
+        return status_responses
+
+    def build_response(
+        self, options: ResponseOptions
+    ) -> Dict[str, Union[Response, ResponseRef]]:
+        """
+        Groups responses that have the same status code.
+        """
+
         responses: Dict[str, Union[Response, ResponseRef]] = {}
+        status_responses = self._get_status_responses(options)
         for status_code, response_type_list in status_responses.items():
             response_type_tuple = tuple(response_type_list)
             if len(response_type_tuple) > 1:
@@ -207,21 +202,21 @@ class Generator:
                 filter(
                     None,
                     (
-                        response_type_descriptions[response_type]
+                        options.type_descriptions[response_type]
                         for response_type in response_type_tuple
                     ),
                 )
             )
 
-            if response_examples:
+            if options.examples:
                 if all(isinstance(t, type) for t in response_type_tuple):
                     examples = [
                         example
-                        for example in response_examples
+                        for example in options.examples
                         if isinstance(example, response_type_tuple)
                     ]
                 else:
-                    examples = response_examples
+                    examples = options.examples
             else:
                 examples = []
 
@@ -232,6 +227,38 @@ class Generator:
             )
 
         return responses
+
+    def _build_response(
+        self, response_type: type, description: str, examples: List[Any] = None
+    ) -> Response:
+        "Creates a response subtree."
+
+        if response_type is not None:
+            return Response(
+                description=description,
+                content=self.content_builder.build_content(response_type, examples),
+            )
+        else:
+            return Response(description=description)
+
+
+class Generator:
+    endpoint: type
+    options: Options
+    schema_builder: SchemaBuilder
+    responses: Dict[str, Response]
+
+    def __init__(self, endpoint: type, options: Options) -> None:
+        self.endpoint = endpoint
+        self.options = options
+        schema_generator = JsonSchemaGenerator(
+            SchemaOptions(
+                definitions_path="#/components/schemas/",
+                property_description_fun=options.property_description_fun,
+            )
+        )
+        self.schema_builder = SchemaBuilder(schema_generator)
+        self.responses = {}
 
     def _build_type_tag(self, ref: str, schema: Schema) -> Tag:
         definition = f'<SchemaDefinition schemaRef="#/components/schemas/{ref}" />'
@@ -309,10 +336,11 @@ class Generator:
 
         # data passed in payload
         if op.request_param:
+            builder = ContentBuilder(self.schema_builder)
             request_name, request_type = op.request_param
             requestBody = RequestBody(
                 content={
-                    "application/json": self._build_media_type(
+                    "application/json": builder.build_media_type(
                         request_type, op.request_examples
                     )
                 },
@@ -337,12 +365,15 @@ class Generator:
                 )
             }
 
-        responses: Dict[str, Union[Response, ResponseRef]] = self._build_response_group(
+        content_builder = ContentBuilder(self.schema_builder)
+        response_builder = ResponseBuilder(content_builder)
+        response_options = ResponseOptions(
             success_type_descriptions,
             op.response_examples,
             self.options.success_responses,
             "200",
         )
+        responses = response_builder.build_response(response_options)
 
         # failure response types
         if doc_string.raises:
@@ -350,22 +381,24 @@ class Generator:
                 item.raise_type: item.description for item in doc_string.raises.values()
             }
 
-            responses.update(
-                self._build_response_group(
-                    exception_types,
-                    op.response_examples,
-                    self.options.error_responses,
-                    "500",
-                )
+            content_builder = ContentBuilder(self.schema_builder)
+            response_builder = ResponseBuilder(content_builder)
+            response_options = ResponseOptions(
+                exception_types,
+                op.response_examples,
+                self.options.error_responses,
+                "500",
             )
+            responses.update(response_builder.build_response(response_options))
 
         if op.event_type is not None:
+            builder = ContentBuilder(self.schema_builder)
             callbacks = {
                 f"{op.func_name}_callback": {
                     "{$request.query.callback}": PathItem(
                         post=Operation(
                             requestBody=RequestBody(
-                                content=self._build_content(op.event_type)
+                                content=builder.build_content(op.event_type)
                             ),
                             responses={"200": Response(description="OK")},
                         )
