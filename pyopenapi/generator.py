@@ -1,5 +1,6 @@
 from typing import Any, Dict, Set, Union
 
+from strong_typing.core import JsonType
 from strong_typing.docstring import parse_type
 from strong_typing.inspection import (
     is_generic_list,
@@ -44,6 +45,9 @@ from .specification import (
 )
 
 
+SchemaOrRef = Union[Schema, SchemaRef]
+
+
 class SchemaBuilder:
     schema_generator: JsonSchemaGenerator
     schemas: Dict[str, Schema]
@@ -71,7 +75,7 @@ class SchemaBuilder:
         self._add_ref(name, schema)
         return schema
 
-    def classdef_to_ref(self, typ: type) -> Union[Schema, SchemaRef]:
+    def classdef_to_ref(self, typ: type) -> SchemaOrRef:
         """
         Converts a type to a JSON schema, and if possible, returns a schema reference.
         For composite types (such as classes), adds the type to the schema registry in the OpenAPI specification section `components`.
@@ -105,9 +109,18 @@ class SchemaBuilder:
 
 class ContentBuilder:
     schema_builder: SchemaBuilder
+    schema_transformer: Callable[[SchemaOrRef], SchemaOrRef]
+    sample_transformer: Callable[[JsonType], JsonType]
 
-    def __init__(self, schema_builder: SchemaBuilder) -> None:
+    def __init__(
+        self,
+        schema_builder: SchemaBuilder,
+        schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = None,
+        sample_transformer: Callable[[JsonType], JsonType] = None,
+    ) -> None:
         self.schema_builder = schema_builder
+        self.schema_transformer = schema_transformer  # type: ignore
+        self.sample_transformer = sample_transformer  # type: ignore
 
     def build_content(
         self, payload_type: type, examples: List[Any] = None
@@ -126,8 +139,13 @@ class ContentBuilder:
     def build_media_type(
         self, item_type: type, examples: List[Any] = None
     ) -> MediaType:
+
+        schema = self.schema_builder.classdef_to_ref(item_type)
+        if self.schema_transformer:
+            schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = self.schema_transformer  # type: ignore
+            schema = schema_transformer(schema)
         return MediaType(
-            schema=self.schema_builder.classdef_to_ref(item_type),
+            schema=schema,
             examples=self._build_examples(examples),
         )
 
@@ -135,14 +153,18 @@ class ContentBuilder:
         self, examples: List[Any] = None
     ) -> Optional[Dict[str, Union[Example, ExampleRef]]]:
 
-        return (
-            {
-                str(example): Example(value=object_to_json(example))
-                for example in examples
-            }
-            if examples is not None
-            else None
-        )
+        if examples is None:
+            return None
+
+        if self.sample_transformer:
+            sample_transformer: Callable[[JsonType], JsonType] = self.sample_transformer  # type: ignore
+        else:
+            sample_transformer = lambda sample: sample
+
+        return {
+            str(example): Example(value=sample_transformer(object_to_json(example)))
+            for example in examples
+        }
 
 
 @dataclass
@@ -208,22 +230,10 @@ class ResponseBuilder:
                 )
             )
 
-            if options.examples:
-                if all(isinstance(t, type) for t in response_type_tuple):
-                    examples = [
-                        example
-                        for example in options.examples
-                        if isinstance(example, response_type_tuple)
-                    ]
-                else:
-                    examples = options.examples
-            else:
-                examples = []
-
             responses[status_code] = self._build_response(
                 response_type=composite_response_type,
                 description=description,
-                examples=examples if examples else None,
+                examples=options.examples if options.examples else None,
             )
 
         return responses
@@ -365,11 +375,18 @@ class Generator:
                 )
             }
 
+        response_examples = op.response_examples or []
+        success_examples = [
+            example
+            for example in response_examples
+            if not isinstance(example, Exception)
+        ]
+
         content_builder = ContentBuilder(self.schema_builder)
         response_builder = ResponseBuilder(content_builder)
         response_options = ResponseOptions(
             success_type_descriptions,
-            op.response_examples,
+            success_examples,
             self.options.success_responses,
             "200",
         )
@@ -380,12 +397,37 @@ class Generator:
             exception_types: Dict[type, str] = {
                 item.raise_type: item.description for item in doc_string.raises.values()
             }
+            exception_examples = [
+                example
+                for example in response_examples
+                if isinstance(example, Exception)
+            ]
 
-            content_builder = ContentBuilder(self.schema_builder)
+            if self.options.error_wrapper:
+                schema_transformer = lambda schema: {
+                    "type": "object",
+                    "properties": {
+                        "error": schema,
+                    },
+                    "additionalProperties": False,
+                    "required": [
+                        "error",
+                    ],
+                }
+                sample_transformer = lambda error: {"error": error}
+            else:
+                schema_transformer = None
+                sample_transformer = None
+
+            content_builder = ContentBuilder(
+                self.schema_builder,
+                schema_transformer=schema_transformer,
+                sample_transformer=sample_transformer,
+            )
             response_builder = ResponseBuilder(content_builder)
             response_options = ResponseOptions(
                 exception_types,
-                op.response_examples,
+                exception_examples,
                 self.options.error_responses,
                 "500",
             )
