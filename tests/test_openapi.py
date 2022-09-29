@@ -8,7 +8,16 @@ from uuid import UUID
 from pyopenapi import Info, Options, Server, Specification
 from pyopenapi.specification import SecuritySchemeHTTP
 
-from endpoint import BadRequestError, Endpoint, InternalServerError, Student, Teacher
+from endpoint import (
+    AuthenticationError,
+    BadRequestError,
+    Endpoint,
+    InternalServerError,
+    NotFoundError,
+    Student,
+    Teacher,
+    ValidationError,
+)
 
 try:
     from pygments import highlight
@@ -91,9 +100,13 @@ class TestOpenAPI(unittest.TestCase):
                 extra_types=[ExampleType, UnreferencedType],
                 success_responses={Student: 201, Teacher: 202},
                 error_responses={
+                    AuthenticationError: 401,
                     BadRequestError: 400,
                     InternalServerError: 500,
+                    NotFoundError: 404,
+                    ValidationError: 400,
                 },
+                error_wrapper=True,
             ),
         )
 
