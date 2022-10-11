@@ -1,3 +1,6 @@
 aiohttp
 json_strong_typing
-pygments
+Pygments
+PyYAML
+types-PyYAML
+types-Pygments
