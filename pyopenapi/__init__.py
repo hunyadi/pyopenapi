@@ -4,7 +4,7 @@ from .metadata import WebMethod
 from .options import *
 from .utility import Specification
 
-__version__ = "0.1.6"
+__version__ = "0.1.7"
 
 T = TypeVar("T")
 
