@@ -48,6 +48,19 @@ from .specification import (
 SchemaOrRef = Union[Schema, SchemaRef]
 
 
+def http_status_to_string(status_code: HTTPStatusCode) -> str:
+    "Converts an HTTP status code to a string."
+
+    if isinstance(status_code, HTTPStatus):
+        return str(status_code.value)
+    elif isinstance(status_code, int):
+        return str(status_code)
+    elif isinstance(status_code, str):
+        return status_code
+    else:
+        raise TypeError("expected: HTTP status code")
+
+
 class SchemaBuilder:
     schema_generator: JsonSchemaGenerator
     schemas: Dict[str, Schema]
@@ -180,8 +193,15 @@ class ResponseOptions:
 
     type_descriptions: Dict[type, str]
     examples: Optional[List[Any]]
-    status_catalog: Dict[type, Union[int, str]]
-    default_status_code: Union[int, str]
+    status_catalog: Dict[type, HTTPStatusCode]
+    default_status_code: HTTPStatusCode
+
+
+@dataclass
+class StatusResponse:
+    status_code: str
+    types: List[type] = dataclasses.field(default_factory=list)
+    examples: List[Any] = dataclasses.field(default_factory=list)
 
 
 class ResponseBuilder:
@@ -190,16 +210,31 @@ class ResponseBuilder:
     def __init__(self, content_builder: ContentBuilder) -> None:
         self.content_builder = content_builder
 
-    def _get_status_responses(self, options: ResponseOptions) -> Dict[str, List[type]]:
-        status_responses: Dict[str, List[type]] = {}
+    def _get_status_responses(
+        self, options: ResponseOptions
+    ) -> Dict[str, StatusResponse]:
+        status_responses: Dict[str, StatusResponse] = {}
 
         for response_type in options.type_descriptions.keys():
-            status_code = str(
+            status_code = http_status_to_string(
                 options.status_catalog.get(response_type, options.default_status_code)
             )
+
+            # look up response for status code
             if status_code not in status_responses:
-                status_responses[status_code] = []
-            status_responses[status_code].append(response_type)
+                status_responses[status_code] = StatusResponse(status_code)
+            status_response = status_responses[status_code]
+
+            # append response types that are assigned the given status code
+            status_response.types.append(response_type)
+
+            # append examples that have the matching response type
+            if options.examples:
+                status_response.examples.extend(
+                    example
+                    for example in options.examples
+                    if isinstance(example, response_type)
+                )
 
         return status_responses
 
@@ -212,12 +247,12 @@ class ResponseBuilder:
 
         responses: Dict[str, Union[Response, ResponseRef]] = {}
         status_responses = self._get_status_responses(options)
-        for status_code, response_type_list in status_responses.items():
-            response_type_tuple = tuple(response_type_list)
-            if len(response_type_tuple) > 1:
-                composite_response_type: type = Union[response_type_tuple]  # type: ignore
+        for status_code, status_response in status_responses.items():
+            response_types = tuple(status_response.types)
+            if len(response_types) > 1:
+                composite_response_type: type = Union[response_types]  # type: ignore
             else:
-                (response_type,) = response_type_tuple
+                (response_type,) = response_types
                 composite_response_type = response_type
 
             description = " **OR** ".join(
@@ -225,7 +260,7 @@ class ResponseBuilder:
                     None,
                     (
                         options.type_descriptions[response_type]
-                        for response_type in response_type_tuple
+                        for response_type in response_types
                     ),
                 )
             )
@@ -233,7 +268,7 @@ class ResponseBuilder:
             responses[status_code] = self._build_response(
                 response_type=composite_response_type,
                 description=description,
-                examples=options.examples if options.examples else None,
+                examples=status_response.examples or None,
             )
 
         return responses

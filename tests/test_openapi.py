@@ -2,6 +2,7 @@ import os
 import os.path
 import unittest
 from datetime import datetime
+from http import HTTPStatus
 from typing import TextIO
 from uuid import UUID
 
@@ -98,12 +99,15 @@ class TestOpenAPI(unittest.TestCase):
                     "JWT",
                 ),
                 extra_types=[ExampleType, UnreferencedType],
-                success_responses={Student: 201, Teacher: 202},
+                success_responses={
+                    Student: HTTPStatus.CREATED,
+                    Teacher: HTTPStatus.ACCEPTED,
+                },
                 error_responses={
-                    AuthenticationError: 401,
+                    AuthenticationError: HTTPStatus.UNAUTHORIZED,
                     BadRequestError: 400,
                     InternalServerError: 500,
-                    NotFoundError: 404,
+                    NotFoundError: HTTPStatus.NOT_FOUND,
                     ValidationError: 400,
                 },
                 error_wrapper=True,

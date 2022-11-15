@@ -1,5 +1,6 @@
 import dataclasses
 from dataclasses import dataclass
+from http import HTTPStatus
 from typing import Callable, ClassVar, Dict, List, Optional, Union
 
 from .specification import (
@@ -10,6 +11,8 @@ from .specification import (
     SecuritySchemeOpenIDConnect,
     Server,
 )
+
+HTTPStatusCode = Union[HTTPStatus, int, str]
 
 
 @dataclass
@@ -30,10 +33,10 @@ class Options:
     info: Info
     default_security_scheme: Optional[SecurityScheme] = None
     extra_types: Union[List[type], Dict[str, List[type]], None] = None
-    success_responses: Dict[type, Union[int, str]] = dataclasses.field(
+    success_responses: Dict[type, HTTPStatusCode] = dataclasses.field(
         default_factory=dict
     )
-    error_responses: Dict[type, Union[int, str]] = dataclasses.field(
+    error_responses: Dict[type, HTTPStatusCode] = dataclasses.field(
         default_factory=dict
     )
     error_wrapper: bool = False
