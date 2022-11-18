@@ -122,21 +122,21 @@ class SchemaBuilder:
 
 class ContentBuilder:
     schema_builder: SchemaBuilder
-    schema_transformer: Callable[[SchemaOrRef], SchemaOrRef]
-    sample_transformer: Callable[[JsonType], JsonType]
+    schema_transformer: Optional[Callable[[SchemaOrRef], SchemaOrRef]]
+    sample_transformer: Optional[Callable[[JsonType], JsonType]]
 
     def __init__(
         self,
         schema_builder: SchemaBuilder,
-        schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = None,
-        sample_transformer: Callable[[JsonType], JsonType] = None,
+        schema_transformer: Optional[Callable[[SchemaOrRef], SchemaOrRef]] = None,
+        sample_transformer: Optional[Callable[[JsonType], JsonType]] = None,
     ) -> None:
         self.schema_builder = schema_builder
-        self.schema_transformer = schema_transformer  # type: ignore
-        self.sample_transformer = sample_transformer  # type: ignore
+        self.schema_transformer = schema_transformer
+        self.sample_transformer = sample_transformer
 
     def build_content(
-        self, payload_type: type, examples: List[Any] = None
+        self, payload_type: type, examples: Optional[List[Any]] = None
     ) -> Dict[str, MediaType]:
         "Creates the content subtree for a request or response."
 
@@ -150,7 +150,7 @@ class ContentBuilder:
         return {media_type: self.build_media_type(item_type, examples)}
 
     def build_media_type(
-        self, item_type: type, examples: List[Any] = None
+        self, item_type: type, examples: Optional[List[Any]] = None
     ) -> MediaType:
 
         schema = self.schema_builder.classdef_to_ref(item_type)
@@ -163,7 +163,7 @@ class ContentBuilder:
         )
 
     def _build_examples(
-        self, examples: List[Any] = None
+        self, examples: Optional[List[Any]] = None
     ) -> Optional[Dict[str, Union[Example, ExampleRef]]]:
 
         if examples is None:
@@ -274,7 +274,10 @@ class ResponseBuilder:
         return responses
 
     def _build_response(
-        self, response_type: type, description: str, examples: List[Any] = None
+        self,
+        response_type: type,
+        description: str,
+        examples: Optional[List[Any]] = None,
     ) -> Response:
         "Creates a response subtree."
 

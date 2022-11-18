@@ -2,7 +2,7 @@ import datetime
 import enum
 import uuid
 from dataclasses import dataclass
-from typing import Callable, Generator, List, Optional, Union
+from typing import Callable, Generator, List, Optional, Protocol, Union
 
 from pyopenapi import webmethod
 from strong_typing.schema import json_schema_type
@@ -224,7 +224,7 @@ class Teacher(Person):
 #
 
 
-class JobManagement:
+class JobManagement(Protocol):
     """
     Job management.
 
@@ -301,7 +301,7 @@ class JobManagement:
     data_event: Callable[[DataEvent], None]
 
 
-class PeopleCatalog:
+class PeopleCatalog(Protocol):
     """
     Operations related to people.
     """
@@ -378,7 +378,7 @@ class TokenProperties:
     expires_at: datetime.datetime
 
 
-class Endpoint(JobManagement, PeopleCatalog):
+class Endpoint(JobManagement, PeopleCatalog, Protocol):
     @webmethod(route="/auth", public=True)
     def do_authenticate(self, credentials: Credentials) -> TokenProperties:
         """

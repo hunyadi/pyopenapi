@@ -1,5 +1,6 @@
 import importlib.resources
 import json
+import sys
 from typing import TextIO
 
 from strong_typing.schema import StrictJsonType, object_to_json
@@ -90,10 +91,16 @@ class Specification:
         :param pretty_print: Whether to use line indents to beautify the JSON string in the HTML file.
         """
 
-        with importlib.resources.open_text(
-            __package__, "template.html", encoding="utf-8", errors="strict"
-        ) as html_template_file:
-            html_template = html_template_file.read()
+        if sys.version_info >= (3, 9):
+            with importlib.resources.files(__package__).joinpath("template.html").open(
+                encoding="utf-8", errors="strict"
+            ) as html_template_file:
+                html_template = html_template_file.read()
+        else:
+            with importlib.resources.open_text(
+                __package__, "template.html", encoding="utf-8", errors="strict"
+            ) as html_template_file:
+                html_template = html_template_file.read()
 
         html = html_template.replace(
             "{ /* OPENAPI_SPECIFICATION */ }",

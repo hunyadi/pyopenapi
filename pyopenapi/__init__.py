@@ -1,4 +1,4 @@
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, Optional, TypeVar
 
 from .metadata import WebMethod
 from .options import *
@@ -10,12 +10,12 @@ T = TypeVar("T")
 
 
 def webmethod(
-    route: str = None,
-    public: bool = False,
-    request_example: Any = None,
-    response_example: Any = None,
-    request_examples: List[Any] = None,
-    response_examples: List[Any] = None,
+    route: Optional[str] = None,
+    public: Optional[bool] = False,
+    request_example: Optional[Any] = None,
+    response_example: Optional[Any] = None,
+    request_examples: Optional[List[Any]] = None,
+    response_examples: Optional[List[Any]] = None,
 ) -> Callable[[T], T]:
     """
     Decorator that supplies additional metadata to an endpoint operation function.
@@ -48,7 +48,7 @@ def webmethod(
             "__webmethod__",
             WebMethod(
                 route=route,
-                public=public,
+                public=public or False,
                 request_examples=request_examples,
                 response_examples=response_examples,
             ),

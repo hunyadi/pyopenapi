@@ -1,6 +1,6 @@
 import unittest
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional, Protocol
 
 from pyopenapi import webmethod
 from pyopenapi.proxy import make_proxy_class
@@ -29,7 +29,7 @@ class HTTPBinPostResponse(HTTPBinResponse):
     form: Dict[str, str]
 
 
-class API:
+class API(Protocol):
     @webmethod(route="/get")
     def get_method(self, /, id: str) -> HTTPBinResponse:
         ...
@@ -47,7 +47,7 @@ class TestOpenAPI(unittest.IsolatedAsyncioTestCase):
         self,
         response: HTTPBinResponse,
         params: Dict[str, str],
-        headers: Dict[str, str] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> None:
         self.assertIsInstance(response, HTTPBinResponse)
         self.assertDictEqual(response.args, params)
