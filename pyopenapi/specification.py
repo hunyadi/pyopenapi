@@ -242,6 +242,7 @@ class Document:
 
     openapi: str
     info: Info
+    jsonSchemaDialect: str
     servers: List[Server]
     paths: Dict[str, PathItem]
     components: Optional[Components] = None

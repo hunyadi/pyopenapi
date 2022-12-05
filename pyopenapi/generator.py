@@ -613,6 +613,7 @@ class Generator:
         return Document(
             openapi="3.1.0",
             info=self.options.info,
+            jsonSchemaDialect="https://json-schema.org/draft/2020-12/schema",
             servers=[self.options.server],
             paths=paths,
             components=Components(
