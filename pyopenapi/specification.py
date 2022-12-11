@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import dataclasses
 import enum
 from dataclasses import dataclass
@@ -66,7 +64,7 @@ class Info:
 class MediaType:
     schema: Optional[Schema] = None
     example: Optional[Any] = None
-    examples: Optional[Dict[str, Union[Example, ExampleRef]]] = None
+    examples: Optional[Dict[str, Union["Example", ExampleRef]]] = None
 
 
 @dataclass
@@ -109,7 +107,7 @@ class Operation:
     parameters: Optional[List[Parameter]] = None
     requestBody: Optional[RequestBody] = None
     callbacks: Optional[Dict[str, "Callback"]] = None
-    security: Optional[List[SecurityRequirement]] = None
+    security: Optional[List["SecurityRequirement"]] = None
 
 
 @dataclass
@@ -125,7 +123,7 @@ class PathItem:
     patch: Optional[Operation] = None
     trace: Optional[Operation] = None
 
-    def update(self, other: PathItem) -> None:
+    def update(self, other: "PathItem") -> None:
         "Merges another instance of this class into this object."
 
         for field in dataclasses.fields(self.__class__):
