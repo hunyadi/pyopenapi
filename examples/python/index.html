@@ -5,22 +5,22 @@ td.linenos .special { color: #000000; background-color: #ffffc0; padding-left: 5
 span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
 .highlight .hll { background-color: #ffffcc }
 .highlight { background: #f8f8f8; }
-.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .c { color: #3D7B7B; font-style: italic } /* Comment */
 .highlight .err { border: 1px solid #FF0000 } /* Error */
 .highlight .k { color: #008000; font-weight: bold } /* Keyword */
 .highlight .o { color: #666666 } /* Operator */
-.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
-.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
-.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
-.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
-.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
-.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .ch { color: #3D7B7B; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #3D7B7B; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #9C6500 } /* Comment.Preproc */
+.highlight .cpf { color: #3D7B7B; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #3D7B7B; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #3D7B7B; font-style: italic } /* Comment.Special */
 .highlight .gd { color: #A00000 } /* Generic.Deleted */
 .highlight .ge { font-style: italic } /* Generic.Emph */
-.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gr { color: #E40000 } /* Generic.Error */
 .highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
-.highlight .gi { color: #00A000 } /* Generic.Inserted */
-.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gi { color: #008400 } /* Generic.Inserted */
+.highlight .go { color: #717171 } /* Generic.Output */
 .highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
 .highlight .gs { font-weight: bold } /* Generic.Strong */
 .highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
@@ -33,15 +33,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .kt { color: #B00040 } /* Keyword.Type */
 .highlight .m { color: #666666 } /* Literal.Number */
 .highlight .s { color: #BA2121 } /* Literal.String */
-.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .na { color: #687822 } /* Name.Attribute */
 .highlight .nb { color: #008000 } /* Name.Builtin */
 .highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
 .highlight .no { color: #880000 } /* Name.Constant */
 .highlight .nd { color: #AA22FF } /* Name.Decorator */
-.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
-.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .ni { color: #717171; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #CB3F38; font-weight: bold } /* Name.Exception */
 .highlight .nf { color: #0000FF } /* Name.Function */
-.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nl { color: #767600 } /* Name.Label */
 .highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
 .highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
 .highlight .nv { color: #19177C } /* Name.Variable */
@@ -58,11 +58,11 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
 .highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
 .highlight .s2 { color: #BA2121 } /* Literal.String.Double */
-.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .se { color: #AA5D1F; font-weight: bold } /* Literal.String.Escape */
 .highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
-.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .si { color: #A45A77; font-weight: bold } /* Literal.String.Interpol */
 .highlight .sx { color: #008000 } /* Literal.String.Other */
-.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .sr { color: #A45A77 } /* Literal.String.Regex */
 .highlight .s1 { color: #BA2121 } /* Literal.String.Single */
 .highlight .ss { color: #19177C } /* Literal.String.Symbol */
 .highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
@@ -75,7 +75,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="kn">import</span> <span class="nn">enum</span>
 <span class="kn">import</span> <span class="nn">uuid</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">pyopenapi</span> <span class="kn">import</span> <span class="n">webmethod</span>
 <span class="kn">from</span> <span class="nn">strong_typing.schema</span> <span class="kn">import</span> <span class="n">json_schema_type</span>
@@ -93,6 +93,85 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+
+
+<span class="nd">@json_schema_type</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">OperationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Encapsulates an error from an endpoint operation.</span>
+
+<span class="sd">    :param type: A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception</span>
+<span class="sd">    class (i.e. Python exception type).</span>
+<span class="sd">    :param uuid: Unique identifier of the error. This identifier helps locate the exact source of the error (e.g. find</span>
+<span class="sd">    the log entry in the server log stream). Make sure to include this identifier when contacting support.</span>
+<span class="sd">    :param message: A human-readable description for the error for informational purposes. The exact format of the</span>
+<span class="sd">    message is unspecified, and implementations should not rely on the presence of any specific information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">uuid</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">AuthenticationError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised when the client fails to provide valid authentication credentials.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">BadRequestError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The server cannot process the request due a client error.</span>
+
+<span class="sd">    This might be due to malformed request syntax or invalid usage.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">InternalServerError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+    <span class="s2">&quot;The server encountered an unexpected error when processing the request.&quot;</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">NotFoundError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised when an entity does not exist or has expired.</span>
+
+<span class="sd">    :param id: The identifier of the entity not found, e.g. the UUID of a job.</span>
+<span class="sd">    :param kind: The entity that is not found such as a namespace, object, person or job.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Location</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Refers to a location in parsable text input (e.g. JSON, YAML or structured text).</span>
+
+<span class="sd">    :param line: Line number (1-based).</span>
+<span class="sd">    :param column: Column number w.r.t. the beginning of the line (1-based).</span>
+<span class="sd">    :param character: Character number w.r.t. the beginning of the input (1-based).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">line</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">column</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">character</span><span class="p">:</span> <span class="nb">int</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">ValidationError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised when a JSON validation error occurs.</span>
+
+<span class="sd">    :param location: Location of where invalid input was found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">location</span><span class="p">:</span> <span class="n">Location</span>
 
 
 <span class="k">class</span> <span class="nc">Status</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
@@ -193,8 +272,32 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">family_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">given_name</span><span class="p">:</span> <span class="nb">str</span>
 
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">given_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">family_name</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="k">class</span> <span class="nc">JobManagement</span><span class="p">:</span>
+
+<span class="nd">@json_schema_type</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+    <span class="s2">&quot;A student at a university.&quot;</span>
+
+    <span class="n">birth_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="nd">@json_schema_type</span>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Teacher</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+    <span class="s2">&quot;A lecturer at a university.&quot;</span>
+
+    <span class="n">subject</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># Endpoint examples</span>
+<span class="c1">#</span>
+
+
+<span class="k">class</span> <span class="nc">JobManagement</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Job management.</span>
 
@@ -206,16 +309,32 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="sd">        Creates a new job with the given data as input.</span>
 
 <span class="sd">        :param items: A set of URLs to resources used to initiate the job.</span>
-<span class="sd">        :return: The unique identifier of the newly created job.</span>
+<span class="sd">        :returns: The unique identifier of the newly created job.</span>
+<span class="sd">        :raises BadRequestError: URL points to an invalid location.</span>
+<span class="sd">        :raises InternalServerError: Unexpected error while creating job.</span>
+<span class="sd">        :raises ValidationError: The input is malformed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
+    <span class="nd">@webmethod</span><span class="p">(</span>
+        <span class="n">response_examples</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">NotFoundError</span><span class="p">(</span>
+                <span class="s2">&quot;NotFoundException&quot;</span><span class="p">,</span>
+                <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">(</span><span class="s2">&quot;123e4567-e89b-12d3-a456-426614174000&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;Job does not exist.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;12345678-1234-5678-1234-567812345678&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;job&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
     <span class="k">def</span> <span class="nf">get_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Format</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Job</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Query status information about a job.</span>
 
 <span class="sd">        :param job_id: Unique identifier for the job to query.</span>
-<span class="sd">        :return: Status information about the job.</span>
+<span class="sd">        :returns: Status information about the job.</span>
+<span class="sd">        :raises NotFoundError: The job does not exist.</span>
+<span class="sd">        :raises ValidationError: The input is malformed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
@@ -235,6 +354,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="sd">        :param job_id: Unique identifier for the job to update.</span>
 <span class="sd">        :param job: Data to update the job with.</span>
+<span class="sd">        :raises ValidationError: The input is malformed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
@@ -254,7 +374,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">data_event</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DataEvent</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">PeopleCatalog</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">PeopleCatalog</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Operations related to people.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -280,8 +400,66 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
+    <span class="nd">@webmethod</span><span class="p">(</span>
+        <span class="n">route</span><span class="o">=</span><span class="s2">&quot;/member/name/</span><span class="si">{family}</span><span class="s2">/</span><span class="si">{given}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">response_examples</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">Student</span><span class="p">(</span><span class="s2">&quot;Szörnyeteg&quot;</span><span class="p">,</span> <span class="s2">&quot;Lajos&quot;</span><span class="p">),</span>
+            <span class="n">Student</span><span class="p">(</span><span class="s2">&quot;Ló&quot;</span><span class="p">,</span> <span class="s2">&quot;Szerafin&quot;</span><span class="p">),</span>
+            <span class="n">Student</span><span class="p">(</span><span class="s2">&quot;Bruckner&quot;</span><span class="p">,</span> <span class="s2">&quot;Szigfrid&quot;</span><span class="p">),</span>
+            <span class="n">Student</span><span class="p">(</span><span class="s2">&quot;Nagy&quot;</span><span class="p">,</span> <span class="s2">&quot;Zoárd&quot;</span><span class="p">),</span>
+            <span class="n">Teacher</span><span class="p">(</span><span class="s2">&quot;Mikka&quot;</span><span class="p">,</span> <span class="s2">&quot;Makka&quot;</span><span class="p">,</span> <span class="s2">&quot;Négyszögletű Kerek Erdő&quot;</span><span class="p">),</span>
+            <span class="n">Teacher</span><span class="p">(</span><span class="s2">&quot;Vacska&quot;</span><span class="p">,</span> <span class="s2">&quot;Mati&quot;</span><span class="p">,</span> <span class="s2">&quot;Négyszögletű Kerek Erdő&quot;</span><span class="p">),</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">get_member_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">given</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Student</span><span class="p">,</span> <span class="n">Teacher</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find a member by their name.</span>
 
-<span class="k">class</span> <span class="nc">Endpoint</span><span class="p">(</span><span class="n">JobManagement</span><span class="p">,</span> <span class="n">PeopleCatalog</span><span class="p">):</span>
-    <span class="k">pass</span>
+<span class="sd">        This operation has multiple response payload types.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># Authentication and authorization</span>
+<span class="c1">#</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Credentials</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Authentication credentials.</span>
+
+<span class="sd">    :param client_id: An API key.</span>
+<span class="sd">    :param client_secret: The secret that corresponds to the API key.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">client_secret</span><span class="p">:</span> <span class="nb">str</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">TokenProperties</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Authentication/authorization token issued in response to an authentication request.</span>
+
+<span class="sd">    :param access_token: A base64-encoded access token string with header, payload and signature parts.</span>
+<span class="sd">    :param expires_at: Expiry of the access token. This field is informational, the timestamp is also embedded in the access token.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">access_token</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">expires_at</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
+
+
+<span class="k">class</span> <span class="nc">Endpoint</span><span class="p">(</span><span class="n">JobManagement</span><span class="p">,</span> <span class="n">PeopleCatalog</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">):</span>
+    <span class="nd">@webmethod</span><span class="p">(</span><span class="n">route</span><span class="o">=</span><span class="s2">&quot;/auth&quot;</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">do_authenticate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="p">:</span> <span class="n">Credentials</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenProperties</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Issues a JSON Web Token (JWT) to be passed to API calls.</span>
+
+<span class="sd">        :raises AuthenticationError: Client lacks valid authentication credentials.</span>
+<span class="sd">        :raises ValidationError: The input is malformed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="o">...</span>
 </pre></div>
 </body></html>

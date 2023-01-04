@@ -1,10 +1,11 @@
 {
-    "openapi": "3.0.3",
+    "openapi": "3.1.0",
     "info": {
         "title": "Example specification",
         "version": "1.0",
-        "description": "# Introduction\n\nThis is introductory text for the API. You can write a Markdown document, save it in a separate file and import the file as a global description by passing it as a parameter to the initializer of the `Specification` class.\n"
+        "description": "# Introduction\n\nThis is introductory text for the API. You can write a Markdown document, save it in a separate file and import the file as a global description by passing it as a parameter to the initializer of the `Specification` class.\n\nThis specification has been generated with [python-openapi](https://github.com/hunyadi/pyopenapi).\n"
     },
+    "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
     "servers": [
         {
             "url": "http://example.com/api"
@@ -25,10 +26,119 @@
                         }
                     },
                     "400": {
-                        "$ref": "#/components/responses/BadRequest"
+                        "description": "URL points to an invalid location. **OR** The input is malformed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "oneOf": [
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string",
+                                                            "description": "A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception class (i.e. Python exception type)."
+                                                        },
+                                                        "uuid": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "description": "Unique identifier of the error. This identifier helps locate the exact source of the error (e.g. find the log entry in the server log stream). Make sure to include this identifier when contacting support."
+                                                        },
+                                                        "message": {
+                                                            "type": "string",
+                                                            "description": "A human-readable description for the error for informational purposes. The exact format of the message is unspecified, and implementations should not rely on the presence of any specific information."
+                                                        }
+                                                    },
+                                                    "additionalProperties": false,
+                                                    "required": [
+                                                        "type",
+                                                        "uuid",
+                                                        "message"
+                                                    ],
+                                                    "title": "The server cannot process the request due a client error.",
+                                                    "description": "This might be due to malformed request syntax or invalid usage."
+                                                },
+                                                {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "type": {
+                                                            "type": "string",
+                                                            "description": "A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception class (i.e. Python exception type)."
+                                                        },
+                                                        "uuid": {
+                                                            "type": "string",
+                                                            "format": "uuid",
+                                                            "description": "Unique identifier of the error. This identifier helps locate the exact source of the error (e.g. find the log entry in the server log stream). Make sure to include this identifier when contacting support."
+                                                        },
+                                                        "message": {
+                                                            "type": "string",
+                                                            "description": "A human-readable description for the error for informational purposes. The exact format of the message is unspecified, and implementations should not rely on the presence of any specific information."
+                                                        },
+                                                        "location": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "line": {
+                                                                    "type": "integer",
+                                                                    "description": "Line number (1-based)."
+                                                                },
+                                                                "column": {
+                                                                    "type": "integer",
+                                                                    "description": "Column number w.r.t. the beginning of the line (1-based)."
+                                                                },
+                                                                "character": {
+                                                                    "type": "integer",
+                                                                    "description": "Character number w.r.t. the beginning of the input (1-based)."
+                                                                }
+                                                            },
+                                                            "additionalProperties": false,
+                                                            "required": [
+                                                                "line",
+                                                                "column",
+                                                                "character"
+                                                            ],
+                                                            "description": "Location of where invalid input was found."
+                                                        }
+                                                    },
+                                                    "additionalProperties": false,
+                                                    "required": [
+                                                        "type",
+                                                        "uuid",
+                                                        "message",
+                                                        "location"
+                                                    ],
+                                                    "title": "Raised when a JSON validation error occurs."
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
                     },
                     "500": {
-                        "$ref": "#/components/responses/InternalServerError"
+                        "description": "Unexpected error while creating job.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "$ref": "#/components/schemas/InternalServerError"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 },
                 "tags": [
@@ -52,6 +162,76 @@
                 }
             }
         },
+        "/auth": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/TokenProperties"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Client lacks valid authentication credentials.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "$ref": "#/components/schemas/AuthenticationError"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "The input is malformed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "$ref": "#/components/schemas/ValidationError"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Endpoint"
+                ],
+                "summary": "Issues a JSON Web Token (JWT) to be passed to API calls.",
+                "parameters": [],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Credentials"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "security": []
+            }
+        },
         "/job/{job_id}": {
             "get": {
                 "responses": {
@@ -65,11 +245,56 @@
                             }
                         }
                     },
-                    "400": {
-                        "$ref": "#/components/responses/BadRequest"
+                    "404": {
+                        "description": "The job does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "$ref": "#/components/schemas/NotFoundError"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "error"
+                                    ]
+                                },
+                                "examples": {
+                                    "('NotFoundException', UUID('123e4567-e89b-12d3-a456-426614174000'), 'Job does not exist.', '12345678-1234-5678-1234-567812345678', 'job')": {
+                                        "value": {
+                                            "error": {
+                                                "type": "NotFoundException",
+                                                "uuid": "123e4567-e89b-12d3-a456-426614174000",
+                                                "message": "Job does not exist.",
+                                                "id": "12345678-1234-5678-1234-567812345678",
+                                                "kind": "job"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
-                    "500": {
-                        "$ref": "#/components/responses/InternalServerError"
+                    "400": {
+                        "description": "The input is malformed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "$ref": "#/components/schemas/ValidationError"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 },
                 "tags": [
@@ -98,12 +323,8 @@
             },
             "delete": {
                 "responses": {
-                    "200": {},
-                    "400": {
-                        "$ref": "#/components/responses/BadRequest"
-                    },
-                    "500": {
-                        "$ref": "#/components/responses/InternalServerError"
+                    "200": {
+                        "description": "OK"
                     }
                 },
                 "tags": [
@@ -124,12 +345,27 @@
             },
             "patch": {
                 "responses": {
-                    "200": {},
-                    "400": {
-                        "$ref": "#/components/responses/BadRequest"
+                    "200": {
+                        "description": "OK"
                     },
-                    "500": {
-                        "$ref": "#/components/responses/InternalServerError"
+                    "400": {
+                        "description": "The input is malformed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "$ref": "#/components/schemas/ValidationError"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
                     }
                 },
                 "tags": [
@@ -161,10 +397,102 @@
                 }
             }
         },
+        "/member/name/{family}/{given}": {
+            "get": {
+                "responses": {
+                    "201": {
+                        "description": "A student at a university.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Student"
+                                },
+                                "examples": {
+                                    "Lajos Szörnyeteg": {
+                                        "value": {
+                                            "family_name": "Szörnyeteg",
+                                            "given_name": "Lajos"
+                                        }
+                                    },
+                                    "Szerafin Ló": {
+                                        "value": {
+                                            "family_name": "Ló",
+                                            "given_name": "Szerafin"
+                                        }
+                                    },
+                                    "Szigfrid Bruckner": {
+                                        "value": {
+                                            "family_name": "Bruckner",
+                                            "given_name": "Szigfrid"
+                                        }
+                                    },
+                                    "Zoárd Nagy": {
+                                        "value": {
+                                            "family_name": "Nagy",
+                                            "given_name": "Zoárd"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "A lecturer at a university.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Teacher"
+                                },
+                                "examples": {
+                                    "Makka Mikka": {
+                                        "value": {
+                                            "family_name": "Mikka",
+                                            "given_name": "Makka",
+                                            "subject": "Négyszögletű Kerek Erdő"
+                                        }
+                                    },
+                                    "Mati Vacska": {
+                                        "value": {
+                                            "family_name": "Vacska",
+                                            "given_name": "Mati",
+                                            "subject": "Négyszögletű Kerek Erdő"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "PeopleCatalog"
+                ],
+                "summary": "Find a member by their name.",
+                "description": "This operation has multiple response payload types.",
+                "parameters": [
+                    {
+                        "name": "family",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "given",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
         "/person/id/{id}": {
             "get": {
                 "responses": {
                     "200": {
+                        "description": "OK",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -172,12 +500,6 @@
                                 }
                             }
                         }
-                    },
-                    "400": {
-                        "$ref": "#/components/responses/BadRequest"
-                    },
-                    "500": {
-                        "$ref": "#/components/responses/InternalServerError"
                     }
                 },
                 "tags": [
@@ -201,23 +523,22 @@
             "get": {
                 "responses": {
                     "200": {
+                        "description": "OK",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/Person"
                                 },
-                                "example": {
-                                    "family_name": "Hunyadi",
-                                    "given_name": "Levente"
+                                "examples": {
+                                    "Levente Hunyadi": {
+                                        "value": {
+                                            "family_name": "Hunyadi",
+                                            "given_name": "Levente"
+                                        }
+                                    }
                                 }
                             }
                         }
-                    },
-                    "400": {
-                        "$ref": "#/components/responses/BadRequest"
-                    },
-                    "500": {
-                        "$ref": "#/components/responses/InternalServerError"
                     }
                 },
                 "tags": [
@@ -249,6 +570,7 @@
             "get": {
                 "responses": {
                     "200": {
+                        "description": "OK",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -256,12 +578,6 @@
                                 }
                             }
                         }
-                    },
-                    "400": {
-                        "$ref": "#/components/responses/BadRequest"
-                    },
-                    "500": {
-                        "$ref": "#/components/responses/InternalServerError"
                     }
                 },
                 "tags": [
@@ -316,6 +632,145 @@
                 "type": "string",
                 "format": "uuid"
             },
+            "InternalServerError": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "description": "A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception class (i.e. Python exception type)."
+                    },
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Unique identifier of the error. This identifier helps locate the exact source of the error (e.g. find the log entry in the server log stream). Make sure to include this identifier when contacting support."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "A human-readable description for the error for informational purposes. The exact format of the message is unspecified, and implementations should not rely on the presence of any specific information."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "type",
+                    "uuid",
+                    "message"
+                ],
+                "title": "The server encountered an unexpected error when processing the request."
+            },
+            "Credentials": {
+                "type": "object",
+                "properties": {
+                    "client_id": {
+                        "type": "string",
+                        "description": "An API key."
+                    },
+                    "client_secret": {
+                        "type": "string",
+                        "description": "The secret that corresponds to the API key."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "client_id",
+                    "client_secret"
+                ],
+                "title": "Authentication credentials."
+            },
+            "TokenProperties": {
+                "type": "object",
+                "properties": {
+                    "access_token": {
+                        "type": "string",
+                        "description": "A base64-encoded access token string with header, payload and signature parts."
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "Expiry of the access token. This field is informational, the timestamp is also embedded in the access token."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "access_token",
+                    "expires_at"
+                ],
+                "title": "Authentication/authorization token issued in response to an authentication request."
+            },
+            "AuthenticationError": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "description": "A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception class (i.e. Python exception type)."
+                    },
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Unique identifier of the error. This identifier helps locate the exact source of the error (e.g. find the log entry in the server log stream). Make sure to include this identifier when contacting support."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "A human-readable description for the error for informational purposes. The exact format of the message is unspecified, and implementations should not rely on the presence of any specific information."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "type",
+                    "uuid",
+                    "message"
+                ],
+                "title": "Raised when the client fails to provide valid authentication credentials."
+            },
+            "ValidationError": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "description": "A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception class (i.e. Python exception type)."
+                    },
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Unique identifier of the error. This identifier helps locate the exact source of the error (e.g. find the log entry in the server log stream). Make sure to include this identifier when contacting support."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "A human-readable description for the error for informational purposes. The exact format of the message is unspecified, and implementations should not rely on the presence of any specific information."
+                    },
+                    "location": {
+                        "type": "object",
+                        "properties": {
+                            "line": {
+                                "type": "integer",
+                                "description": "Line number (1-based)."
+                            },
+                            "column": {
+                                "type": "integer",
+                                "description": "Column number w.r.t. the beginning of the line (1-based)."
+                            },
+                            "character": {
+                                "type": "integer",
+                                "description": "Character number w.r.t. the beginning of the input (1-based)."
+                            }
+                        },
+                        "additionalProperties": false,
+                        "required": [
+                            "line",
+                            "column",
+                            "character"
+                        ],
+                        "description": "Location of where invalid input was found."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "type",
+                    "uuid",
+                    "message",
+                    "location"
+                ],
+                "title": "Raised when a JSON validation error occurs."
+            },
             "Format": {
                 "type": "string",
                 "enum": [
@@ -335,11 +790,11 @@
                             "text/plain",
                             "text/markdown"
                         ],
-                        "title": "The representation format for the text."
+                        "description": "The representation format for the text."
                     },
                     "text": {
                         "type": "string",
-                        "title": "The text string."
+                        "description": "The text string."
                     }
                 },
                 "additionalProperties": false,
@@ -355,7 +810,7 @@
                     "id": {
                         "type": "string",
                         "format": "uuid",
-                        "title": "Job identifier."
+                        "description": "Job identifier."
                     },
                     "status": {
                         "type": "string",
@@ -364,16 +819,16 @@
                             "running",
                             "stopped"
                         ],
-                        "title": "Current job status."
+                        "description": "Current job status."
                     },
                     "started_at": {
                         "type": "string",
                         "format": "date-time",
-                        "title": "The timestamp (in UTC) when the job was started."
+                        "description": "The timestamp (in UTC) when the job was started."
                     },
                     "description": {
                         "$ref": "#/components/schemas/Description",
-                        "title": "Additional information associated with the job."
+                        "description": "Additional information associated with the job."
                     }
                 },
                 "additionalProperties": false,
@@ -385,16 +840,97 @@
                 ],
                 "title": "A unit of execution."
             },
+            "NotFoundError": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "description": "A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception class (i.e. Python exception type)."
+                    },
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Unique identifier of the error. This identifier helps locate the exact source of the error (e.g. find the log entry in the server log stream). Make sure to include this identifier when contacting support."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "A human-readable description for the error for informational purposes. The exact format of the message is unspecified, and implementations should not rely on the presence of any specific information."
+                    },
+                    "id": {
+                        "type": "string",
+                        "description": "The identifier of the entity not found, e.g. the UUID of a job."
+                    },
+                    "kind": {
+                        "type": "string",
+                        "description": "The entity that is not found such as a namespace, object, person or job."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "type",
+                    "uuid",
+                    "message",
+                    "id",
+                    "kind"
+                ],
+                "title": "Raised when an entity does not exist or has expired."
+            },
+            "Student": {
+                "type": "object",
+                "properties": {
+                    "family_name": {
+                        "type": "string",
+                        "description": "The person's family name (typically last name)."
+                    },
+                    "given_name": {
+                        "type": "string",
+                        "description": "The person's given name (typically first name)."
+                    },
+                    "birth_date": {
+                        "type": "string",
+                        "format": "date"
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "family_name",
+                    "given_name"
+                ],
+                "title": "A student at a university."
+            },
+            "Teacher": {
+                "type": "object",
+                "properties": {
+                    "family_name": {
+                        "type": "string",
+                        "description": "The person's family name (typically last name)."
+                    },
+                    "given_name": {
+                        "type": "string",
+                        "description": "The person's given name (typically first name)."
+                    },
+                    "subject": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "family_name",
+                    "given_name",
+                    "subject"
+                ],
+                "title": "A lecturer at a university."
+            },
             "Person": {
                 "type": "object",
                 "properties": {
                     "family_name": {
                         "type": "string",
-                        "title": "The person's family name (typically last name)."
+                        "description": "The person's family name (typically last name)."
                     },
                     "given_name": {
                         "type": "string",
-                        "title": "The person's given name (typically first name)."
+                        "description": "The person's given name (typically first name)."
                     }
                 },
                 "additionalProperties": false,
@@ -410,11 +946,11 @@
                     "id": {
                         "type": "string",
                         "format": "uuid",
-                        "title": "Uniquely identifies the job which the response corresponds to."
+                        "description": "Uniquely identifies the job which the response corresponds to."
                     },
                     "description": {
                         "type": "string",
-                        "title": "Textual description associated with the response."
+                        "description": "Textual description associated with the response."
                     }
                 },
                 "additionalProperties": false,
@@ -431,7 +967,7 @@
                     "id": {
                         "type": "string",
                         "format": "uuid",
-                        "title": "Uniquely identifies the job which the event corresponds to."
+                        "description": "Uniquely identifies the job which the event corresponds to."
                     },
                     "status": {
                         "type": "string",
@@ -440,7 +976,7 @@
                             "running",
                             "stopped"
                         ],
-                        "title": "The current status of the job."
+                        "description": "The current status of the job."
                     }
                 },
                 "additionalProperties": false,
@@ -470,25 +1006,25 @@
                     "uuid": {
                         "type": "string",
                         "format": "uuid",
-                        "title": "Uniquely identifies this instance."
+                        "description": "Uniquely identifies this instance."
                     },
                     "count": {
                         "type": "integer",
-                        "title": "A sample property of an integer type."
+                        "description": "A sample property of an integer type."
                     },
                     "value": {
                         "type": "string",
-                        "title": "A sample property of a string type."
+                        "description": "A sample property of a string type."
                     },
                     "created_at": {
                         "type": "string",
                         "format": "date-time",
-                        "title": "A timestamp. The date type is identified with OpenAPI's format string."
+                        "description": "A timestamp. The date type is identified with OpenAPI's format string."
                     },
                     "updated_at": {
                         "type": "string",
                         "format": "date-time",
-                        "title": "A timestamp."
+                        "description": "A timestamp."
                     }
                 },
                 "additionalProperties": false,
@@ -504,59 +1040,9 @@
             "UnreferencedType": {
                 "type": "object",
                 "title": "A type not referenced from anywhere else but passed as an additional type to the initializer of the class `Specification`."
-            },
-            "ErrorResponse": {
-                "type": "object",
-                "properties": {
-                    "error": {
-                        "type": "object",
-                        "properties": {
-                            "id": {
-                                "type": "string",
-                                "title": "A machine-processable identifier for the error."
-                            },
-                            "message": {
-                                "type": "string",
-                                "title": "A human-readable description for the error."
-                            }
-                        },
-                        "additionalProperties": false,
-                        "required": [
-                            "id",
-                            "message"
-                        ],
-                        "title": "Details related to the error."
-                    }
-                },
-                "additionalProperties": false,
-                "required": [
-                    "error"
-                ],
-                "title": "Encapsulates an error response from an endpoint."
             }
         },
-        "responses": {
-            "BadRequest": {
-                "description": "The server cannot process the request due a client error (e.g. malformed request syntax).",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/ErrorResponse"
-                        }
-                    }
-                }
-            },
-            "InternalServerError": {
-                "description": "The server encountered an unexpected error when processing the request.",
-                "content": {
-                    "application/json": {
-                        "schema": {
-                            "$ref": "#/components/schemas/ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
+        "responses": {},
         "securitySchemes": {
             "Default": {
                 "type": "http",
@@ -572,6 +1058,9 @@
         }
     ],
     "tags": [
+        {
+            "name": "Endpoint"
+        },
         {
             "name": "PeopleCatalog",
             "x-displayName": "Operations related to people."
@@ -590,6 +1079,26 @@
             "description": "<SchemaDefinition schemaRef=\"#/components/schemas/UUID\" />"
         },
         {
+            "name": "InternalServerError",
+            "description": "The server encountered an unexpected error when processing the request.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/InternalServerError\" />"
+        },
+        {
+            "name": "Credentials",
+            "description": "Authentication credentials.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/Credentials\" />"
+        },
+        {
+            "name": "TokenProperties",
+            "description": "Authentication/authorization token issued in response to an authentication request.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/TokenProperties\" />"
+        },
+        {
+            "name": "AuthenticationError",
+            "description": "Raised when the client fails to provide valid authentication credentials.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/AuthenticationError\" />"
+        },
+        {
+            "name": "ValidationError",
+            "description": "Raised when a JSON validation error occurs.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/ValidationError\" />"
+        },
+        {
             "name": "Format",
             "description": "Possible representation formats.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/Format\" />"
         },
@@ -600,6 +1109,18 @@
         {
             "name": "Job",
             "description": "A unit of execution.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/Job\" />"
+        },
+        {
+            "name": "NotFoundError",
+            "description": "Raised when an entity does not exist or has expired.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/NotFoundError\" />"
+        },
+        {
+            "name": "Student",
+            "description": "A student at a university.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/Student\" />"
+        },
+        {
+            "name": "Teacher",
+            "description": "A lecturer at a university.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/Teacher\" />"
         },
         {
             "name": "Person",
@@ -630,6 +1151,7 @@
         {
             "name": "Operations",
             "tags": [
+                "Endpoint",
                 "JobManagement",
                 "PeopleCatalog"
             ]
@@ -637,14 +1159,22 @@
         {
             "name": "Types",
             "tags": [
+                "AuthenticationError",
+                "Credentials",
                 "Description",
                 "Format",
+                "InternalServerError",
                 "Job",
+                "NotFoundError",
                 "Person",
                 "StatusEvent",
                 "StatusResponse",
+                "Student",
+                "Teacher",
+                "TokenProperties",
                 "URL",
-                "UUID"
+                "UUID",
+                "ValidationError"
             ]
         },
         {

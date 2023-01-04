@@ -1,20 +1,44 @@
 components:
-  responses:
-    BadRequest:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-      description: The server cannot process the request due a client error (e.g.
-        malformed request syntax).
-    InternalServerError:
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorResponse'
-      description: The server encountered an unexpected error when processing the
-        request.
+  responses: {}
   schemas:
+    AuthenticationError:
+      additionalProperties: false
+      properties:
+        message:
+          description: A human-readable description for the error for informational
+            purposes. The exact format of the message is unspecified, and implementations
+            should not rely on the presence of any specific information.
+          type: string
+        type:
+          description: A machine-processable identifier for the error. Typically corresponds
+            to the fully-qualified exception class (i.e. Python exception type).
+          type: string
+        uuid:
+          description: Unique identifier of the error. This identifier helps locate
+            the exact source of the error (e.g. find the log entry in the server log
+            stream). Make sure to include this identifier when contacting support.
+          format: uuid
+          type: string
+      required:
+      - type
+      - uuid
+      - message
+      title: Raised when the client fails to provide valid authentication credentials.
+      type: object
+    Credentials:
+      additionalProperties: false
+      properties:
+        client_id:
+          description: An API key.
+          type: string
+        client_secret:
+          description: The secret that corresponds to the API key.
+          type: string
+      required:
+      - client_id
+      - client_secret
+      title: Authentication credentials.
+      type: object
     DataEvent:
       additionalProperties: false
       properties:
@@ -28,61 +52,41 @@ components:
       additionalProperties: false
       properties:
         format:
+          description: The representation format for the text.
           enum:
           - text/html
           - text/plain
           - text/markdown
-          title: The representation format for the text.
           type: string
         text:
-          title: The text string.
+          description: The text string.
           type: string
       required:
       - format
       - text
       title: A textual description as plain text or a well-known markup format.
       type: object
-    ErrorResponse:
-      additionalProperties: false
-      properties:
-        error:
-          additionalProperties: false
-          properties:
-            id:
-              title: A machine-processable identifier for the error.
-              type: string
-            message:
-              title: A human-readable description for the error.
-              type: string
-          required:
-          - id
-          - message
-          title: Details related to the error.
-          type: object
-      required:
-      - error
-      title: Encapsulates an error response from an endpoint.
-      type: object
     ExampleType:
       additionalProperties: false
       properties:
         count:
-          title: A sample property of an integer type.
+          description: A sample property of an integer type.
           type: integer
         created_at:
+          description: A timestamp. The date type is identified with OpenAPI's format
+            string.
           format: date-time
-          title: A timestamp. The date type is identified with OpenAPI's format string.
           type: string
         updated_at:
+          description: A timestamp.
           format: date-time
-          title: A timestamp.
           type: string
         uuid:
+          description: Uniquely identifies this instance.
           format: uuid
-          title: Uniquely identifies this instance.
           type: string
         value:
-          title: A sample property of a string type.
+          description: A sample property of a string type.
           type: string
       required:
       - uuid
@@ -99,26 +103,50 @@ components:
       - text/markdown
       title: Possible representation formats.
       type: string
+    InternalServerError:
+      additionalProperties: false
+      properties:
+        message:
+          description: A human-readable description for the error for informational
+            purposes. The exact format of the message is unspecified, and implementations
+            should not rely on the presence of any specific information.
+          type: string
+        type:
+          description: A machine-processable identifier for the error. Typically corresponds
+            to the fully-qualified exception class (i.e. Python exception type).
+          type: string
+        uuid:
+          description: Unique identifier of the error. This identifier helps locate
+            the exact source of the error (e.g. find the log entry in the server log
+            stream). Make sure to include this identifier when contacting support.
+          format: uuid
+          type: string
+      required:
+      - type
+      - uuid
+      - message
+      title: The server encountered an unexpected error when processing the request.
+      type: object
     Job:
       additionalProperties: false
       properties:
         description:
           $ref: '#/components/schemas/Description'
-          title: Additional information associated with the job.
+          description: Additional information associated with the job.
         id:
+          description: Job identifier.
           format: uuid
-          title: Job identifier.
           type: string
         started_at:
+          description: The timestamp (in UTC) when the job was started.
           format: date-time
-          title: The timestamp (in UTC) when the job was started.
           type: string
         status:
+          description: Current job status.
           enum:
           - created
           - running
           - stopped
-          title: Current job status.
           type: string
       required:
       - id
@@ -127,14 +155,48 @@ components:
       - description
       title: A unit of execution.
       type: object
+    NotFoundError:
+      additionalProperties: false
+      properties:
+        id:
+          description: The identifier of the entity not found, e.g. the UUID of a
+            job.
+          type: string
+        kind:
+          description: The entity that is not found such as a namespace, object, person
+            or job.
+          type: string
+        message:
+          description: A human-readable description for the error for informational
+            purposes. The exact format of the message is unspecified, and implementations
+            should not rely on the presence of any specific information.
+          type: string
+        type:
+          description: A machine-processable identifier for the error. Typically corresponds
+            to the fully-qualified exception class (i.e. Python exception type).
+          type: string
+        uuid:
+          description: Unique identifier of the error. This identifier helps locate
+            the exact source of the error (e.g. find the log entry in the server log
+            stream). Make sure to include this identifier when contacting support.
+          format: uuid
+          type: string
+      required:
+      - type
+      - uuid
+      - message
+      - id
+      - kind
+      title: Raised when an entity does not exist or has expired.
+      type: object
     Person:
       additionalProperties: false
       properties:
         family_name:
-          title: The person's family name (typically last name).
+          description: The person's family name (typically last name).
           type: string
         given_name:
-          title: The person's given name (typically first name).
+          description: The person's given name (typically first name).
           type: string
       required:
       - family_name
@@ -147,15 +209,15 @@ components:
         over a websocket connection.
       properties:
         id:
+          description: Uniquely identifies the job which the event corresponds to.
           format: uuid
-          title: Uniquely identifies the job which the event corresponds to.
           type: string
         status:
+          description: The current status of the job.
           enum:
           - created
           - running
           - stopped
-          title: The current status of the job.
           type: string
       required:
       - id
@@ -168,17 +230,70 @@ components:
         by several out-of-band events, transmitted e.g. over a websocket connection.
       properties:
         description:
-          title: Textual description associated with the response.
+          description: Textual description associated with the response.
           type: string
         id:
+          description: Uniquely identifies the job which the response corresponds
+            to.
           format: uuid
-          title: Uniquely identifies the job which the response corresponds to.
           type: string
       required:
       - id
       - description
       title: Triggered synchronously as the immediate response to an asynchronous
         operation.
+      type: object
+    Student:
+      additionalProperties: false
+      properties:
+        birth_date:
+          format: date
+          type: string
+        family_name:
+          description: The person's family name (typically last name).
+          type: string
+        given_name:
+          description: The person's given name (typically first name).
+          type: string
+      required:
+      - family_name
+      - given_name
+      title: A student at a university.
+      type: object
+    Teacher:
+      additionalProperties: false
+      properties:
+        family_name:
+          description: The person's family name (typically last name).
+          type: string
+        given_name:
+          description: The person's given name (typically first name).
+          type: string
+        subject:
+          type: string
+      required:
+      - family_name
+      - given_name
+      - subject
+      title: A lecturer at a university.
+      type: object
+    TokenProperties:
+      additionalProperties: false
+      properties:
+        access_token:
+          description: A base64-encoded access token string with header, payload and
+            signature parts.
+          type: string
+        expires_at:
+          description: Expiry of the access token. This field is informational, the
+            timestamp is also embedded in the access token.
+          format: date-time
+          type: string
+      required:
+      - access_token
+      - expires_at
+      title: Authentication/authorization token issued in response to an authentication
+        request.
       type: object
     URL:
       format: uri
@@ -191,6 +306,49 @@ components:
     UnreferencedType:
       title: A type not referenced from anywhere else but passed as an additional
         type to the initializer of the class `Specification`.
+      type: object
+    ValidationError:
+      additionalProperties: false
+      properties:
+        location:
+          additionalProperties: false
+          description: Location of where invalid input was found.
+          properties:
+            character:
+              description: Character number w.r.t. the beginning of the input (1-based).
+              type: integer
+            column:
+              description: Column number w.r.t. the beginning of the line (1-based).
+              type: integer
+            line:
+              description: Line number (1-based).
+              type: integer
+          required:
+          - line
+          - column
+          - character
+          type: object
+        message:
+          description: A human-readable description for the error for informational
+            purposes. The exact format of the message is unspecified, and implementations
+            should not rely on the presence of any specific information.
+          type: string
+        type:
+          description: A machine-processable identifier for the error. Typically corresponds
+            to the fully-qualified exception class (i.e. Python exception type).
+          type: string
+        uuid:
+          description: Unique identifier of the error. This identifier helps locate
+            the exact source of the error (e.g. find the log entry in the server log
+            stream). Make sure to include this identifier when contacting support.
+          format: uuid
+          type: string
+      required:
+      - type
+      - uuid
+      - message
+      - location
+      title: Raised when a JSON validation error occurs.
       type: object
   securitySchemes:
     Default:
@@ -207,11 +365,59 @@ info:
     it in a separate file and import the file as a global description by passing it
     as a parameter to the initializer of the `Specification` class.
 
+
+    This specification has been generated with [python-openapi](https://github.com/hunyadi/pyopenapi).
+
     '
   title: Example specification
   version: '1.0'
-openapi: 3.0.3
+jsonSchemaDialect: https://json-schema.org/draft/2020-12/schema
+openapi: 3.1.0
 paths:
+  /auth:
+    post:
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credentials'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenProperties'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    $ref: '#/components/schemas/ValidationError'
+                required:
+                - error
+                type: object
+          description: The input is malformed.
+        '401':
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    $ref: '#/components/schemas/AuthenticationError'
+                required:
+                - error
+                type: object
+          description: Client lacks valid authentication credentials.
+      security: []
+      summary: Issues a JSON Web Token (JWT) to be passed to API calls.
+      tags:
+      - Endpoint
   /job:
     post:
       parameters: []
@@ -232,9 +438,104 @@ paths:
                 $ref: '#/components/schemas/UUID'
           description: The unique identifier of the newly created job.
         '400':
-          $ref: '#/components/responses/BadRequest'
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    oneOf:
+                    - additionalProperties: false
+                      description: This might be due to malformed request syntax or
+                        invalid usage.
+                      properties:
+                        message:
+                          description: A human-readable description for the error
+                            for informational purposes. The exact format of the message
+                            is unspecified, and implementations should not rely on
+                            the presence of any specific information.
+                          type: string
+                        type:
+                          description: A machine-processable identifier for the error.
+                            Typically corresponds to the fully-qualified exception
+                            class (i.e. Python exception type).
+                          type: string
+                        uuid:
+                          description: Unique identifier of the error. This identifier
+                            helps locate the exact source of the error (e.g. find
+                            the log entry in the server log stream). Make sure to
+                            include this identifier when contacting support.
+                          format: uuid
+                          type: string
+                      required:
+                      - type
+                      - uuid
+                      - message
+                      title: The server cannot process the request due a client error.
+                      type: object
+                    - additionalProperties: false
+                      properties:
+                        location:
+                          additionalProperties: false
+                          description: Location of where invalid input was found.
+                          properties:
+                            character:
+                              description: Character number w.r.t. the beginning of
+                                the input (1-based).
+                              type: integer
+                            column:
+                              description: Column number w.r.t. the beginning of the
+                                line (1-based).
+                              type: integer
+                            line:
+                              description: Line number (1-based).
+                              type: integer
+                          required:
+                          - line
+                          - column
+                          - character
+                          type: object
+                        message:
+                          description: A human-readable description for the error
+                            for informational purposes. The exact format of the message
+                            is unspecified, and implementations should not rely on
+                            the presence of any specific information.
+                          type: string
+                        type:
+                          description: A machine-processable identifier for the error.
+                            Typically corresponds to the fully-qualified exception
+                            class (i.e. Python exception type).
+                          type: string
+                        uuid:
+                          description: Unique identifier of the error. This identifier
+                            helps locate the exact source of the error (e.g. find
+                            the log entry in the server log stream). Make sure to
+                            include this identifier when contacting support.
+                          format: uuid
+                          type: string
+                      required:
+                      - type
+                      - uuid
+                      - message
+                      - location
+                      title: Raised when a JSON validation error occurs.
+                      type: object
+                required:
+                - error
+                type: object
+          description: URL points to an invalid location. **OR** The input is malformed.
         '500':
-          $ref: '#/components/responses/InternalServerError'
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    $ref: '#/components/schemas/InternalServerError'
+                required:
+                - error
+                type: object
+          description: Unexpected error while creating job.
       summary: Creates a new job with the given data as input.
       tags:
       - JobManagement
@@ -248,11 +549,8 @@ paths:
         schema:
           $ref: '#/components/schemas/UUID'
       responses:
-        '200': {}
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        '200':
+          description: OK
       summary: Terminates a job.
       tags:
       - JobManagement
@@ -277,9 +575,39 @@ paths:
                 $ref: '#/components/schemas/Job'
           description: Status information about the job.
         '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    $ref: '#/components/schemas/ValidationError'
+                required:
+                - error
+                type: object
+          description: The input is malformed.
+        '404':
+          content:
+            application/json:
+              examples:
+                ? ('NotFoundException', UUID('123e4567-e89b-12d3-a456-426614174000'),
+                  'Job does not exist.', '12345678-1234-5678-1234-567812345678', 'job')
+                : value:
+                    error:
+                      id: 12345678-1234-5678-1234-567812345678
+                      kind: job
+                      message: Job does not exist.
+                      type: NotFoundException
+                      uuid: 123e4567-e89b-12d3-a456-426614174000
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    $ref: '#/components/schemas/NotFoundError'
+                required:
+                - error
+                type: object
+          description: The job does not exist.
       summary: Query status information about a job.
       tags:
       - JobManagement
@@ -300,14 +628,81 @@ paths:
         description: Data to update the job with.
         required: true
       responses:
-        '200': {}
+        '200':
+          description: OK
         '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          content:
+            application/json:
+              schema:
+                additionalProperties: false
+                properties:
+                  error:
+                    $ref: '#/components/schemas/ValidationError'
+                required:
+                - error
+                type: object
+          description: The input is malformed.
       summary: Updates information related to a job.
       tags:
       - JobManagement
+  /member/name/{family}/{given}:
+    get:
+      description: This operation has multiple response payload types.
+      parameters:
+      - in: path
+        name: family
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: given
+        required: true
+        schema:
+          type: string
+      responses:
+        '201':
+          content:
+            application/json:
+              examples:
+                Lajos Szörnyeteg:
+                  value:
+                    family_name: Szörnyeteg
+                    given_name: Lajos
+                Szerafin Ló:
+                  value:
+                    family_name: Ló
+                    given_name: Szerafin
+                Szigfrid Bruckner:
+                  value:
+                    family_name: Bruckner
+                    given_name: Szigfrid
+                Zoárd Nagy:
+                  value:
+                    family_name: Nagy
+                    given_name: Zoárd
+              schema:
+                $ref: '#/components/schemas/Student'
+          description: A student at a university.
+        '202':
+          content:
+            application/json:
+              examples:
+                Makka Mikka:
+                  value:
+                    family_name: Mikka
+                    given_name: Makka
+                    subject: Négyszögletű Kerek Erdő
+                Mati Vacska:
+                  value:
+                    family_name: Vacska
+                    given_name: Mati
+                    subject: Négyszögletű Kerek Erdő
+              schema:
+                $ref: '#/components/schemas/Teacher'
+          description: A lecturer at a university.
+      summary: Find a member by their name.
+      tags:
+      - PeopleCatalog
   /person/id/{id}:
     get:
       description: This operation has a custom route associated with it.
@@ -323,10 +718,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Person'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          description: OK
       summary: Find a person by their identifier.
       tags:
       - PeopleCatalog
@@ -348,15 +740,14 @@ paths:
         '200':
           content:
             application/json:
-              example:
-                family_name: Hunyadi
-                given_name: Levente
+              examples:
+                Levente Hunyadi:
+                  value:
+                    family_name: Hunyadi
+                    given_name: Levente
               schema:
                 $ref: '#/components/schemas/Person'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          description: OK
       summary: Find a person by their name.
       tags:
       - PeopleCatalog
@@ -396,10 +787,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusResponse'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+          description: OK
       summary: Provides asynchronous status information about a job.
       tags:
       - JobManagement
@@ -408,6 +796,7 @@ security:
 servers:
 - url: http://example.com/api
 tags:
+- name: Endpoint
 - name: PeopleCatalog
   x-displayName: Operations related to people.
 - description: Operations to create, inspect, update and terminate jobs.
@@ -420,6 +809,32 @@ tags:
   name: URL
 - description: <SchemaDefinition schemaRef="#/components/schemas/UUID" />
   name: UUID
+- description: 'The server encountered an unexpected error when processing the request.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/InternalServerError" />'
+  name: InternalServerError
+- description: 'Authentication credentials.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/Credentials" />'
+  name: Credentials
+- description: 'Authentication/authorization token issued in response to an authentication
+    request.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/TokenProperties" />'
+  name: TokenProperties
+- description: 'Raised when the client fails to provide valid authentication credentials.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/AuthenticationError" />'
+  name: AuthenticationError
+- description: 'Raised when a JSON validation error occurs.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/ValidationError" />'
+  name: ValidationError
 - description: 'Possible representation formats.
 
 
@@ -435,6 +850,21 @@ tags:
 
     <SchemaDefinition schemaRef="#/components/schemas/Job" />'
   name: Job
+- description: 'Raised when an entity does not exist or has expired.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/NotFoundError" />'
+  name: NotFoundError
+- description: 'A student at a university.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/Student" />'
+  name: Student
+- description: 'A lecturer at a university.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/Teacher" />'
+  name: Teacher
 - description: 'Represents a real person.
 
 
@@ -475,18 +905,27 @@ tags:
 x-tagGroups:
 - name: Operations
   tags:
+  - Endpoint
   - JobManagement
   - PeopleCatalog
 - name: Types
   tags:
+  - AuthenticationError
+  - Credentials
   - Description
   - Format
+  - InternalServerError
   - Job
+  - NotFoundError
   - Person
   - StatusEvent
   - StatusResponse
+  - Student
+  - Teacher
+  - TokenProperties
   - URL
   - UUID
+  - ValidationError
 - name: Events
   tags:
   - DataEvent
