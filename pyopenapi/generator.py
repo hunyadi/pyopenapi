@@ -1,3 +1,4 @@
+import hashlib
 from typing import Any, Dict, Set, Union
 
 from strong_typing.core import JsonType
@@ -17,7 +18,7 @@ from strong_typing.schema import (
     SchemaOptions,
     get_schema_identifier,
 )
-from strong_typing.serialization import object_to_json
+from strong_typing.serialization import json_dump_string, object_to_json
 
 from .operations import (
     EndpointOperation,
@@ -43,7 +44,6 @@ from .specification import (
     Tag,
     TagGroup,
 )
-
 
 SchemaOrRef = Union[Schema, SchemaRef]
 
@@ -157,27 +157,50 @@ class ContentBuilder:
         if self.schema_transformer:
             schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = self.schema_transformer  # type: ignore
             schema = schema_transformer(schema)
+
+        if not examples:
+            return MediaType(schema=schema)
+
+        if len(examples) == 1:
+            return MediaType(schema=schema, example=self._build_example(examples[0]))
+
         return MediaType(
             schema=schema,
             examples=self._build_examples(examples),
         )
 
     def _build_examples(
-        self, examples: Optional[List[Any]] = None
-    ) -> Optional[Dict[str, Union[Example, ExampleRef]]]:
-
-        if examples is None:
-            return None
+        self, examples: List[Any]
+    ) -> Dict[str, Union[Example, ExampleRef]]:
+        "Creates a set of several examples for a media type."
 
         if self.sample_transformer:
             sample_transformer: Callable[[JsonType], JsonType] = self.sample_transformer  # type: ignore
         else:
             sample_transformer = lambda sample: sample
 
-        return {
-            str(example): Example(value=sample_transformer(object_to_json(example)))
-            for example in examples
-        }
+        results: Dict[str, Union[Example, ExampleRef]] = {}
+        for example in examples:
+            value = sample_transformer(object_to_json(example))
+
+            hash_string = (
+                hashlib.md5(json_dump_string(value).encode("utf-8")).digest().hex()
+            )
+            name = f"ex-{hash_string}"
+
+            results[name] = Example(value=value)
+
+        return results
+
+    def _build_example(self, example: Any) -> Any:
+        "Creates a single example for a media type."
+
+        if self.sample_transformer:
+            sample_transformer: Callable[[JsonType], JsonType] = self.sample_transformer  # type: ignore
+        else:
+            sample_transformer = lambda sample: sample
+
+        return sample_transformer(object_to_json(example))
 
 
 @dataclass
@@ -236,7 +259,7 @@ class ResponseBuilder:
                     if isinstance(example, response_type)
                 )
 
-        return status_responses
+        return dict(sorted(status_responses.items()))
 
     def build_response(
         self, options: ResponseOptions
