@@ -100,8 +100,8 @@ class EndpointOperation:
     response_type: type
     http_method: HTTPMethod
     public: bool
-    request_examples: Optional[List[Any]]
-    response_examples: Optional[List[Any]]
+    request_examples: Optional[List[Any]] = None
+    response_examples: Optional[List[Any]] = None
 
     def get_route(self) -> str:
         if self.route is not None:
@@ -162,7 +162,9 @@ def _get_defining_class(member_fn: str, derived_cls: type) -> type:
     )
 
 
-def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
+def get_endpoint_operations(
+    endpoint: type, use_examples: bool = True
+) -> List[EndpointOperation]:
     """
     Extracts a list of member functions in a class eligible for HTTP interface binding.
 
@@ -179,6 +181,7 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
     and the caller is expected to provide the data as serialized JSON in an HTTP POST request.
 
     :param endpoint: A class with member functions that can be mapped to an HTTP endpoint.
+    :param use_examples: Whether to return examples associated with member functions.
     """
 
     result = []
@@ -325,8 +328,8 @@ def get_endpoint_operations(endpoint: type) -> List[EndpointOperation]:
                 response_type=response_type,
                 http_method=http_method,
                 public=public,
-                request_examples=request_examples,
-                response_examples=response_examples,
+                request_examples=request_examples if use_examples else None,
+                response_examples=response_examples if use_examples else None,
             )
         )
 

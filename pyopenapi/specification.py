@@ -240,9 +240,9 @@ class Document:
 
     openapi: str
     info: Info
-    jsonSchemaDialect: str
     servers: List[Server]
     paths: Dict[str, PathItem]
+    jsonSchemaDialect: Optional[str] = None
     components: Optional[Components] = None
     security: Optional[List[SecurityRequirement]] = None
     tags: Optional[List[Tag]] = None

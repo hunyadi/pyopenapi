@@ -1,7 +1,7 @@
 import dataclasses
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Callable, ClassVar, Dict, List, Optional, Union
+from typing import Callable, ClassVar, Dict, List, Optional, Tuple, Union
 
 from .specification import (
     Info,
@@ -20,8 +20,10 @@ class Options:
     """
     :param server: Base URL for the API endpoint.
     :param info: Meta-information for the endpoint specification.
+    :param version: OpenAPI specification version as a tuple of major, minor, revision.
     :param default_security_scheme: Security scheme to apply to endpoints, unless overridden on a per-endpoint basis.
     :param extra_types: Extra types in addition to those found in operation signatures. Use a dictionary to group related types.
+    :param use_examples: Whether to emit examples for operations.
     :param success_responses: Associates operation response types with HTTP status codes.
     :param error_responses: Associates error response types with HTTP status codes.
     :param error_wrapper: True if errors are encapsulated in an error object wrapper.
@@ -31,8 +33,10 @@ class Options:
 
     server: Server
     info: Info
+    version: Tuple[int, int, int] = (3, 1, 0)
     default_security_scheme: Optional[SecurityScheme] = None
     extra_types: Union[List[type], Dict[str, List[type]], None] = None
+    use_examples: bool = True
     success_responses: Dict[type, HTTPStatusCode] = dataclasses.field(
         default_factory=dict
     )

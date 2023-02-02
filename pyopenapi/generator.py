@@ -325,6 +325,7 @@ class Generator:
         schema_generator = JsonSchemaGenerator(
             SchemaOptions(
                 definitions_path="#/components/schemas/",
+                use_examples=self.options.use_examples,
                 property_description_fun=options.property_description_fun,
             )
         )
@@ -447,7 +448,7 @@ class Generator:
         response_builder = ResponseBuilder(content_builder)
         response_options = ResponseOptions(
             success_type_descriptions,
-            success_examples,
+            success_examples if self.options.use_examples else None,
             self.options.success_responses,
             "200",
         )
@@ -488,7 +489,7 @@ class Generator:
             response_builder = ResponseBuilder(content_builder)
             response_options = ResponseOptions(
                 exception_types,
-                exception_examples,
+                exception_examples if self.options.use_examples else None,
                 self.options.error_responses,
                 "500",
             )
@@ -526,7 +527,9 @@ class Generator:
     def generate(self) -> Document:
         paths: Dict[str, PathItem] = {}
         endpoint_classes: Set[type] = set()
-        for op in get_endpoint_operations(self.endpoint):
+        for op in get_endpoint_operations(
+            self.endpoint, use_examples=self.options.use_examples
+        ):
             endpoint_classes.add(op.defining_class)
 
             operation = self._build_operation(op)
@@ -634,9 +637,13 @@ class Generator:
             securitySchemes = None
 
         return Document(
-            openapi="3.1.0",
+            openapi=".".join(str(item) for item in self.options.version),
             info=self.options.info,
-            jsonSchemaDialect="https://json-schema.org/draft/2020-12/schema",
+            jsonSchemaDialect=(
+                "https://json-schema.org/draft/2020-12/schema"
+                if self.options.version >= (3, 1, 0)
+                else None
+            ),
             servers=[self.options.server],
             paths=paths,
             components=Components(
