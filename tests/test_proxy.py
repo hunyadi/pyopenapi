@@ -2,9 +2,10 @@ import unittest
 from dataclasses import dataclass
 from typing import Dict, Optional, Protocol
 
+from strong_typing.schema import JsonType
+
 from pyopenapi import webmethod
 from pyopenapi.proxy import make_proxy_class
-from strong_typing.schema import JsonType
 
 
 @dataclass
@@ -31,11 +32,11 @@ class HTTPBinPostResponse(HTTPBinResponse):
 
 class API(Protocol):
     @webmethod(route="/get")
-    def get_method(self, /, id: str) -> HTTPBinResponse:
+    async def get_method(self, /, id: str) -> HTTPBinResponse:
         ...
 
     @webmethod(route="/put")
-    def set_method(self, /, id: str, doc: Document) -> HTTPBinPostResponse:
+    async def set_method(self, /, id: str, doc: Document) -> HTTPBinPostResponse:
         ...
 
 
@@ -54,9 +55,9 @@ class TestOpenAPI(unittest.IsolatedAsyncioTestCase):
         if headers:
             self.assertDictSubset(headers, response.headers)
 
-    async def test_http(self):
-        Proxy = make_proxy_class(API)
-        proxy = Proxy("http://httpbin.org")
+    async def test_http(self) -> None:
+        Proxy = make_proxy_class(API)  # type: ignore
+        proxy = Proxy("http://httpbin.org")  # type: ignore
 
         response = await proxy.get_method("abc")
         self.assertResponse(response, params={"id": "abc"})

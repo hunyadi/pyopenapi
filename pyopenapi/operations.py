@@ -118,10 +118,10 @@ class _FormatParameterExtractor:
 
     keys: List[str]
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.keys = []
 
-    def __getitem__(self, key: str):
+    def __getitem__(self, key: str) -> None:
         self.keys.append(key)
         return None
 
@@ -135,7 +135,6 @@ def _get_route_parameters(route: str) -> List[str]:
 def _get_endpoint_functions(
     endpoint: type, prefixes: List[str]
 ) -> Iterator[Tuple[str, str, str, Callable]]:
-
     if not inspect.isclass(endpoint):
         raise ValidationError(f"object is not a class type: {endpoint}")
 
@@ -200,7 +199,6 @@ def get_endpoint_operations(
             "update",
         ],
     ):
-
         # extract routing information from function metadata
         webmethod: Optional[WebMethod] = getattr(func_ref, "__webmethod__", None)
         if webmethod is not None:
@@ -237,7 +235,7 @@ def get_endpoint_operations(
                 )
 
             if is_type_optional(param_type):
-                inner_type = unwrap_optional_type(param_type)
+                inner_type: type = unwrap_optional_type(param_type)
             else:
                 inner_type = param_type
 

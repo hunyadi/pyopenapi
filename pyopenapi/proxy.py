@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Optional, Tuple, Type, TypeVar
+from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar
 
 import aiohttp
 from strong_typing.serialization import json_to_object, object_to_json
@@ -69,7 +69,9 @@ class OperationProxy:
         self.op = op
         self.sig = get_signature(op.func_ref)
 
-    async def __call__(self, endpoint_proxy: EndpointProxy, *args, **kwargs):
+    async def __call__(
+        self, endpoint_proxy: EndpointProxy, *args: Any, **kwargs: Any
+    ) -> Any:
         "Invokes an API operation via HTTP REST."
 
         ba = self.sig.bind(self, *args, **kwargs)
@@ -115,12 +117,14 @@ class OperationProxy:
             return None
 
 
-def _get_operation_proxy(op: EndpointOperation):
+def _get_operation_proxy(op: EndpointOperation) -> Callable[..., Any]:
     "Wraps an operation into a function that calls the corresponding HTTP REST API operation."
 
     operation_proxy = OperationProxy(op)
 
-    async def _operation_proxy_fn(self: EndpointProxy, *args, **kwargs):
+    async def _operation_proxy_fn(
+        self: EndpointProxy, *args: Any, **kwargs: Any
+    ) -> Any:
         return await operation_proxy(self, *args, **kwargs)
 
     return _operation_proxy_fn

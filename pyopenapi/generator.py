@@ -1,8 +1,9 @@
 import hashlib
+import typing
 from typing import Any, Dict, Set, Union
 
 from strong_typing.core import JsonType
-from strong_typing.docstring import parse_type
+from strong_typing.docstring import Docstring, parse_type
 from strong_typing.inspection import (
     is_generic_list,
     is_type_optional,
@@ -40,12 +41,11 @@ from .specification import (
     RequestBody,
     Response,
     ResponseRef,
+    SchemaOrRef,
     SchemaRef,
     Tag,
     TagGroup,
 )
-
-SchemaOrRef = Union[Schema, SchemaRef]
 
 
 def http_status_to_string(status_code: HTTPStatusCode) -> str:
@@ -152,7 +152,6 @@ class ContentBuilder:
     def build_media_type(
         self, item_type: type, examples: Optional[List[Any]] = None
     ) -> MediaType:
-
         schema = self.schema_builder.classdef_to_ref(item_type)
         if self.schema_transformer:
             schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = self.schema_transformer  # type: ignore
@@ -313,6 +312,27 @@ class ResponseBuilder:
             return Response(description=description)
 
 
+def schema_error_wrapper(schema: SchemaOrRef) -> Schema:
+    "Wraps an error output schema into a top-level error schema."
+
+    return {
+        "type": "object",
+        "properties": {
+            "error": schema,  # type: ignore
+        },
+        "additionalProperties": False,
+        "required": [
+            "error",
+        ],
+    }
+
+
+def sample_error_wrapper(error: JsonType) -> JsonType:
+    "Wraps an error output sample into a top-level error sample."
+
+    return {"error": error}
+
+
 class Generator:
     endpoint: type
     options: Options
@@ -334,8 +354,8 @@ class Generator:
 
     def _build_type_tag(self, ref: str, schema: Schema) -> Tag:
         definition = f'<SchemaDefinition schemaRef="#/components/schemas/{ref}" />'
-        title = schema.get("title")
-        description = schema.get("description")
+        title = typing.cast(str, schema.get("title"))
+        description = typing.cast(str, schema.get("description"))
         return Tag(
             name=ref,
             description="\n\n".join(
@@ -362,7 +382,8 @@ class Generator:
                 schema = self.schema_builder.classdef_to_named_schema(name, extra_type)
                 tag_list.append(self._build_type_tag(name, schema))
 
-            extra_tags[category_name] = tag_list
+            if tag_list:
+                extra_tags[category_name] = tag_list
 
         return extra_tags
 
@@ -388,7 +409,7 @@ class Generator:
         query_parameters = []
         for param_name, param_type in op.query_params:
             if is_type_optional(param_type):
-                inner_type = unwrap_optional_type(param_type)
+                inner_type: type = unwrap_optional_type(param_type)
                 required = False
             else:
                 inner_type = param_type
@@ -425,9 +446,14 @@ class Generator:
         # success response types
         if doc_string.returns is None and is_type_union(op.response_type):
             # split union of return types into a list of response types
-            success_type_descriptions = {
-                item: parse_type(item).short_description
+            success_type_docstring: Dict[type, Docstring] = {
+                typing.cast(type, item): parse_type(item)
                 for item in unwrap_union_types(op.response_type)
+            }
+            success_type_descriptions = {
+                item: doc_string.short_description
+                for item, doc_string in success_type_docstring.items()
+                if doc_string.short_description
             }
         else:
             # use return type as a single response type
@@ -466,17 +492,8 @@ class Generator:
             ]
 
             if self.options.error_wrapper:
-                schema_transformer = lambda schema: {
-                    "type": "object",
-                    "properties": {
-                        "error": schema,
-                    },
-                    "additionalProperties": False,
-                    "required": [
-                        "error",
-                    ],
-                }
-                sample_transformer = lambda error: {"error": error}
+                schema_transformer = schema_error_wrapper
+                sample_transformer = sample_error_wrapper
             else:
                 schema_transformer = None
                 sample_transformer = None

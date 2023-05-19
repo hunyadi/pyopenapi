@@ -1,13 +1,14 @@
 import importlib.resources
 import json
 import sys
+import typing
 from typing import TextIO
 
 from strong_typing.schema import StrictJsonType, object_to_json
 
 from .generator import Generator
-from .specification import Document
 from .options import Options
+from .specification import Document
 
 
 class Specification:
@@ -24,18 +25,22 @@ class Specification:
         The result can be serialized to a JSON string with `json.dump` or `json.dumps`.
         """
 
-        json_doc = object_to_json(self.document)
+        json_doc = typing.cast(StrictJsonType, object_to_json(self.document))
 
-        # rename vendor-specific properties
-        tag_groups = json_doc.pop("tagGroups", None)
-        if tag_groups:
-            json_doc["x-tagGroups"] = tag_groups
-        tags = json_doc.get("tags")
-        if tags:
-            for tag in tags:
-                display_name = tag.pop("displayName", None)
-                if display_name:
-                    tag["x-displayName"] = display_name
+        if isinstance(json_doc, dict):
+            # rename vendor-specific properties
+            tag_groups = json_doc.pop("tagGroups", None)
+            if tag_groups:
+                json_doc["x-tagGroups"] = tag_groups
+            tags = json_doc.get("tags")
+            if tags and isinstance(tags, list):
+                for tag in tags:
+                    if not isinstance(tag, dict):
+                        continue
+
+                    display_name = tag.pop("displayName", None)
+                    if display_name:
+                        tag["x-displayName"] = display_name
 
         return json_doc
 

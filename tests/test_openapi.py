@@ -6,9 +6,6 @@ from http import HTTPStatus
 from typing import TextIO
 from uuid import UUID
 
-from pyopenapi import Info, Options, Server, Specification
-from pyopenapi.specification import SecuritySchemeHTTP
-
 from endpoint import (
     AuthenticationError,
     BadRequestError,
@@ -19,6 +16,9 @@ from endpoint import (
     Teacher,
     ValidationError,
 )
+
+from pyopenapi import Info, Options, Server, Specification
+from pyopenapi.specification import SecuritySchemeHTTP
 
 try:
     from pygments import highlight
@@ -114,7 +114,7 @@ class TestOpenAPI(unittest.TestCase):
             ),
         )
 
-    def test_json(self):
+    def test_json(self) -> None:
         json_dir = os.path.join(self.root, "json")
         os.makedirs(json_dir, exist_ok=True)
 
@@ -127,7 +127,7 @@ class TestOpenAPI(unittest.TestCase):
         with open(path, "w", encoding="utf-8") as f:
             save_with_highlight(f, code, "json")
 
-    def test_yaml(self):
+    def test_yaml(self) -> None:
         try:
             import yaml
 
@@ -146,12 +146,12 @@ class TestOpenAPI(unittest.TestCase):
         except ImportError:
             self.skipTest("package PyYAML is required for `*.yaml` output")
 
-    def test_html(self):
+    def test_html(self) -> None:
         path = os.path.join(self.root, "index.html")
         with open(path, "w", encoding="utf-8") as f:
             self.specification.write_html(f, pretty_print=False)
 
-    def test_python(self):
+    def test_python(self) -> None:
         source = os.path.join(os.path.dirname(__file__), "endpoint.py")
         with open(source, "r", encoding="utf-8") as f:
             code = f.read()

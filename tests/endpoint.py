@@ -4,11 +4,12 @@ import uuid
 from dataclasses import dataclass
 from typing import Callable, Generator, List, Optional, Protocol, Union
 
-from pyopenapi import webmethod
 from strong_typing.schema import json_schema_type
 
+from pyopenapi import webmethod
 
-@json_schema_type(schema={"type": "string", "format": "uri", "pattern": "^https?://"})
+
+@json_schema_type(schema={"type": "string", "format": "uri", "pattern": "^https?://"})  # type: ignore
 @dataclass
 class URL:
     """A Uniform Resource Locator (URL).
@@ -18,7 +19,7 @@ class URL:
 
     url: str
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.url
 
 

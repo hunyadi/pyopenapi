@@ -3,7 +3,7 @@ import enum
 from dataclasses import dataclass
 from typing import Any, ClassVar, Dict, List, Optional, Union
 
-from strong_typing.schema import JsonType, StrictJsonType, Schema
+from strong_typing.schema import JsonType, Schema, StrictJsonType
 
 URL = str
 
@@ -20,6 +20,9 @@ class Ref:
 @dataclass
 class SchemaRef(Ref):
     ref_type: ClassVar[str] = "schemas"
+
+
+SchemaOrRef = Union[Schema, SchemaRef]
 
 
 @dataclass
@@ -62,7 +65,7 @@ class Info:
 
 @dataclass
 class MediaType:
-    schema: Optional[Schema] = None
+    schema: Optional[SchemaOrRef] = None
     example: Optional[Any] = None
     examples: Optional[Dict[str, Union["Example", ExampleRef]]] = None
 
@@ -93,7 +96,7 @@ class Parameter:
     in_: ParameterLocation
     description: Optional[str] = None
     required: Optional[bool] = None
-    schema: Optional[Schema] = None
+    schema: Optional[SchemaOrRef] = None
     example: Optional[Any] = None
 
 
