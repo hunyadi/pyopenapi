@@ -1,4 +1,5 @@
 import hashlib
+import ipaddress
 import typing
 from typing import Any, Dict, Set, Union
 
@@ -18,6 +19,7 @@ from strong_typing.schema import (
     Schema,
     SchemaOptions,
     get_schema_identifier,
+    register_schema,
 )
 from strong_typing.serialization import json_dump_string, object_to_json
 
@@ -45,6 +47,34 @@ from .specification import (
     SchemaRef,
     Tag,
     TagGroup,
+)
+
+register_schema(
+    ipaddress.IPv4Address,
+    schema={
+        "type": "string",
+        "format": "ipv4",
+        "title": "IPv4 address",
+        "description": "IPv4 address, according to dotted-quad ABNF syntax as defined in RFC 2673, section 3.2.",
+    },
+    examples=["192.0.2.0", "198.51.100.1", "203.0.113.255"],
+)
+
+register_schema(
+    ipaddress.IPv6Address,
+    schema={
+        "type": "string",
+        "format": "ipv6",
+        "title": "IPv6 address",
+        "description": "IPv6 address, as defined in RFC 2373, section 2.2.",
+    },
+    examples=[
+        "FEDC:BA98:7654:3210:FEDC:BA98:7654:3210",
+        "1080:0:0:0:8:800:200C:417A",
+        "1080::8:800:200C:417A",
+        "FF01::101",
+        "::1",
+    ],
 )
 
 
