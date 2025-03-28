@@ -1,7 +1,10 @@
+import dataclasses
 import hashlib
 import ipaddress
 import typing
-from typing import Any, Dict, Set, Union
+from dataclasses import dataclass
+from http import HTTPStatus
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 
 from strong_typing.core import JsonType
 from strong_typing.docstring import Docstring, parse_type
@@ -29,7 +32,7 @@ from .operations import (
     get_endpoint_events,
     get_endpoint_operations,
 )
-from .options import *
+from .options import HTTPStatusCode, Options
 from .specification import (
     Components,
     Document,
@@ -184,7 +187,9 @@ class ContentBuilder:
     ) -> MediaType:
         schema = self.schema_builder.classdef_to_ref(item_type)
         if self.schema_transformer:
-            schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = self.schema_transformer  # type: ignore
+            schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = (
+                self.schema_transformer
+            )
             schema = schema_transformer(schema)
 
         if not examples:
@@ -204,9 +209,9 @@ class ContentBuilder:
         "Creates a set of several examples for a media type."
 
         if self.sample_transformer:
-            sample_transformer: Callable[[JsonType], JsonType] = self.sample_transformer  # type: ignore
+            sample_transformer: Callable[[JsonType], JsonType] = self.sample_transformer
         else:
-            sample_transformer = lambda sample: sample
+            sample_transformer = lambda sample: sample  # noqa: E731
 
         results: Dict[str, Union[Example, ExampleRef]] = {}
         for example in examples:
@@ -225,9 +230,9 @@ class ContentBuilder:
         "Creates a single example for a media type."
 
         if self.sample_transformer:
-            sample_transformer: Callable[[JsonType], JsonType] = self.sample_transformer  # type: ignore
+            sample_transformer: Callable[[JsonType], JsonType] = self.sample_transformer
         else:
-            sample_transformer = lambda sample: sample
+            sample_transformer = lambda sample: sample  # noqa: E731
 
         return sample_transformer(object_to_json(example))
 

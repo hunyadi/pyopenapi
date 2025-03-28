@@ -3,14 +3,10 @@ from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Callable, ClassVar, Dict, List, Optional, Tuple, Union
 
-from .specification import (
-    Info,
-    SecurityScheme,
-    SecuritySchemeAPI,
-    SecuritySchemeHTTP,
-    SecuritySchemeOpenIDConnect,
-    Server,
-)
+from .specification import Info, SecurityScheme, Server
+from .specification import SecuritySchemeAPI as SecuritySchemeAPI
+from .specification import SecuritySchemeHTTP as SecuritySchemeHTTP
+from .specification import SecuritySchemeOpenIDConnect as SecuritySchemeOpenIDConnect
 
 HTTPStatusCode = Union[HTTPStatus, int, str]
 

@@ -32,12 +32,10 @@ class HTTPBinPostResponse(HTTPBinResponse):
 
 class API(Protocol):
     @webmethod(route="/get")
-    async def get_method(self, /, id: str) -> HTTPBinResponse:
-        ...
+    async def get_method(self, /, id: str) -> HTTPBinResponse: ...
 
     @webmethod(route="/put")
-    async def set_method(self, /, id: str, doc: Document) -> HTTPBinPostResponse:
-        ...
+    async def set_method(self, /, id: str, doc: Document) -> HTTPBinPostResponse: ...
 
 
 class TestOpenAPI(unittest.IsolatedAsyncioTestCase):

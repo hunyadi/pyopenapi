@@ -5,28 +5,17 @@
     "terminal.integrated.env.windows": {
         "PYTHONPATH": "${workspaceFolder}"
     },
-    "python.formatting.provider": "black",
-    "python.linting.mypyEnabled": true,
-    "python.linting.mypyArgs": [
-        "--check-untyped-defs",
-        "--disallow-untyped-calls",
-        "--disallow-untyped-defs",
-        "--follow-imports=silent",
-        "--ignore-missing-imports",
-        "--no-implicit-optional",
-        "--show-column-numbers",
-    ],
-    "editor.codeActionsOnSave": {
-        "source.organizeImports": true
-    },
-    "editor.formatOnSave": true,
     "files.insertFinalNewline": true,
-    "isort.args": [
-        "--profile",
-        "black"
-    ],
     "[python]": {
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        },
         "editor.formatOnSave": true,
-        "editor.defaultFormatter": "ms-python.black-formatter"
-    }
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+    "cSpell.words": [
+        "pyopenapi",
+        "webmethod"
+    ]
 }

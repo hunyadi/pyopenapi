@@ -1,8 +1,8 @@
-from typing import Any, Callable, Optional, TypeVar
+from typing import Any, Callable, List, Optional, TypeVar
 
 from .metadata import WebMethod
 from .options import *
-from .utility import Specification
+from .utility import Specification as Specification
 
 __version__ = "0.1.9"
 
