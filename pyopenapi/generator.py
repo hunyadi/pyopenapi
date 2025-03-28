@@ -4,7 +4,7 @@ import ipaddress
 import typing
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, Callable, Dict, List, Optional, Set, Union
+from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 from strong_typing.core import JsonType
 from strong_typing.docstring import Docstring, parse_type
@@ -208,20 +208,11 @@ class ContentBuilder:
     ) -> Dict[str, Union[Example, ExampleRef]]:
         "Creates a set of several examples for a media type."
 
-        if self.sample_transformer:
-            sample_transformer: Callable[[JsonType], JsonType] = self.sample_transformer
-        else:
-            sample_transformer = lambda sample: sample  # noqa: E731
+        builder = ExampleBuilder(self.sample_transformer)
 
         results: Dict[str, Union[Example, ExampleRef]] = {}
         for example in examples:
-            value = sample_transformer(object_to_json(example))
-
-            hash_string = (
-                hashlib.md5(json_dump_string(value).encode("utf-8")).digest().hex()
-            )
-            name = f"ex-{hash_string}"
-
+            name, value = builder.get_named(example)
             results[name] = Example(value=value)
 
         return results
@@ -229,12 +220,45 @@ class ContentBuilder:
     def _build_example(self, example: Any) -> Any:
         "Creates a single example for a media type."
 
-        if self.sample_transformer:
-            sample_transformer: Callable[[JsonType], JsonType] = self.sample_transformer
-        else:
-            sample_transformer = lambda sample: sample  # noqa: E731
+        builder = ExampleBuilder(self.sample_transformer)
+        return builder.get_anonymous(example)
 
-        return sample_transformer(object_to_json(example))
+
+class ExampleBuilder:
+    sample_transformer: Callable[[JsonType], JsonType]
+
+    def __init__(
+        self,
+        sample_transformer: Optional[Callable[[JsonType], JsonType]] = None,
+    ) -> None:
+        if sample_transformer:
+            self.sample_transformer = sample_transformer
+        else:
+            self.sample_transformer = lambda sample: sample  # noqa: E731
+
+    def _get_value(self, example: Any) -> JsonType:
+        return self.sample_transformer(object_to_json(example))
+
+    def get_anonymous(self, example: Any) -> JsonType:
+        return self._get_value(example)
+
+    def get_named(self, example: Any) -> Tuple[str, JsonType]:
+        value = self._get_value(example)
+
+        name: Optional[str] = None
+
+        if type(example).__str__ is not object.__str__:
+            friendly_name = str(example)
+            if friendly_name.isprintable():
+                name = friendly_name
+
+        if name is None:
+            hash_string = (
+                hashlib.md5(json_dump_string(value).encode("utf-8")).digest().hex()
+            )
+            name = f"ex-{hash_string}"
+
+        return name, value
 
 
 @dataclass
