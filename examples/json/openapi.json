@@ -5,7 +5,6 @@
         "version": "1.0",
         "description": "# Introduction\n\nThis is introductory text for the API. You can write a Markdown document, save it in a separate file and import the file as a global description by passing it as a parameter to the initializer of the `Specification` class.\n\nThis specification has been generated with [python-openapi](https://github.com/hunyadi/pyopenapi).\n"
     },
-    "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
     "servers": [
         {
             "url": "http://example.com/api"
@@ -175,15 +174,15 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Client lacks valid authentication credentials.",
+                    "400": {
+                        "description": "The input is malformed.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
                                         "error": {
-                                            "$ref": "#/components/schemas/AuthenticationError"
+                                            "$ref": "#/components/schemas/ValidationError"
                                         }
                                     },
                                     "additionalProperties": false,
@@ -194,15 +193,15 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "The input is malformed.",
+                    "401": {
+                        "description": "Client lacks valid authentication credentials.",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
                                         "error": {
-                                            "$ref": "#/components/schemas/ValidationError"
+                                            "$ref": "#/components/schemas/AuthenticationError"
                                         }
                                     },
                                     "additionalProperties": false,
@@ -245,6 +244,25 @@
                             }
                         }
                     },
+                    "400": {
+                        "description": "The input is malformed.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "$ref": "#/components/schemas/ValidationError"
+                                        }
+                                    },
+                                    "additionalProperties": false,
+                                    "required": [
+                                        "error"
+                                    ]
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "The job does not exist.",
                         "content": {
@@ -261,37 +279,14 @@
                                         "error"
                                     ]
                                 },
-                                "examples": {
-                                    "('NotFoundException', UUID('123e4567-e89b-12d3-a456-426614174000'), 'Job does not exist.', '12345678-1234-5678-1234-567812345678', 'job')": {
-                                        "value": {
-                                            "error": {
-                                                "type": "NotFoundException",
-                                                "uuid": "123e4567-e89b-12d3-a456-426614174000",
-                                                "message": "Job does not exist.",
-                                                "id": "12345678-1234-5678-1234-567812345678",
-                                                "kind": "job"
-                                            }
-                                        }
+                                "example": {
+                                    "error": {
+                                        "type": "NotFoundException",
+                                        "uuid": "123e4567-e89b-12d3-a456-426614174000",
+                                        "message": "Job does not exist.",
+                                        "id": "12345678-1234-5678-1234-567812345678",
+                                        "kind": "job"
                                     }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "The input is malformed.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "error": {
-                                            "$ref": "#/components/schemas/ValidationError"
-                                        }
-                                    },
-                                    "additionalProperties": false,
-                                    "required": [
-                                        "error"
-                                    ]
                                 }
                             }
                         }
@@ -408,25 +403,25 @@
                                     "$ref": "#/components/schemas/Student"
                                 },
                                 "examples": {
-                                    "Lajos Szörnyeteg": {
+                                    "ex-354a63aba9fe9d01b73c221627e09b04": {
                                         "value": {
                                             "family_name": "Szörnyeteg",
                                             "given_name": "Lajos"
                                         }
                                     },
-                                    "Szerafin Ló": {
+                                    "ex-18e7b86801ed57543c965329aa39d24f": {
                                         "value": {
                                             "family_name": "Ló",
                                             "given_name": "Szerafin"
                                         }
                                     },
-                                    "Szigfrid Bruckner": {
+                                    "ex-c0c1743833fec6e800494bb04621acc8": {
                                         "value": {
                                             "family_name": "Bruckner",
                                             "given_name": "Szigfrid"
                                         }
                                     },
-                                    "Zoárd Nagy": {
+                                    "ex-cec57c3187962b6c8df304aa6044a52d": {
                                         "value": {
                                             "family_name": "Nagy",
                                             "given_name": "Zoárd"
@@ -444,14 +439,14 @@
                                     "$ref": "#/components/schemas/Teacher"
                                 },
                                 "examples": {
-                                    "Makka Mikka": {
+                                    "ex-e0a90703c388b5ae0104a1cd4fa81e9d": {
                                         "value": {
                                             "family_name": "Mikka",
                                             "given_name": "Makka",
                                             "subject": "Négyszögletű Kerek Erdő"
                                         }
                                     },
-                                    "Mati Vacska": {
+                                    "ex-da01485f0be82043c6f442093916a990": {
                                         "value": {
                                             "family_name": "Vacska",
                                             "given_name": "Mati",
@@ -529,13 +524,9 @@
                                 "schema": {
                                     "$ref": "#/components/schemas/Person"
                                 },
-                                "examples": {
-                                    "Levente Hunyadi": {
-                                        "value": {
-                                            "family_name": "Hunyadi",
-                                            "given_name": "Levente"
-                                        }
-                                    }
+                                "example": {
+                                    "family_name": "Hunyadi",
+                                    "given_name": "Levente"
                                 }
                             }
                         }
@@ -620,6 +611,7 @@
             }
         }
     },
+    "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
     "components": {
         "schemas": {
             "URL": {
@@ -696,31 +688,6 @@
                 ],
                 "title": "Authentication/authorization token issued in response to an authentication request."
             },
-            "AuthenticationError": {
-                "type": "object",
-                "properties": {
-                    "type": {
-                        "type": "string",
-                        "description": "A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception class (i.e. Python exception type)."
-                    },
-                    "uuid": {
-                        "type": "string",
-                        "format": "uuid",
-                        "description": "Unique identifier of the error. This identifier helps locate the exact source of the error (e.g. find the log entry in the server log stream). Make sure to include this identifier when contacting support."
-                    },
-                    "message": {
-                        "type": "string",
-                        "description": "A human-readable description for the error for informational purposes. The exact format of the message is unspecified, and implementations should not rely on the presence of any specific information."
-                    }
-                },
-                "additionalProperties": false,
-                "required": [
-                    "type",
-                    "uuid",
-                    "message"
-                ],
-                "title": "Raised when the client fails to provide valid authentication credentials."
-            },
             "ValidationError": {
                 "type": "object",
                 "properties": {
@@ -770,6 +737,31 @@
                     "location"
                 ],
                 "title": "Raised when a JSON validation error occurs."
+            },
+            "AuthenticationError": {
+                "type": "object",
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "description": "A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception class (i.e. Python exception type)."
+                    },
+                    "uuid": {
+                        "type": "string",
+                        "format": "uuid",
+                        "description": "Unique identifier of the error. This identifier helps locate the exact source of the error (e.g. find the log entry in the server log stream). Make sure to include this identifier when contacting support."
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "A human-readable description for the error for informational purposes. The exact format of the message is unspecified, and implementations should not rely on the presence of any specific information."
+                    }
+                },
+                "additionalProperties": false,
+                "required": [
+                    "type",
+                    "uuid",
+                    "message"
+                ],
+                "title": "Raised when the client fails to provide valid authentication credentials."
             },
             "Format": {
                 "type": "string",
@@ -1059,16 +1051,16 @@
     ],
     "tags": [
         {
+            "name": "JobManagement",
+            "description": "Operations to create, inspect, update and terminate jobs.",
+            "x-displayName": "Job management."
+        },
+        {
             "name": "Endpoint"
         },
         {
             "name": "PeopleCatalog",
             "x-displayName": "Operations related to people."
-        },
-        {
-            "name": "JobManagement",
-            "description": "Operations to create, inspect, update and terminate jobs.",
-            "x-displayName": "Job management."
         },
         {
             "name": "URL",
@@ -1091,12 +1083,12 @@
             "description": "Authentication/authorization token issued in response to an authentication request.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/TokenProperties\" />"
         },
         {
-            "name": "AuthenticationError",
-            "description": "Raised when the client fails to provide valid authentication credentials.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/AuthenticationError\" />"
-        },
-        {
             "name": "ValidationError",
             "description": "Raised when a JSON validation error occurs.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/ValidationError\" />"
+        },
+        {
+            "name": "AuthenticationError",
+            "description": "Raised when the client fails to provide valid authentication credentials.\n\n<SchemaDefinition schemaRef=\"#/components/schemas/AuthenticationError\" />"
         },
         {
             "name": "Format",

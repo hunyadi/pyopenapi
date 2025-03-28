@@ -6,9 +6,9 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .hll { background-color: #ffffcc }
 .highlight { background: #f8f8f8; }
 .highlight .c { color: #3D7B7B; font-style: italic } /* Comment */
-.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .err { border: 1px solid #F00 } /* Error */
 .highlight .k { color: #008000; font-weight: bold } /* Keyword */
-.highlight .o { color: #666666 } /* Operator */
+.highlight .o { color: #666 } /* Operator */
 .highlight .ch { color: #3D7B7B; font-style: italic } /* Comment.Hashbang */
 .highlight .cm { color: #3D7B7B; font-style: italic } /* Comment.Multiline */
 .highlight .cp { color: #9C6500 } /* Comment.Preproc */
@@ -17,6 +17,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .cs { color: #3D7B7B; font-style: italic } /* Comment.Special */
 .highlight .gd { color: #A00000 } /* Generic.Deleted */
 .highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .ges { font-weight: bold; font-style: italic } /* Generic.EmphStrong */
 .highlight .gr { color: #E40000 } /* Generic.Error */
 .highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
 .highlight .gi { color: #008400 } /* Generic.Inserted */
@@ -24,34 +25,34 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
 .highlight .gs { font-weight: bold } /* Generic.Strong */
 .highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
-.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .gt { color: #04D } /* Generic.Traceback */
 .highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
 .highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
 .highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
 .highlight .kp { color: #008000 } /* Keyword.Pseudo */
 .highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
 .highlight .kt { color: #B00040 } /* Keyword.Type */
-.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .m { color: #666 } /* Literal.Number */
 .highlight .s { color: #BA2121 } /* Literal.String */
 .highlight .na { color: #687822 } /* Name.Attribute */
 .highlight .nb { color: #008000 } /* Name.Builtin */
-.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
-.highlight .no { color: #880000 } /* Name.Constant */
-.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .nc { color: #00F; font-weight: bold } /* Name.Class */
+.highlight .no { color: #800 } /* Name.Constant */
+.highlight .nd { color: #A2F } /* Name.Decorator */
 .highlight .ni { color: #717171; font-weight: bold } /* Name.Entity */
 .highlight .ne { color: #CB3F38; font-weight: bold } /* Name.Exception */
-.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nf { color: #00F } /* Name.Function */
 .highlight .nl { color: #767600 } /* Name.Label */
-.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nn { color: #00F; font-weight: bold } /* Name.Namespace */
 .highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
 .highlight .nv { color: #19177C } /* Name.Variable */
-.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
-.highlight .w { color: #bbbbbb } /* Text.Whitespace */
-.highlight .mb { color: #666666 } /* Literal.Number.Bin */
-.highlight .mf { color: #666666 } /* Literal.Number.Float */
-.highlight .mh { color: #666666 } /* Literal.Number.Hex */
-.highlight .mi { color: #666666 } /* Literal.Number.Integer */
-.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .ow { color: #A2F; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #BBB } /* Text.Whitespace */
+.highlight .mb { color: #666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666 } /* Literal.Number.Float */
+.highlight .mh { color: #666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666 } /* Literal.Number.Oct */
 .highlight .sa { color: #BA2121 } /* Literal.String.Affix */
 .highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
 .highlight .sc { color: #BA2121 } /* Literal.String.Char */
@@ -66,39 +67,40 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .s1 { color: #BA2121 } /* Literal.String.Single */
 .highlight .ss { color: #19177C } /* Literal.String.Symbol */
 .highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
-.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .fm { color: #00F } /* Name.Function.Magic */
 .highlight .vc { color: #19177C } /* Name.Variable.Class */
 .highlight .vg { color: #19177C } /* Name.Variable.Global */
 .highlight .vi { color: #19177C } /* Name.Variable.Instance */
 .highlight .vm { color: #19177C } /* Name.Variable.Magic */
-.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style></head><body><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">enum</span>
-<span class="kn">import</span> <span class="nn">uuid</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Union</span>
+.highlight .il { color: #666 } /* Literal.Number.Integer.Long */</style></head><body><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Generator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">pyopenapi</span> <span class="kn">import</span> <span class="n">webmethod</span>
-<span class="kn">from</span> <span class="nn">strong_typing.schema</span> <span class="kn">import</span> <span class="n">json_schema_type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">strong_typing.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">json_schema_type</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyopenapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">webmethod</span>
 
 
-<span class="nd">@json_schema_type</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uri&quot;</span><span class="p">,</span> <span class="s2">&quot;pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;^https?://&quot;</span><span class="p">})</span>
+<span class="nd">@json_schema_type</span><span class="p">(</span><span class="n">schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;uri&quot;</span><span class="p">,</span> <span class="s2">&quot;pattern&quot;</span><span class="p">:</span> <span class="s2">&quot;^https?://&quot;</span><span class="p">})</span>  <span class="c1"># type: ignore</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">URL</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;A Uniform Resource Locator (URL).</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">URL</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A Uniform Resource Locator (URL).</span>
 
 <span class="sd">    :param url: The URL encapsulated in this object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">OperationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OperationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Encapsulates an error from an endpoint operation.</span>
 
 <span class="sd">    :param type: A machine-processable identifier for the error. Typically corresponds to the fully-qualified exception</span>
@@ -115,15 +117,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">AuthenticationError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AuthenticationError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Raised when the client fails to provide valid authentication credentials.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">BadRequestError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BadRequestError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The server cannot process the request due a client error.</span>
 
 <span class="sd">    This might be due to malformed request syntax or invalid usage.</span>
@@ -131,13 +133,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">InternalServerError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">InternalServerError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
     <span class="s2">&quot;The server encountered an unexpected error when processing the request.&quot;</span>
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">NotFoundError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NotFoundError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Raised when an entity does not exist or has expired.</span>
 
 <span class="sd">    :param id: The identifier of the entity not found, e.g. the UUID of a job.</span>
@@ -149,8 +151,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Location</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Location</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Refers to a location in parsable text input (e.g. JSON, YAML or structured text).</span>
 
 <span class="sd">    :param line: Line number (1-based).</span>
@@ -164,8 +166,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">ValidationError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ValidationError</span><span class="p">(</span><span class="n">OperationError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Raised when a JSON validation error occurs.</span>
 
 <span class="sd">    :param location: Location of where invalid input was found.</span>
@@ -174,7 +176,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">location</span><span class="p">:</span> <span class="n">Location</span>
 
 
-<span class="k">class</span> <span class="nc">Status</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Status</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
     <span class="s2">&quot;Status of a job.&quot;</span>
 
     <span class="n">Created</span> <span class="o">=</span> <span class="s2">&quot;created&quot;</span>
@@ -182,7 +184,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">Stopped</span> <span class="o">=</span> <span class="s2">&quot;stopped&quot;</span>
 
 
-<span class="k">class</span> <span class="nc">Format</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Format</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">):</span>
     <span class="s2">&quot;Possible representation formats.&quot;</span>
 
     <span class="n">HTML</span> <span class="o">=</span> <span class="s2">&quot;text/html&quot;</span>
@@ -192,8 +194,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Description</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Description</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A textual description as plain text or a well-known markup format.</span>
 
 <span class="sd">    :param format: The representation format for the text.</span>
@@ -206,8 +208,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Job</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Job</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A unit of execution.</span>
 
 <span class="sd">    :param id: Job identifier.</span>
@@ -224,8 +226,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">StatusResponse</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StatusResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Triggered synchronously as the immediate response to an asynchronous operation.</span>
 
 <span class="sd">    This response serves as an acknowledgment, and may be followed by several out-of-band events, transmitted e.g. over a websocket connection.</span>
@@ -240,8 +242,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">StatusEvent</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StatusEvent</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Triggered when an out-of-band event takes place.</span>
 
 <span class="sd">    This message is typically transmitted in a separate channel, e.g. over a websocket connection.</span>
@@ -255,14 +257,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">DataEvent</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataEvent</span><span class="p">:</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span>
 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Person</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Represents a real person.</span>
 
 <span class="sd">    :param family_name: The person&#39;s family name (typically last name).</span>
@@ -272,13 +274,13 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">family_name</span><span class="p">:</span> <span class="nb">str</span>
     <span class="n">given_name</span><span class="p">:</span> <span class="nb">str</span>
 
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">given_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">family_name</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Student</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Student</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
     <span class="s2">&quot;A student at a university.&quot;</span>
 
     <span class="n">birth_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -286,7 +288,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 <span class="nd">@json_schema_type</span>
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Teacher</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Teacher</span><span class="p">(</span><span class="n">Person</span><span class="p">):</span>
     <span class="s2">&quot;A lecturer at a university.&quot;</span>
 
     <span class="n">subject</span><span class="p">:</span> <span class="nb">str</span>
@@ -297,15 +299,15 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="c1">#</span>
 
 
-<span class="k">class</span> <span class="nc">JobManagement</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">JobManagement</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Job management.</span>
 
 <span class="sd">    Operations to create, inspect, update and terminate jobs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">create_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">URL</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">items</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">URL</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new job with the given data as input.</span>
 
 <span class="sd">        :param items: A set of URLs to resources used to initiate the job.</span>
@@ -327,8 +329,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <span class="p">)</span>
         <span class="p">],</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Format</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Job</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="nb">format</span><span class="p">:</span> <span class="n">Format</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Job</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Query status information about a job.</span>
 
 <span class="sd">        :param job_id: Unique identifier for the job to query.</span>
@@ -338,16 +340,16 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
-    <span class="k">def</span> <span class="nf">remove_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Terminates a job.</span>
 
 <span class="sd">        :param job_id: Unique identifier for the job to terminate.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
-    <span class="k">def</span> <span class="nf">update_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">job</span><span class="p">:</span> <span class="n">Job</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_job</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="n">job</span><span class="p">:</span> <span class="n">Job</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Updates information related to a job.</span>
 
 <span class="sd">        May cause the job to be stopped and restarted.</span>
@@ -358,10 +360,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="o">...</span>
 
-    <span class="k">def</span> <span class="nf">get_status</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_status</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">job_id</span><span class="p">:</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">,</span> <span class="o">/</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Generator</span><span class="p">[</span><span class="n">StatusEvent</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">StatusResponse</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Provides asynchronous status information about a job.</span>
 
 <span class="sd">        This operation is defined with the special return type of `Generator`. `Generator[Y,S,R]` has the yield type</span>
@@ -374,14 +376,14 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">data_event</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">DataEvent</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
 
 
-<span class="k">class</span> <span class="nc">PeopleCatalog</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PeopleCatalog</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Operations related to people.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@webmethod</span><span class="p">(</span><span class="n">route</span><span class="o">=</span><span class="s2">&quot;/person/id/</span><span class="si">{id}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_person_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_person_by_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find a person by their identifier.</span>
 
 <span class="sd">        This operation has a custom route associated with it.</span>
@@ -392,8 +394,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
         <span class="n">route</span><span class="o">=</span><span class="s2">&quot;/person/name/</span><span class="si">{family}</span><span class="s2">/</span><span class="si">{given}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="n">response_example</span><span class="o">=</span><span class="n">Person</span><span class="p">(</span><span class="s2">&quot;Hunyadi&quot;</span><span class="p">,</span> <span class="s2">&quot;Levente&quot;</span><span class="p">),</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_person_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">given</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_person_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">given</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Person</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find a person by their name.</span>
 
 <span class="sd">        This operation has a custom route associated with it.</span>
@@ -411,8 +413,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
             <span class="n">Teacher</span><span class="p">(</span><span class="s2">&quot;Vacska&quot;</span><span class="p">,</span> <span class="s2">&quot;Mati&quot;</span><span class="p">,</span> <span class="s2">&quot;Négyszögletű Kerek Erdő&quot;</span><span class="p">),</span>
         <span class="p">],</span>
     <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_member_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">given</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Student</span><span class="p">,</span> <span class="n">Teacher</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_member_by_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">family</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">given</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">/</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Student</span><span class="p">,</span> <span class="n">Teacher</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Find a member by their name.</span>
 
 <span class="sd">        This operation has multiple response payload types.</span>
@@ -426,8 +428,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">Credentials</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Credentials</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Authentication credentials.</span>
 
 <span class="sd">    :param client_id: An API key.</span>
@@ -439,8 +441,8 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 
 
 <span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">TokenProperties</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TokenProperties</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Authentication/authorization token issued in response to an authentication request.</span>
 
 <span class="sd">    :param access_token: A base64-encoded access token string with header, payload and signature parts.</span>
@@ -451,10 +453,10 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
     <span class="n">expires_at</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span>
 
 
-<span class="k">class</span> <span class="nc">Endpoint</span><span class="p">(</span><span class="n">JobManagement</span><span class="p">,</span> <span class="n">PeopleCatalog</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Endpoint</span><span class="p">(</span><span class="n">JobManagement</span><span class="p">,</span> <span class="n">PeopleCatalog</span><span class="p">,</span> <span class="n">Protocol</span><span class="p">):</span>
     <span class="nd">@webmethod</span><span class="p">(</span><span class="n">route</span><span class="o">=</span><span class="s2">&quot;/auth&quot;</span><span class="p">,</span> <span class="n">public</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">def</span> <span class="nf">do_authenticate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="p">:</span> <span class="n">Credentials</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenProperties</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">do_authenticate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="p">:</span> <span class="n">Credentials</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TokenProperties</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Issues a JSON Web Token (JWT) to be passed to API calls.</span>
 
 <span class="sd">        :raises AuthenticationError: Client lacks valid authentication credentials.</span>

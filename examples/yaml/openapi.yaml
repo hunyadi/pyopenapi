@@ -589,16 +589,13 @@ paths:
         '404':
           content:
             application/json:
-              examples:
-                ? ('NotFoundException', UUID('123e4567-e89b-12d3-a456-426614174000'),
-                  'Job does not exist.', '12345678-1234-5678-1234-567812345678', 'job')
-                : value:
-                    error:
-                      id: 12345678-1234-5678-1234-567812345678
-                      kind: job
-                      message: Job does not exist.
-                      type: NotFoundException
-                      uuid: 123e4567-e89b-12d3-a456-426614174000
+              example:
+                error:
+                  id: 12345678-1234-5678-1234-567812345678
+                  kind: job
+                  message: Job does not exist.
+                  type: NotFoundException
+                  uuid: 123e4567-e89b-12d3-a456-426614174000
               schema:
                 additionalProperties: false
                 properties:
@@ -664,19 +661,19 @@ paths:
           content:
             application/json:
               examples:
-                Lajos Szörnyeteg:
-                  value:
-                    family_name: Szörnyeteg
-                    given_name: Lajos
-                Szerafin Ló:
+                ex-18e7b86801ed57543c965329aa39d24f:
                   value:
                     family_name: Ló
                     given_name: Szerafin
-                Szigfrid Bruckner:
+                ex-354a63aba9fe9d01b73c221627e09b04:
+                  value:
+                    family_name: Szörnyeteg
+                    given_name: Lajos
+                ex-c0c1743833fec6e800494bb04621acc8:
                   value:
                     family_name: Bruckner
                     given_name: Szigfrid
-                Zoárd Nagy:
+                ex-cec57c3187962b6c8df304aa6044a52d:
                   value:
                     family_name: Nagy
                     given_name: Zoárd
@@ -687,15 +684,15 @@ paths:
           content:
             application/json:
               examples:
-                Makka Mikka:
-                  value:
-                    family_name: Mikka
-                    given_name: Makka
-                    subject: Négyszögletű Kerek Erdő
-                Mati Vacska:
+                ex-da01485f0be82043c6f442093916a990:
                   value:
                     family_name: Vacska
                     given_name: Mati
+                    subject: Négyszögletű Kerek Erdő
+                ex-e0a90703c388b5ae0104a1cd4fa81e9d:
+                  value:
+                    family_name: Mikka
+                    given_name: Makka
                     subject: Négyszögletű Kerek Erdő
               schema:
                 $ref: '#/components/schemas/Teacher'
@@ -740,11 +737,9 @@ paths:
         '200':
           content:
             application/json:
-              examples:
-                Levente Hunyadi:
-                  value:
-                    family_name: Hunyadi
-                    given_name: Levente
+              example:
+                family_name: Hunyadi
+                given_name: Levente
               schema:
                 $ref: '#/components/schemas/Person'
           description: OK
@@ -796,12 +791,12 @@ security:
 servers:
 - url: http://example.com/api
 tags:
-- name: Endpoint
-- name: PeopleCatalog
-  x-displayName: Operations related to people.
 - description: Operations to create, inspect, update and terminate jobs.
   name: JobManagement
   x-displayName: Job management.
+- name: Endpoint
+- name: PeopleCatalog
+  x-displayName: Operations related to people.
 - description: 'A Uniform Resource Locator (URL).
 
 
@@ -825,16 +820,16 @@ tags:
 
     <SchemaDefinition schemaRef="#/components/schemas/TokenProperties" />'
   name: TokenProperties
-- description: 'Raised when the client fails to provide valid authentication credentials.
-
-
-    <SchemaDefinition schemaRef="#/components/schemas/AuthenticationError" />'
-  name: AuthenticationError
 - description: 'Raised when a JSON validation error occurs.
 
 
     <SchemaDefinition schemaRef="#/components/schemas/ValidationError" />'
   name: ValidationError
+- description: 'Raised when the client fails to provide valid authentication credentials.
+
+
+    <SchemaDefinition schemaRef="#/components/schemas/AuthenticationError" />'
+  name: AuthenticationError
 - description: 'Possible representation formats.
 
 
