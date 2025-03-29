@@ -1,0 +1,155 @@
+---
+name: pyopenapi build, test and deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish-to-github:
+        type: boolean
+        description: 'Publish to GitHub'
+        required: true
+        default: false
+      publish-to-pypi:
+        type: boolean
+        description: 'Publish to PyPI'
+        required: true
+        default: false
+
+jobs:
+  build:
+    name: Build distribution
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch source code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.8"
+      - name: Set up build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip --disable-pip-version-check install -r requirements.txt
+
+      # Generate and publish website content
+      - name: Generate website content
+        run: |
+          python -m unittest discover -s tests
+      - name: Save website content as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: github-pages
+          path: website/
+
+      # Generate and publish PyPI package
+      - name: Build PyPI package
+        run: |
+          python -m build --sdist --wheel
+      - name: Save PyPI package as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyopenapi-dist
+          path: dist/**
+          if-no-files-found: error
+          compression-level: 0
+
+  test:
+    name: Run unit tests
+
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch source code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip --disable-pip-version-check install -r requirements.txt
+      - name: Run unit tests
+        run: |
+          python -m unittest discover -s tests
+
+  github-deploy:
+    name: GitHub Pages deploy
+
+    # Add a dependency to the build job
+    needs: build
+
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write      # to deploy to Pages
+      id-token: write   # to verify the deployment originates from an appropriate source
+
+    # Deploy to the github-pages environment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    # Specify runner and deployment step
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: github-pages
+
+  github-release:
+    name: GitHub Release signed with Sigstore
+
+    if: ${{ inputs.publish-to-github }}
+    needs: build
+
+    permissions:
+      contents: write  # IMPORTANT: mandatory for making GitHub Releases
+      id-token: write  # IMPORTANT: mandatory for Sigstore
+
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download the distribution
+      uses: actions/download-artifact@v4
+      with:
+        name: pyopenapi-dist
+        path: dist/
+    - name: Sign the distribution with Sigstore
+      uses: sigstore/gh-action-sigstore-python@v3.0.0
+      with:
+        inputs: |
+          ./dist/*.tar.gz
+          ./dist/*.whl
+    - name: Upload artifact signatures to GitHub Release
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      # Upload to GitHub Release using the `gh` CLI.
+      # `dist/` contains the built packages, and the
+      # sigstore-produced signatures and certificates.
+      run: >-
+        gh release create
+        `ls -1 dist/*.tar.gz | grep -Eo '[0-9]+[.][0-9]+[.][0-9]+'` dist/**
+        --repo '${{ github.repository }}' --notes ''
+
+  pypi-publish:
+    name: Publish release to PyPI
+
+    if: ${{ inputs.publish-to-pypi }}
+    needs: build
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the distribution
+        uses: actions/download-artifact@v4
+        with:
+          name: pyopenapi-dist
+          path: dist/
+      - name: Publish package distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_ID_TOKEN }}

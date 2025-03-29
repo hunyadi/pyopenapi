@@ -6,19 +6,12 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
-from strong_typing.inspection import (
-    get_signature,
-    is_type_enum,
-    is_type_optional,
-    unwrap_optional_type,
-)
+from strong_typing.inspection import get_signature, is_type_enum, is_type_optional, unwrap_optional_type
 
 from .metadata import WebMethod
 
 
-def split_prefix(
-    s: str, sep: str, prefix: Union[str, Iterable[str]]
-) -> Tuple[Optional[str], str]:
+def split_prefix(s: str, sep: str, prefix: Union[str, Iterable[str]]) -> Tuple[Optional[str], str]:
     """
     Recognizes a prefix at the beginning of a string.
 
@@ -50,6 +43,7 @@ def _get_annotation_type(annotation: Union[type, str], callable: Callable) -> ty
         return annotation
 
 
+@enum.unique
 class HTTPMethod(enum.Enum):
     "HTTP method used to invoke an endpoint operation."
 
@@ -132,9 +126,7 @@ def _get_route_parameters(route: str) -> List[str]:
     return extractor.keys
 
 
-def _get_endpoint_functions(
-    endpoint: type, prefixes: List[str]
-) -> Iterator[Tuple[str, str, str, Callable]]:
+def _get_endpoint_functions(endpoint: type, prefixes: List[str]) -> Iterator[Tuple[str, str, str, Callable]]:
     if not inspect.isclass(endpoint):
         raise ValidationError(f"object is not a class type: {endpoint}")
 
@@ -156,14 +148,10 @@ def _get_defining_class(member_fn: str, derived_cls: type) -> type:
             if name == member_fn:
                 return cls
 
-    raise ValidationError(
-        f"cannot find defining class for {member_fn} in {derived_cls}"
-    )
+    raise ValidationError(f"cannot find defining class for {member_fn} in {derived_cls}")
 
 
-def get_endpoint_operations(
-    endpoint: type, use_examples: bool = True
-) -> List[EndpointOperation]:
+def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> List[EndpointOperation]:
     """
     Extracts a list of member functions in a class eligible for HTTP interface binding.
 
@@ -230,36 +218,23 @@ def get_endpoint_operations(
 
             # check if all parameters have explicit type
             if parameter.annotation is inspect.Parameter.empty:
-                raise ValidationError(
-                    f"parameter '{param_name}' in function '{func_name}' has no type annotation"
-                )
+                raise ValidationError(f"parameter '{param_name}' in function '{func_name}' has no type annotation")
 
             if is_type_optional(param_type):
                 inner_type: type = unwrap_optional_type(param_type)
             else:
                 inner_type = param_type
 
-            if (
-                inner_type is bool
-                or inner_type is int
-                or inner_type is float
-                or inner_type is str
-                or inner_type is uuid.UUID
-                or is_type_enum(inner_type)
-            ):
+            if inner_type is bool or inner_type is int or inner_type is float or inner_type is str or inner_type is uuid.UUID or is_type_enum(inner_type):
                 if parameter.kind == inspect.Parameter.POSITIONAL_ONLY:
                     if route_params is not None and param_name not in route_params:
-                        raise ValidationError(
-                            f"positional parameter '{param_name}' absent from user-defined route '{route}' for function '{func_name}'"
-                        )
+                        raise ValidationError(f"positional parameter '{param_name}' absent from user-defined route '{route}' for function '{func_name}'")
 
                     # simple type maps to route path element, e.g. /study/{uuid}/{version}
                     path_params.append((param_name, param_type))
                 else:
                     if route_params is not None and param_name in route_params:
-                        raise ValidationError(
-                            f"query parameter '{param_name}' found in user-defined route '{route}' for function '{func_name}'"
-                        )
+                        raise ValidationError(f"query parameter '{param_name}' found in user-defined route '{route}' for function '{func_name}'")
 
                     # simple type maps to key=value pair in query string
                     query_params.append((param_name, param_type))
@@ -280,9 +255,7 @@ def get_endpoint_operations(
 
         # check if function has explicit return type
         if signature.return_annotation is inspect.Signature.empty:
-            raise ValidationError(
-                f"function '{func_name}' has no return type annotation"
-            )
+            raise ValidationError(f"function '{func_name}' has no return type annotation")
 
         return_type = _get_annotation_type(signature.return_annotation, func_ref)
 

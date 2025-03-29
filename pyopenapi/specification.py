@@ -84,6 +84,7 @@ class Response:
     content: Optional[Dict[str, MediaType]] = None
 
 
+@enum.unique
 class ParameterLocation(enum.Enum):
     Query = "query"
     Header = "header"
@@ -154,6 +155,7 @@ class Server:
     description: Optional[str] = None
 
 
+@enum.unique
 class SecuritySchemeType(enum.Enum):
     ApiKey = "apiKey"
     HTTP = "http"
@@ -183,9 +185,7 @@ class SecuritySchemeHTTP(SecurityScheme):
     scheme: str
     bearerFormat: Optional[str] = None
 
-    def __init__(
-        self, description: str, scheme: str, bearerFormat: Optional[str] = None
-    ) -> None:
+    def __init__(self, description: str, scheme: str, bearerFormat: Optional[str] = None) -> None:
         super().__init__(SecuritySchemeType.HTTP, description)
         self.scheme = scheme
         self.bearerFormat = bearerFormat

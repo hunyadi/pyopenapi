@@ -14,7 +14,7 @@ from .specification import Document
 class Specification:
     document: Document
 
-    def __init__(self, endpoint: type, options: Options):
+    def __init__(self, endpoint: type, options: Options) -> None:
         generator = Generator(endpoint, options)
         self.document = generator.generate()
 
@@ -53,9 +53,7 @@ class Specification:
 
         json_doc = self.get_json()
         if pretty_print:
-            return json.dumps(
-                json_doc, check_circular=False, ensure_ascii=False, indent=4
-            )
+            return json.dumps(json_doc, check_circular=False, ensure_ascii=False, indent=4)
         else:
             return json.dumps(
                 json_doc,
@@ -97,14 +95,10 @@ class Specification:
         """
 
         if sys.version_info >= (3, 9):
-            with importlib.resources.files(__package__).joinpath("template.html").open(
-                encoding="utf-8", errors="strict"
-            ) as html_template_file:
+            with importlib.resources.files(__package__).joinpath("template.html").open(encoding="utf-8", errors="strict") as html_template_file:
                 html_template = html_template_file.read()
         else:
-            with importlib.resources.open_text(
-                __package__, "template.html", encoding="utf-8", errors="strict"
-            ) as html_template_file:
+            with importlib.resources.open_text(__package__, "template.html", encoding="utf-8", errors="strict") as html_template_file:
                 html_template = html_template_file.read()
 
         html = html_template.replace(

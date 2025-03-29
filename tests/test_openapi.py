@@ -6,16 +6,7 @@ from http import HTTPStatus
 from typing import TextIO
 from uuid import UUID
 
-from endpoint import (
-    AuthenticationError,
-    BadRequestError,
-    Endpoint,
-    InternalServerError,
-    NotFoundError,
-    Student,
-    Teacher,
-    ValidationError,
-)
+from endpoint import AuthenticationError, BadRequestError, Endpoint, InternalServerError, NotFoundError, Student, Teacher, ValidationError
 
 from pyopenapi import Info, Options, Server, Specification
 from pyopenapi.specification import SecuritySchemeHTTP
@@ -83,7 +74,7 @@ class TestOpenAPI(unittest.TestCase):
         with open(os.path.join(os.path.dirname(__file__), "endpoint.md"), "r") as f:
             description = f.read()
 
-        self.root = os.path.join(os.path.dirname(__file__), "..", "examples")
+        self.root = os.path.join(os.path.dirname(__file__), "..", "website", "examples")
         os.makedirs(self.root, exist_ok=True)
         self.specification = Specification(
             Endpoint,

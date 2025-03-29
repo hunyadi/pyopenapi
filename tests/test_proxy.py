@@ -1,3 +1,4 @@
+import sys
 import unittest
 from dataclasses import dataclass
 from typing import Dict, Optional, Protocol
@@ -53,6 +54,7 @@ class TestOpenAPI(unittest.IsolatedAsyncioTestCase):
         if headers:
             self.assertDictSubset(headers, response.headers)
 
+    @unittest.skipUnless(sys.version_info >= (3, 9), "requires Python 3.9 or later")
     async def test_http(self) -> None:
         Proxy = make_proxy_class(API)  # type: ignore
         proxy = Proxy("http://httpbin.org")  # type: ignore
@@ -61,9 +63,7 @@ class TestOpenAPI(unittest.IsolatedAsyncioTestCase):
         self.assertResponse(response, params={"id": "abc"})
 
         response = await proxy.set_method("abc", Document("title", "text"))
-        self.assertResponse(
-            response, params={"id": "abc"}, headers={"Content-Type": "application/json"}
-        )
+        self.assertResponse(response, params={"id": "abc"}, headers={"Content-Type": "application/json"})
 
 
 if __name__ == "__main__":

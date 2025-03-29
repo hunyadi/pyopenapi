@@ -3,10 +3,11 @@ from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Callable, ClassVar, Dict, List, Optional, Tuple, Union
 
-from .specification import Info, SecurityScheme, Server
+from .specification import Info, SecurityScheme
 from .specification import SecuritySchemeAPI as SecuritySchemeAPI
 from .specification import SecuritySchemeHTTP as SecuritySchemeHTTP
 from .specification import SecuritySchemeOpenIDConnect as SecuritySchemeOpenIDConnect
+from .specification import Server
 
 HTTPStatusCode = Union[HTTPStatus, int, str]
 
@@ -33,12 +34,8 @@ class Options:
     default_security_scheme: Optional[SecurityScheme] = None
     extra_types: Union[List[type], Dict[str, List[type]], None] = None
     use_examples: bool = True
-    success_responses: Dict[type, HTTPStatusCode] = dataclasses.field(
-        default_factory=dict
-    )
-    error_responses: Dict[type, HTTPStatusCode] = dataclasses.field(
-        default_factory=dict
-    )
+    success_responses: Dict[type, HTTPStatusCode] = dataclasses.field(default_factory=dict)
+    error_responses: Dict[type, HTTPStatusCode] = dataclasses.field(default_factory=dict)
     error_wrapper: bool = False
     property_description_fun: Optional[Callable[[type, str, str], str]] = None
     captions: Optional[Dict[str, str]] = None

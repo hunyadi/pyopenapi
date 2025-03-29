@@ -1,10 +1,10 @@
 from typing import Any, Callable, List, Optional, TypeVar
 
 from .metadata import WebMethod
-from .options import *
+from .options import *  # noqa: F403
 from .utility import Specification as Specification
 
-__version__ = "0.1.9"
+__version__ = "0.1.10"
 
 T = TypeVar("T")
 
@@ -29,13 +29,9 @@ def webmethod(
     """
 
     if request_example is not None and request_examples is not None:
-        raise ValueError(
-            "arguments `request_example` and `request_examples` are exclusive"
-        )
+        raise ValueError("arguments `request_example` and `request_examples` are exclusive")
     if response_example is not None and response_examples is not None:
-        raise ValueError(
-            "arguments `response_example` and `response_examples` are exclusive"
-        )
+        raise ValueError("arguments `response_example` and `response_examples` are exclusive")
 
     if request_example:
         request_examples = [request_example]

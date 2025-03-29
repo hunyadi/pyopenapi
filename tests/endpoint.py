@@ -286,9 +286,7 @@ class JobManagement(Protocol):
         """
         ...
 
-    def get_status(
-        self, job_id: uuid.UUID, /
-    ) -> Generator[StatusEvent, None, StatusResponse]:
+    def get_status(self, job_id: uuid.UUID, /) -> Generator[StatusEvent, None, StatusResponse]:
         """
         Provides asynchronous status information about a job.
 

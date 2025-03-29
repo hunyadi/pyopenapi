@@ -4,12 +4,7 @@ from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar
 import aiohttp
 from strong_typing.serialization import json_to_object, object_to_json
 
-from .operations import (
-    EndpointOperation,
-    HTTPMethod,
-    get_endpoint_operations,
-    get_signature,
-)
+from .operations import EndpointOperation, HTTPMethod, get_endpoint_operations, get_signature
 
 
 async def make_request(
@@ -51,9 +46,9 @@ class ProxyInvokeError(RuntimeError):
 class EndpointProxy:
     "The HTTP REST proxy class for an endpoint."
 
-    url: str
+    base_url: str
 
-    def __init__(self, base_url: str):
+    def __init__(self, base_url: str) -> None:
         self.base_url = base_url
 
 
@@ -65,22 +60,18 @@ class OperationProxy:
     payload, builds an HTTP request, and processes the HTTP response.
     """
 
-    def __init__(self, op: EndpointOperation):
+    def __init__(self, op: EndpointOperation) -> None:
         self.op = op
         self.sig = get_signature(op.func_ref)
 
-    async def __call__(
-        self, endpoint_proxy: EndpointProxy, *args: Any, **kwargs: Any
-    ) -> Any:
+    async def __call__(self, endpoint_proxy: EndpointProxy, *args: Any, **kwargs: Any) -> Any:
         "Invokes an API operation via HTTP REST."
 
         ba = self.sig.bind(self, *args, **kwargs)
 
         # substitute parameters in URL path
         route = self.op.get_route()
-        path = route.format_map(
-            {name: ba.arguments[name] for name, _type in self.op.path_params}
-        )
+        path = route.format_map({name: ba.arguments[name] for name, _type in self.op.path_params})
 
         # gather URL query parameters
         query = {name: str(ba.arguments[name]) for name, _type in self.op.query_params}
@@ -99,18 +90,14 @@ class OperationProxy:
             data = None
 
         # make HTTP request
-        status, response = await make_request(
-            self.op.http_method, endpoint_proxy.base_url, path, query, data
-        )
+        status, response = await make_request(self.op.http_method, endpoint_proxy.base_url, path, query, data)
 
         # process HTTP response
         if response:
             try:
                 s = json.loads(response)
             except json.JSONDecodeError:
-                raise ProxyInvokeError(
-                    f"response body is not well-formed JSON:\n{response}"
-                )
+                raise ProxyInvokeError(f"response body is not well-formed JSON:\n{response}")
 
             return json_to_object(self.op.response_type, s)
         else:
@@ -122,9 +109,7 @@ def _get_operation_proxy(op: EndpointOperation) -> Callable[..., Any]:
 
     operation_proxy = OperationProxy(op)
 
-    async def _operation_proxy_fn(
-        self: EndpointProxy, *args: Any, **kwargs: Any
-    ) -> Any:
+    async def _operation_proxy_fn(self: EndpointProxy, *args: Any, **kwargs: Any) -> Any:
         return await operation_proxy(self, *args, **kwargs)
 
     return _operation_proxy_fn

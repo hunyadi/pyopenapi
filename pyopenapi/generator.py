@@ -8,30 +8,12 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
 
 from strong_typing.core import JsonType
 from strong_typing.docstring import Docstring, parse_type
-from strong_typing.inspection import (
-    is_generic_list,
-    is_type_optional,
-    is_type_union,
-    unwrap_generic_list,
-    unwrap_optional_type,
-    unwrap_union_types,
-)
+from strong_typing.inspection import is_generic_list, is_type_optional, is_type_union, unwrap_generic_list, unwrap_optional_type, unwrap_union_types
 from strong_typing.name import python_type_to_name
-from strong_typing.schema import (
-    JsonSchemaGenerator,
-    Schema,
-    SchemaOptions,
-    get_schema_identifier,
-    register_schema,
-)
+from strong_typing.schema import JsonSchemaGenerator, Schema, SchemaOptions, get_schema_identifier, register_schema
 from strong_typing.serialization import json_dump_string, object_to_json
 
-from .operations import (
-    EndpointOperation,
-    HTTPMethod,
-    get_endpoint_events,
-    get_endpoint_operations,
-)
+from .operations import EndpointOperation, HTTPMethod, get_endpoint_events, get_endpoint_operations
 from .options import HTTPStatusCode, Options
 from .specification import (
     Components,
@@ -168,9 +150,7 @@ class ContentBuilder:
         self.schema_transformer = schema_transformer
         self.sample_transformer = sample_transformer
 
-    def build_content(
-        self, payload_type: type, examples: Optional[List[Any]] = None
-    ) -> Dict[str, MediaType]:
+    def build_content(self, payload_type: type, examples: Optional[List[Any]] = None) -> Dict[str, MediaType]:
         "Creates the content subtree for a request or response."
 
         if is_generic_list(payload_type):
@@ -182,14 +162,10 @@ class ContentBuilder:
 
         return {media_type: self.build_media_type(item_type, examples)}
 
-    def build_media_type(
-        self, item_type: type, examples: Optional[List[Any]] = None
-    ) -> MediaType:
+    def build_media_type(self, item_type: type, examples: Optional[List[Any]] = None) -> MediaType:
         schema = self.schema_builder.classdef_to_ref(item_type)
         if self.schema_transformer:
-            schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = (
-                self.schema_transformer
-            )
+            schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = self.schema_transformer
             schema = schema_transformer(schema)
 
         if not examples:
@@ -203,9 +179,7 @@ class ContentBuilder:
             examples=self._build_examples(examples),
         )
 
-    def _build_examples(
-        self, examples: List[Any]
-    ) -> Dict[str, Union[Example, ExampleRef]]:
+    def _build_examples(self, examples: List[Any]) -> Dict[str, Union[Example, ExampleRef]]:
         "Creates a set of several examples for a media type."
 
         builder = ExampleBuilder(self.sample_transformer)
@@ -253,9 +227,7 @@ class ExampleBuilder:
                 name = friendly_name
 
         if name is None:
-            hash_string = (
-                hashlib.md5(json_dump_string(value).encode("utf-8")).digest().hex()
-            )
+            hash_string = hashlib.md5(json_dump_string(value).encode("utf-8")).digest().hex()
             name = f"ex-{hash_string}"
 
         return name, value
@@ -291,15 +263,11 @@ class ResponseBuilder:
     def __init__(self, content_builder: ContentBuilder) -> None:
         self.content_builder = content_builder
 
-    def _get_status_responses(
-        self, options: ResponseOptions
-    ) -> Dict[str, StatusResponse]:
+    def _get_status_responses(self, options: ResponseOptions) -> Dict[str, StatusResponse]:
         status_responses: Dict[str, StatusResponse] = {}
 
         for response_type in options.type_descriptions.keys():
-            status_code = http_status_to_string(
-                options.status_catalog.get(response_type, options.default_status_code)
-            )
+            status_code = http_status_to_string(options.status_catalog.get(response_type, options.default_status_code))
 
             # look up response for status code
             if status_code not in status_responses:
@@ -311,17 +279,11 @@ class ResponseBuilder:
 
             # append examples that have the matching response type
             if options.examples:
-                status_response.examples.extend(
-                    example
-                    for example in options.examples
-                    if isinstance(example, response_type)
-                )
+                status_response.examples.extend(example for example in options.examples if isinstance(example, response_type))
 
         return dict(sorted(status_responses.items()))
 
-    def build_response(
-        self, options: ResponseOptions
-    ) -> Dict[str, Union[Response, ResponseRef]]:
+    def build_response(self, options: ResponseOptions) -> Dict[str, Union[Response, ResponseRef]]:
         """
         Groups responses that have the same status code.
         """
@@ -339,10 +301,7 @@ class ResponseBuilder:
             description = " **OR** ".join(
                 filter(
                     None,
-                    (
-                        options.type_descriptions[response_type]
-                        for response_type in response_types
-                    ),
+                    (options.type_descriptions[response_type] for response_type in response_types),
                 )
             )
 
@@ -417,14 +376,10 @@ class Generator:
         description = typing.cast(str, schema.get("description"))
         return Tag(
             name=ref,
-            description="\n\n".join(
-                s for s in (title, description, definition) if s is not None
-            ),
+            description="\n\n".join(s for s in (title, description, definition) if s is not None),
         )
 
-    def _build_extra_tag_groups(
-        self, extra_types: Dict[str, List[type]]
-    ) -> Dict[str, List[Tag]]:
+    def _build_extra_tag_groups(self, extra_types: Dict[str, List[type]]) -> Dict[str, List[Tag]]:
         """
         Creates a dictionary of tag group captions as keys, and tag lists as values.
 
@@ -448,9 +403,7 @@ class Generator:
 
     def _build_operation(self, op: EndpointOperation) -> Operation:
         doc_string = parse_type(op.func_ref)
-        doc_params = dict(
-            (param.name, param.description) for param in doc_string.params.values()
-        )
+        doc_params = dict((param.name, param.description) for param in doc_string.params.values())
 
         # parameters passed in URL component path
         path_parameters = [
@@ -491,11 +444,7 @@ class Generator:
             builder = ContentBuilder(self.schema_builder)
             request_name, request_type = op.request_param
             requestBody = RequestBody(
-                content={
-                    "application/json": builder.build_media_type(
-                        request_type, op.request_examples
-                    )
-                },
+                content={"application/json": builder.build_media_type(request_type, op.request_examples)},
                 description=doc_params.get(request_name),
                 required=True,
             )
@@ -505,29 +454,16 @@ class Generator:
         # success response types
         if doc_string.returns is None and is_type_union(op.response_type):
             # split union of return types into a list of response types
-            success_type_docstring: Dict[type, Docstring] = {
-                typing.cast(type, item): parse_type(item)
-                for item in unwrap_union_types(op.response_type)
-            }
+            success_type_docstring: Dict[type, Docstring] = {typing.cast(type, item): parse_type(item) for item in unwrap_union_types(op.response_type)}
             success_type_descriptions = {
-                item: doc_string.short_description
-                for item, doc_string in success_type_docstring.items()
-                if doc_string.short_description
+                item: doc_string.short_description for item, doc_string in success_type_docstring.items() if doc_string.short_description
             }
         else:
             # use return type as a single response type
-            success_type_descriptions = {
-                op.response_type: (
-                    doc_string.returns.description if doc_string.returns else "OK"
-                )
-            }
+            success_type_descriptions = {op.response_type: (doc_string.returns.description if doc_string.returns else "OK")}
 
         response_examples = op.response_examples or []
-        success_examples = [
-            example
-            for example in response_examples
-            if not isinstance(example, Exception)
-        ]
+        success_examples = [example for example in response_examples if not isinstance(example, Exception)]
 
         content_builder = ContentBuilder(self.schema_builder)
         response_builder = ResponseBuilder(content_builder)
@@ -541,14 +477,8 @@ class Generator:
 
         # failure response types
         if doc_string.raises:
-            exception_types: Dict[type, str] = {
-                item.raise_type: item.description for item in doc_string.raises.values()
-            }
-            exception_examples = [
-                example
-                for example in response_examples
-                if isinstance(example, Exception)
-            ]
+            exception_types: Dict[type, str] = {item.raise_type: item.description for item in doc_string.raises.values()}
+            exception_examples = [example for example in response_examples if isinstance(example, Exception)]
 
             if self.options.error_wrapper:
                 schema_transformer = schema_error_wrapper
@@ -577,9 +507,7 @@ class Generator:
                 f"{op.func_name}_callback": {
                     "{$request.query.callback}": PathItem(
                         post=Operation(
-                            requestBody=RequestBody(
-                                content=builder.build_content(op.event_type)
-                            ),
+                            requestBody=RequestBody(content=builder.build_content(op.event_type)),
                             responses={"200": Response(description="OK")},
                         )
                     )
@@ -603,9 +531,7 @@ class Generator:
     def generate(self) -> Document:
         paths: Dict[str, PathItem] = {}
         endpoint_classes: Set[type] = set()
-        for op in get_endpoint_operations(
-            self.endpoint, use_examples=self.options.use_examples
-        ):
+        for op in get_endpoint_operations(self.endpoint, use_examples=self.options.use_examples):
             endpoint_classes.add(op.defining_class)
 
             operation = self._build_operation(op)
@@ -641,10 +567,7 @@ class Generator:
             )
 
         # types that are produced/consumed by operations
-        type_tags = [
-            self._build_type_tag(ref, schema)
-            for ref, schema in self.schema_builder.schemas.items()
-        ]
+        type_tags = [self._build_type_tag(ref, schema) for ref, schema in self.schema_builder.schemas.items()]
 
         # types that are emitted by events
         event_tags: List[Tag] = []
@@ -657,17 +580,11 @@ class Generator:
         extra_tag_groups: Dict[str, List[Tag]] = {}
         if self.options.extra_types is not None:
             if isinstance(self.options.extra_types, list):
-                extra_tag_groups = self._build_extra_tag_groups(
-                    {"AdditionalTypes": self.options.extra_types}
-                )
+                extra_tag_groups = self._build_extra_tag_groups({"AdditionalTypes": self.options.extra_types})
             elif isinstance(self.options.extra_types, dict):
-                extra_tag_groups = self._build_extra_tag_groups(
-                    self.options.extra_types
-                )
+                extra_tag_groups = self._build_extra_tag_groups(self.options.extra_types)
             else:
-                raise TypeError(
-                    f"type mismatch for collection of extra types: {type(self.options.extra_types)}"
-                )
+                raise TypeError(f"type mismatch for collection of extra types: {type(self.options.extra_types)}")
 
         # list all operations and types
         tags: List[Tag] = []
@@ -715,11 +632,7 @@ class Generator:
         return Document(
             openapi=".".join(str(item) for item in self.options.version),
             info=self.options.info,
-            jsonSchemaDialect=(
-                "https://json-schema.org/draft/2020-12/schema"
-                if self.options.version >= (3, 1, 0)
-                else None
-            ),
+            jsonSchemaDialect=("https://json-schema.org/draft/2020-12/schema" if self.options.version >= (3, 1, 0) else None),
             servers=[self.options.server],
             paths=paths,
             components=Components(
