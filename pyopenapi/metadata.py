@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 
 @dataclass
@@ -15,5 +15,5 @@ class WebMethod:
 
     route: Optional[str] = None
     public: bool = False
-    request_examples: Optional[List[Any]] = None
-    response_examples: Optional[List[Any]] = None
+    request_examples: Optional[list[Any]] = None
+    response_examples: Optional[list[Any]] = None

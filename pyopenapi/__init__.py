@@ -1,4 +1,4 @@
-from typing import Any, Callable, List, Optional, TypeVar
+from typing import Any, Callable, Optional, TypeVar
 
 from .metadata import WebMethod
 from .options import *  # noqa: F403
@@ -14,8 +14,8 @@ def webmethod(
     public: Optional[bool] = False,
     request_example: Optional[Any] = None,
     response_example: Optional[Any] = None,
-    request_examples: Optional[List[Any]] = None,
-    response_examples: Optional[List[Any]] = None,
+    request_examples: Optional[list[Any]] = None,
+    response_examples: Optional[list[Any]] = None,
 ) -> Callable[[T], T]:
     """
     Decorator that supplies additional metadata to an endpoint operation function.

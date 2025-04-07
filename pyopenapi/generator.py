@@ -4,7 +4,7 @@ import ipaddress
 import typing
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
+from typing import Any, Callable, Optional, Union
 
 from strong_typing.core import JsonType
 from strong_typing.docstring import Docstring, parse_type
@@ -78,7 +78,7 @@ def http_status_to_string(status_code: HTTPStatusCode) -> str:
 
 class SchemaBuilder:
     schema_generator: JsonSchemaGenerator
-    schemas: Dict[str, Schema]
+    schemas: dict[str, Schema]
 
     def __init__(self, schema_generator: JsonSchemaGenerator) -> None:
         self.schema_generator = schema_generator
@@ -150,7 +150,7 @@ class ContentBuilder:
         self.schema_transformer = schema_transformer
         self.sample_transformer = sample_transformer
 
-    def build_content(self, payload_type: type, examples: Optional[List[Any]] = None) -> Dict[str, MediaType]:
+    def build_content(self, payload_type: type, examples: Optional[list[Any]] = None) -> dict[str, MediaType]:
         "Creates the content subtree for a request or response."
 
         if is_generic_list(payload_type):
@@ -162,7 +162,7 @@ class ContentBuilder:
 
         return {media_type: self.build_media_type(item_type, examples)}
 
-    def build_media_type(self, item_type: type, examples: Optional[List[Any]] = None) -> MediaType:
+    def build_media_type(self, item_type: type, examples: Optional[list[Any]] = None) -> MediaType:
         schema = self.schema_builder.classdef_to_ref(item_type)
         if self.schema_transformer:
             schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = self.schema_transformer
@@ -179,12 +179,12 @@ class ContentBuilder:
             examples=self._build_examples(examples),
         )
 
-    def _build_examples(self, examples: List[Any]) -> Dict[str, Union[Example, ExampleRef]]:
+    def _build_examples(self, examples: list[Any]) -> dict[str, Union[Example, ExampleRef]]:
         "Creates a set of several examples for a media type."
 
         builder = ExampleBuilder(self.sample_transformer)
 
-        results: Dict[str, Union[Example, ExampleRef]] = {}
+        results: dict[str, Union[Example, ExampleRef]] = {}
         for example in examples:
             name, value = builder.get_named(example)
             results[name] = Example(value=value)
@@ -216,7 +216,7 @@ class ExampleBuilder:
     def get_anonymous(self, example: Any) -> JsonType:
         return self._get_value(example)
 
-    def get_named(self, example: Any) -> Tuple[str, JsonType]:
+    def get_named(self, example: Any) -> tuple[str, JsonType]:
         value = self._get_value(example)
 
         name: Optional[str] = None
@@ -244,17 +244,17 @@ class ResponseOptions:
     :param default_status_code: HTTP status code assigned to responses that have no mapping.
     """
 
-    type_descriptions: Dict[type, str]
-    examples: Optional[List[Any]]
-    status_catalog: Dict[type, HTTPStatusCode]
+    type_descriptions: dict[type, str]
+    examples: Optional[list[Any]]
+    status_catalog: dict[type, HTTPStatusCode]
     default_status_code: HTTPStatusCode
 
 
 @dataclass
 class StatusResponse:
     status_code: str
-    types: List[type] = dataclasses.field(default_factory=list)
-    examples: List[Any] = dataclasses.field(default_factory=list)
+    types: list[type] = dataclasses.field(default_factory=list)
+    examples: list[Any] = dataclasses.field(default_factory=list)
 
 
 class ResponseBuilder:
@@ -263,8 +263,8 @@ class ResponseBuilder:
     def __init__(self, content_builder: ContentBuilder) -> None:
         self.content_builder = content_builder
 
-    def _get_status_responses(self, options: ResponseOptions) -> Dict[str, StatusResponse]:
-        status_responses: Dict[str, StatusResponse] = {}
+    def _get_status_responses(self, options: ResponseOptions) -> dict[str, StatusResponse]:
+        status_responses: dict[str, StatusResponse] = {}
 
         for response_type in options.type_descriptions.keys():
             status_code = http_status_to_string(options.status_catalog.get(response_type, options.default_status_code))
@@ -283,12 +283,12 @@ class ResponseBuilder:
 
         return dict(sorted(status_responses.items()))
 
-    def build_response(self, options: ResponseOptions) -> Dict[str, Union[Response, ResponseRef]]:
+    def build_response(self, options: ResponseOptions) -> dict[str, Union[Response, ResponseRef]]:
         """
         Groups responses that have the same status code.
         """
 
-        responses: Dict[str, Union[Response, ResponseRef]] = {}
+        responses: dict[str, Union[Response, ResponseRef]] = {}
         status_responses = self._get_status_responses(options)
         for status_code, status_response in status_responses.items():
             response_types = tuple(status_response.types)
@@ -317,7 +317,7 @@ class ResponseBuilder:
         self,
         response_type: type,
         description: str,
-        examples: Optional[List[Any]] = None,
+        examples: Optional[list[Any]] = None,
     ) -> Response:
         "Creates a response subtree."
 
@@ -355,7 +355,7 @@ class Generator:
     endpoint: type
     options: Options
     schema_builder: SchemaBuilder
-    responses: Dict[str, Response]
+    responses: dict[str, Response]
 
     def __init__(self, endpoint: type, options: Options) -> None:
         self.endpoint = endpoint
@@ -379,17 +379,17 @@ class Generator:
             description="\n\n".join(s for s in (title, description, definition) if s is not None),
         )
 
-    def _build_extra_tag_groups(self, extra_types: Dict[str, List[type]]) -> Dict[str, List[Tag]]:
+    def _build_extra_tag_groups(self, extra_types: dict[str, list[type]]) -> dict[str, list[Tag]]:
         """
         Creates a dictionary of tag group captions as keys, and tag lists as values.
 
         :param extra_types: A dictionary of type categories and list of types in that category.
         """
 
-        extra_tags: Dict[str, List[Tag]] = {}
+        extra_tags: dict[str, list[Tag]] = {}
 
         for category_name, category_items in extra_types.items():
-            tag_list: List[Tag] = []
+            tag_list: list[Tag] = []
 
             for extra_type in category_items:
                 name = python_type_to_name(extra_type)
@@ -454,7 +454,7 @@ class Generator:
         # success response types
         if doc_string.returns is None and is_type_union(op.response_type):
             # split union of return types into a list of response types
-            success_type_docstring: Dict[type, Docstring] = {typing.cast(type, item): parse_type(item) for item in unwrap_union_types(op.response_type)}
+            success_type_docstring: dict[type, Docstring] = {typing.cast(type, item): parse_type(item) for item in unwrap_union_types(op.response_type)}
             success_type_descriptions = {
                 item: doc_string.short_description for item, doc_string in success_type_docstring.items() if doc_string.short_description
             }
@@ -477,7 +477,7 @@ class Generator:
 
         # failure response types
         if doc_string.raises:
-            exception_types: Dict[type, str] = {item.raise_type: item.description for item in doc_string.raises.values()}
+            exception_types: dict[type, str] = {item.raise_type: item.description for item in doc_string.raises.values()}
             exception_examples = [example for example in response_examples if isinstance(example, Exception)]
 
             if self.options.error_wrapper:
@@ -529,8 +529,8 @@ class Generator:
         )
 
     def generate(self) -> Document:
-        paths: Dict[str, PathItem] = {}
-        endpoint_classes: Set[type] = set()
+        paths: dict[str, PathItem] = {}
+        endpoint_classes: set[type] = set()
         for op in get_endpoint_operations(self.endpoint, use_examples=self.options.use_examples):
             endpoint_classes.add(op.defining_class)
 
@@ -555,7 +555,7 @@ class Generator:
             else:
                 paths[route] = pathItem
 
-        operation_tags: List[Tag] = []
+        operation_tags: list[Tag] = []
         for cls in endpoint_classes:
             doc_string = parse_type(cls)
             operation_tags.append(
@@ -570,14 +570,14 @@ class Generator:
         type_tags = [self._build_type_tag(ref, schema) for ref, schema in self.schema_builder.schemas.items()]
 
         # types that are emitted by events
-        event_tags: List[Tag] = []
+        event_tags: list[Tag] = []
         events = get_endpoint_events(self.endpoint)
         for ref, event_type in events.items():
             event_schema = self.schema_builder.classdef_to_named_schema(ref, event_type)
             event_tags.append(self._build_type_tag(ref, event_schema))
 
         # types that are explicitly declared
-        extra_tag_groups: Dict[str, List[Tag]] = {}
+        extra_tag_groups: dict[str, list[Tag]] = {}
         if self.options.extra_types is not None:
             if isinstance(self.options.extra_types, list):
                 extra_tag_groups = self._build_extra_tag_groups({"AdditionalTypes": self.options.extra_types})
@@ -587,7 +587,7 @@ class Generator:
                 raise TypeError(f"type mismatch for collection of extra types: {type(self.options.extra_types)}")
 
         # list all operations and types
-        tags: List[Tag] = []
+        tags: list[Tag] = []
         tags.extend(operation_tags)
         tags.extend(type_tags)
         tags.extend(event_tags)

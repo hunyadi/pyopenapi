@@ -1,7 +1,6 @@
-import sys
 import unittest
 from dataclasses import dataclass
-from typing import Dict, Optional, Protocol
+from typing import Optional, Protocol
 
 from strong_typing.schema import JsonType
 
@@ -17,8 +16,8 @@ class Document:
 
 @dataclass
 class HTTPBinResponse:
-    args: Dict[str, str]
-    headers: Dict[str, str]
+    args: dict[str, str]
+    headers: dict[str, str]
     origin: str
     url: str
 
@@ -27,8 +26,8 @@ class HTTPBinResponse:
 class HTTPBinPostResponse(HTTPBinResponse):
     data: str
     json: JsonType
-    files: Dict[str, str]
-    form: Dict[str, str]
+    files: dict[str, str]
+    form: dict[str, str]
 
 
 class API(Protocol):
@@ -46,15 +45,14 @@ class TestOpenAPI(unittest.IsolatedAsyncioTestCase):
     def assertResponse(
         self,
         response: HTTPBinResponse,
-        params: Dict[str, str],
-        headers: Optional[Dict[str, str]] = None,
+        params: dict[str, str],
+        headers: Optional[dict[str, str]] = None,
     ) -> None:
         self.assertIsInstance(response, HTTPBinResponse)
         self.assertDictEqual(response.args, params)
         if headers:
             self.assertDictSubset(headers, response.headers)
 
-    @unittest.skipUnless(sys.version_info >= (3, 9), "requires Python 3.9 or later")
     async def test_http(self) -> None:
         Proxy = make_proxy_class(API)  # type: ignore
         proxy = Proxy("http://httpbin.org")  # type: ignore

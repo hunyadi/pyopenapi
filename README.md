@@ -7,7 +7,7 @@
 * supports standard and asynchronous functions (`async def`)
 * maps function name prefixes such as `get_` or `create_` to HTTP GET, POST, PUT, DELETE, PATCH
 * handles both simple and composite types (`int`, `str`, `Enum`, `@dataclass`)
-* handles generic types (`List[T]`, `Dict[K, V]`, `Optional[T]`, `Union[T1, T2, T3]`)
+* handles generic types (`list[T]`, `dict[K, V]`, `Optional[T]`, `Union[T1, T2, T3]`)
 * maps Python positional-only and keyword-only arguments (of simple types) to path and query parameters, respectively
 * maps composite types to HTTP request body
 * supports user-defined routes, request and response samples with decorator `@webmethod`
@@ -60,7 +60,7 @@ Let's take a look at the definition of a simple endpoint called `JobManagement`:
 
 ```python
 class JobManagement:
-    def create_job(self, items: List[URL]) -> uuid.UUID:
+    def create_job(self, items: list[URL]) -> uuid.UUID:
         ...
 
     def get_job(self, job_id: uuid.UUID, /, format: Format) -> Job:
@@ -99,7 +99,7 @@ The custom path must have placeholders for all positional-only parameters in the
 
 ### Documenting operations
 
-Use Python ReST (ReStructured Text) doc-strings to attach documentation to operations: 
+Use Python ReST (ReStructured Text) doc-strings to attach documentation to operations:
 
 ```python
 def get_job(self, job_id: uuid.UUID, /, format: Format) -> Job:
@@ -142,7 +142,7 @@ The Python objects in `request_examples` and `response_examples` are translated 
 
 ### Mapping function name prefixes to HTTP verbs
 
-The following table identifies which function name prefixes map to which HTTP verbs: 
+The following table identifies which function name prefixes map to which HTTP verbs:
 
 | Prefix | HTTP verb   |
 | ------ | ----------- |

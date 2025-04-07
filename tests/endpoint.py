@@ -2,7 +2,7 @@ import datetime
 import enum
 import uuid
 from dataclasses import dataclass
-from typing import Callable, Generator, List, Optional, Protocol, Union
+from typing import Callable, Generator, Optional, Protocol, Union
 
 from strong_typing.schema import json_schema_type
 
@@ -232,7 +232,7 @@ class JobManagement(Protocol):
     Operations to create, inspect, update and terminate jobs.
     """
 
-    def create_job(self, items: List[URL]) -> uuid.UUID:
+    def create_job(self, items: list[URL]) -> uuid.UUID:
         """
         Creates a new job with the given data as input.
 

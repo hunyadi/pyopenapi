@@ -4,14 +4,14 @@ import inspect
 import typing
 import uuid
 from dataclasses import dataclass
-from typing import Any, Callable, Dict, Iterable, Iterator, List, Optional, Tuple, Union
+from typing import Any, Callable, Iterable, Iterator, Optional, Union
 
 from strong_typing.inspection import get_signature, is_type_enum, is_type_optional, unwrap_optional_type
 
 from .metadata import WebMethod
 
 
-def split_prefix(s: str, sep: str, prefix: Union[str, Iterable[str]]) -> Tuple[Optional[str], str]:
+def split_prefix(s: str, sep: str, prefix: Union[str, Iterable[str]]) -> tuple[Optional[str], str]:
     """
     Recognizes a prefix at the beginning of a string.
 
@@ -54,7 +54,7 @@ class HTTPMethod(enum.Enum):
     PATCH = "PATCH"
 
 
-OperationParameter = Tuple[str, type]
+OperationParameter = tuple[str, type]
 
 
 class ValidationError(TypeError):
@@ -87,15 +87,15 @@ class EndpointOperation:
     func_name: str
     func_ref: Callable[..., Any]
     route: Optional[str]
-    path_params: List[OperationParameter]
-    query_params: List[OperationParameter]
+    path_params: list[OperationParameter]
+    query_params: list[OperationParameter]
     request_param: Optional[OperationParameter]
     event_type: Optional[type]
     response_type: type
     http_method: HTTPMethod
     public: bool
-    request_examples: Optional[List[Any]] = None
-    response_examples: Optional[List[Any]] = None
+    request_examples: Optional[list[Any]] = None
+    response_examples: Optional[list[Any]] = None
 
     def get_route(self) -> str:
         if self.route is not None:
@@ -110,7 +110,7 @@ class EndpointOperation:
 class _FormatParameterExtractor:
     "A visitor to exract parameters in a format string."
 
-    keys: List[str]
+    keys: list[str]
 
     def __init__(self) -> None:
         self.keys = []
@@ -120,13 +120,13 @@ class _FormatParameterExtractor:
         return None
 
 
-def _get_route_parameters(route: str) -> List[str]:
+def _get_route_parameters(route: str) -> list[str]:
     extractor = _FormatParameterExtractor()
     route.format_map(extractor)
     return extractor.keys
 
 
-def _get_endpoint_functions(endpoint: type, prefixes: List[str]) -> Iterator[Tuple[str, str, str, Callable]]:
+def _get_endpoint_functions(endpoint: type, prefixes: list[str]) -> Iterator[tuple[str, str, str, Callable]]:
     if not inspect.isclass(endpoint):
         raise ValidationError(f"object is not a class type: {endpoint}")
 
@@ -151,7 +151,7 @@ def _get_defining_class(member_fn: str, derived_cls: type) -> type:
     raise ValidationError(f"cannot find defining class for {member_fn} in {derived_cls}")
 
 
-def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> List[EndpointOperation]:
+def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[EndpointOperation]:
     """
     Extracts a list of member functions in a class eligible for HTTP interface binding.
 
@@ -310,7 +310,7 @@ def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> List[E
     return result
 
 
-def get_endpoint_events(endpoint: type) -> Dict[str, type]:
+def get_endpoint_events(endpoint: type) -> dict[str, type]:
     results = {}
 
     for decl in typing.get_type_hints(endpoint).values():

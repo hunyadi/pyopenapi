@@ -1,5 +1,5 @@
 import json
-from typing import Any, Callable, Dict, Optional, Tuple, Type, TypeVar
+from typing import Any, Callable, Optional, TypeVar
 
 import aiohttp
 from strong_typing.serialization import json_to_object, object_to_json
@@ -11,9 +11,9 @@ async def make_request(
     http_method: HTTPMethod,
     server: str,
     path: str,
-    query: Dict[str, str],
+    query: dict[str, str],
     data: Optional[str],
-) -> Tuple[int, str]:
+) -> tuple[int, str]:
     "Makes an asynchronous HTTP request and returns the response."
 
     headers = {"Accept": "application/json"}
@@ -118,7 +118,7 @@ def _get_operation_proxy(op: EndpointOperation) -> Callable[..., Any]:
 T = TypeVar("T")
 
 
-def make_proxy_class(api: Type[T]) -> Type[T]:
+def make_proxy_class(api: type[T]) -> type[T]:
     """
     Creates a proxy class for calling an HTTP REST API.
 

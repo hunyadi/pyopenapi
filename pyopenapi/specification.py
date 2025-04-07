@@ -1,7 +1,7 @@
 import dataclasses
 import enum
 from dataclasses import dataclass
-from typing import Any, ClassVar, Dict, List, Optional, Union
+from typing import Any, ClassVar, Optional, Union
 
 from strong_typing.schema import JsonType as JsonType
 from strong_typing.schema import Schema, StrictJsonType
@@ -68,12 +68,12 @@ class Info:
 class MediaType:
     schema: Optional[SchemaOrRef] = None
     example: Optional[Any] = None
-    examples: Optional[Dict[str, Union["Example", ExampleRef]]] = None
+    examples: Optional[dict[str, Union["Example", ExampleRef]]] = None
 
 
 @dataclass
 class RequestBody:
-    content: Dict[str, MediaType]
+    content: dict[str, MediaType]
     description: Optional[str] = None
     required: Optional[bool] = None
 
@@ -81,7 +81,7 @@ class RequestBody:
 @dataclass
 class Response:
     description: str
-    content: Optional[Dict[str, MediaType]] = None
+    content: Optional[dict[str, MediaType]] = None
 
 
 @enum.unique
@@ -104,15 +104,15 @@ class Parameter:
 
 @dataclass
 class Operation:
-    responses: Dict[str, Union[Response, ResponseRef]]
-    tags: Optional[List[str]] = None
+    responses: dict[str, Union[Response, ResponseRef]]
+    tags: Optional[list[str]] = None
     summary: Optional[str] = None
     description: Optional[str] = None
     operationId: Optional[str] = None
-    parameters: Optional[List[Parameter]] = None
+    parameters: Optional[list[Parameter]] = None
     requestBody: Optional[RequestBody] = None
-    callbacks: Optional[Dict[str, "Callback"]] = None
-    security: Optional[List["SecurityRequirement"]] = None
+    callbacks: Optional[dict[str, "Callback"]] = None
+    security: Optional[list["SecurityRequirement"]] = None
 
 
 @dataclass
@@ -138,7 +138,7 @@ class PathItem:
 
 
 # maps run-time expressions such as "$request.body#/url" to path items
-Callback = Dict[str, PathItem]
+Callback = dict[str, PathItem]
 
 
 @dataclass
@@ -202,17 +202,17 @@ class SecuritySchemeOpenIDConnect(SecurityScheme):
 
 @dataclass
 class Components:
-    schemas: Optional[Dict[str, Schema]] = None
-    responses: Optional[Dict[str, Response]] = None
-    parameters: Optional[Dict[str, Parameter]] = None
-    examples: Optional[Dict[str, Example]] = None
-    requestBodies: Optional[Dict[str, RequestBody]] = None
-    securitySchemes: Optional[Dict[str, SecurityScheme]] = None
-    callbacks: Optional[Dict[str, Callback]] = None
+    schemas: Optional[dict[str, Schema]] = None
+    responses: Optional[dict[str, Response]] = None
+    parameters: Optional[dict[str, Parameter]] = None
+    examples: Optional[dict[str, Example]] = None
+    requestBodies: Optional[dict[str, RequestBody]] = None
+    securitySchemes: Optional[dict[str, SecurityScheme]] = None
+    callbacks: Optional[dict[str, Callback]] = None
 
 
 SecurityScope = str
-SecurityRequirement = Dict[str, List[SecurityScope]]
+SecurityRequirement = dict[str, list[SecurityScope]]
 
 
 @dataclass
@@ -231,7 +231,7 @@ class TagGroup:
     """
 
     name: str
-    tags: List[str]
+    tags: list[str]
 
 
 @dataclass
@@ -244,10 +244,10 @@ class Document:
 
     openapi: str
     info: Info
-    servers: List[Server]
-    paths: Dict[str, PathItem]
+    servers: list[Server]
+    paths: dict[str, PathItem]
     jsonSchemaDialect: Optional[str] = None
     components: Optional[Components] = None
-    security: Optional[List[SecurityRequirement]] = None
-    tags: Optional[List[Tag]] = None
-    tagGroups: Optional[List[TagGroup]] = None
+    security: Optional[list[SecurityRequirement]] = None
+    tags: Optional[list[Tag]] = None
+    tagGroups: Optional[list[TagGroup]] = None
