@@ -1,3 +1,11 @@
+"""
+Generate an OpenAPI specification from a Python class definition
+
+Copyright 2022-2025, Levente Hunyadi
+
+:see: https://github.com/hunyadi/pyopenapi
+"""
+
 import collections.abc
 import enum
 import inspect
@@ -34,11 +42,11 @@ def split_prefix(s: str, sep: str, prefix: Union[str, Iterable[str]]) -> tuple[O
     return None, s
 
 
-def _get_annotation_type(annotation: Union[type, str], callable: Callable) -> type:
-    "Maps a stringized reference to a type, as if using `from __future__ import annotations`."
+def _get_annotation_type(annotation: Union[type, str], callable: Callable[..., Any]) -> type:
+    "Maps a string (forward) reference to a type, as if using `from __future__ import annotations`."
 
     if isinstance(annotation, str):
-        return eval(annotation, callable.__globals__)
+        return typing.cast(type, eval(annotation, callable.__globals__))
     else:
         return annotation
 
@@ -108,7 +116,7 @@ class EndpointOperation:
 
 
 class _FormatParameterExtractor:
-    "A visitor to exract parameters in a format string."
+    "A visitor to extract parameters in a format string."
 
     keys: list[str]
 
@@ -126,7 +134,7 @@ def _get_route_parameters(route: str) -> list[str]:
     return extractor.keys
 
 
-def _get_endpoint_functions(endpoint: type, prefixes: list[str]) -> Iterator[tuple[str, str, str, Callable]]:
+def _get_endpoint_functions(endpoint: type, prefixes: list[str]) -> Iterator[tuple[str, str, str, Callable[..., Any]]]:
     if not inspect.isclass(endpoint):
         raise ValidationError(f"object is not a class type: {endpoint}")
 
@@ -247,7 +255,8 @@ def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[E
                 if request_param is not None:
                     param = (param_name, param_type)
                     raise ValidationError(
-                        f"only a single composite type is permitted in a signature but multiple composite types found in function '{func_name}': {request_param} and {param}"
+                        f"only a single composite type is permitted in a signature but multiple composite types found in function '{func_name}': "
+                        f"{request_param} and {param}"
                     )
 
                 # composite types are read from body

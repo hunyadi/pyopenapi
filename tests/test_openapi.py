@@ -8,8 +8,9 @@ from uuid import UUID
 
 from endpoint import AuthenticationError, BadRequestError, Endpoint, InternalServerError, NotFoundError, Student, Teacher, ValidationError
 
-from pyopenapi import Info, Options, Server, Specification
-from pyopenapi.specification import SecuritySchemeHTTP
+from pyopenapi.options import Options
+from pyopenapi.specification import Info, SecuritySchemeHTTP, Server
+from pyopenapi.utility import Specification
 
 try:
     from pygments import highlight
@@ -19,7 +20,7 @@ try:
 
     def save_with_highlight(f: TextIO, code: str, format: str) -> None:
         lexer = get_lexer_by_name(format)
-        formatter: Formatter = HtmlFormatter()
+        formatter: Formatter = HtmlFormatter()  # type: ignore[type-arg]
         style = formatter.get_style_defs(".highlight")
         f.writelines(
             [

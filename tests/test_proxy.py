@@ -1,11 +1,14 @@
 import unittest
 from dataclasses import dataclass
-from typing import Optional, Protocol
+from typing import Optional, Protocol, TypeVar
 
-from strong_typing.schema import JsonType
+from strong_typing.core import JsonType
 
-from pyopenapi import webmethod
+from pyopenapi.decorators import webmethod
 from pyopenapi.proxy import make_proxy_class
+
+K = TypeVar("K")
+V = TypeVar("V")
 
 
 @dataclass
@@ -39,7 +42,7 @@ class API(Protocol):
 
 
 class TestOpenAPI(unittest.IsolatedAsyncioTestCase):
-    def assertDictSubset(self, subset: dict, superset: dict) -> None:
+    def assertDictSubset(self, subset: dict[K, V], superset: dict[K, V]) -> None:
         self.assertLessEqual(subset.items(), superset.items())
 
     def assertResponse(

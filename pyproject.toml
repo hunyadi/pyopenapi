@@ -1,6 +1,58 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=80.0"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "python-openapi"
+description = "Generate an OpenAPI specification from a Python class definition"
+readme = { file = "README.md", content-type = "text/markdown" }
+keywords = ["openapi3", "openapi", "redoc", "swagger", "json-schema-generator", "dataclasses", "type-inspection"]
+license = "MIT"
+authors = [
+    { name = "Levente Hunyadi", email = "hunyadi@gmail.com" }
+]
+maintainers = [
+    { name = "Levente Hunyadi", email = "hunyadi@gmail.com" }
+]
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
+]
+dependencies = [
+    "aiohttp >= 3.12",
+    "json_strong_typing >= 0.3.9"
+]
+dynamic = ["version"]
+
+[project.urls]
+"Homepage" = "https://github.com/hunyadi/pyopenapi"
+"Source" = "https://github.com/hunyadi/pyopenapi"
+
+[tool.setuptools]
+include-package-data = true
+packages = ["pyopenapi"]
+zip-safe = true
+
+[tool.setuptools.dynamic]
+version = { attr = "pyopenapi.__version__" }
+
+[tool.setuptools.package-data]
+"pyopenapi" = ["py.typed", "template.html"]
 
 [tool.ruff]
 line-length = 160
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "I", "Q"]

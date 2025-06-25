@@ -6,7 +6,7 @@ from typing import Callable, Generator, Optional, Protocol, Union
 
 from strong_typing.schema import json_schema_type
 
-from pyopenapi import webmethod
+from pyopenapi.decorators import webmethod
 
 
 @json_schema_type(schema={"type": "string", "format": "uri", "pattern": "^https?://"})  # type: ignore

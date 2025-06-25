@@ -1,10 +1,18 @@
+"""
+Generate an OpenAPI specification from a Python class definition
+
+Copyright 2022-2025, Levente Hunyadi
+
+:see: https://github.com/hunyadi/pyopenapi
+"""
+
 import dataclasses
 import enum
 from dataclasses import dataclass
 from typing import Any, ClassVar, Optional, Union
 
-from strong_typing.schema import JsonType as JsonType
-from strong_typing.schema import Schema, StrictJsonType
+from strong_typing.core import JsonType as JsonType
+from strong_typing.core import Schema, StrictJsonType
 
 URL = str
 

@@ -1,9 +1,18 @@
+"""
+Generate an OpenAPI specification from a Python class definition
+
+Copyright 2022-2025, Levente Hunyadi
+
+:see: https://github.com/hunyadi/pyopenapi
+"""
+
 import importlib.resources
 import json
 import typing
 from typing import TextIO
 
-from strong_typing.schema import StrictJsonType, object_to_json
+from strong_typing.core import StrictJsonType
+from strong_typing.serialization import object_to_json
 
 from .generator import Generator
 from .options import Options

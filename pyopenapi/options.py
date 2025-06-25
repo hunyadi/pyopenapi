@@ -1,13 +1,20 @@
+"""
+Generate an OpenAPI specification from a Python class definition
+
+Copyright 2022-2025, Levente Hunyadi
+
+:see: https://github.com/hunyadi/pyopenapi
+"""
+
 import dataclasses
 from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Callable, ClassVar, Optional, Union
 
-from .specification import Info, SecurityScheme
+from .specification import Info, SecurityScheme, Server
 from .specification import SecuritySchemeAPI as SecuritySchemeAPI
 from .specification import SecuritySchemeHTTP as SecuritySchemeHTTP
 from .specification import SecuritySchemeOpenIDConnect as SecuritySchemeOpenIDConnect
-from .specification import Server
 
 HTTPStatusCode = Union[HTTPStatus, int, str]
 

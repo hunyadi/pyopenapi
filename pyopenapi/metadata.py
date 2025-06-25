@@ -1,3 +1,11 @@
+"""
+Generate an OpenAPI specification from a Python class definition
+
+Copyright 2022-2025, Levente Hunyadi
+
+:see: https://github.com/hunyadi/pyopenapi
+"""
+
 from dataclasses import dataclass
 from typing import Any, Optional
 

@@ -1,10 +1,19 @@
+"""
+Generate an OpenAPI specification from a Python class definition
+
+Copyright 2022-2025, Levente Hunyadi
+
+:see: https://github.com/hunyadi/pyopenapi
+"""
+
 import json
 from typing import Any, Callable, Optional, TypeVar
 
 import aiohttp
+from strong_typing.inspection import get_signature
 from strong_typing.serialization import json_to_object, object_to_json
 
-from .operations import EndpointOperation, HTTPMethod, get_endpoint_operations, get_signature
+from .operations import EndpointOperation, HTTPMethod, get_endpoint_operations
 
 
 async def make_request(
@@ -97,7 +106,7 @@ class OperationProxy:
             try:
                 s = json.loads(response)
             except json.JSONDecodeError:
-                raise ProxyInvokeError(f"response body is not well-formed JSON:\n{response}")
+                raise ProxyInvokeError(f"response body is not well-formed JSON:\n{response}") from None
 
             return json_to_object(self.op.response_type, s)
         else:

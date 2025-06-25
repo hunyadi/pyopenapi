@@ -1,3 +1,11 @@
+"""
+Generate an OpenAPI specification from a Python class definition
+
+Copyright 2022-2025, Levente Hunyadi
+
+:see: https://github.com/hunyadi/pyopenapi
+"""
+
 import dataclasses
 import hashlib
 import ipaddress
@@ -6,11 +14,11 @@ from dataclasses import dataclass
 from http import HTTPStatus
 from typing import Any, Callable, Optional, Union
 
-from strong_typing.core import JsonType
+from strong_typing.core import JsonType, Schema
 from strong_typing.docstring import Docstring, parse_type
 from strong_typing.inspection import is_generic_list, is_type_optional, is_type_union, unwrap_generic_list, unwrap_optional_type, unwrap_union_types
 from strong_typing.name import python_type_to_name
-from strong_typing.schema import JsonSchemaGenerator, Schema, SchemaOptions, get_schema_identifier, register_schema
+from strong_typing.schema import JsonSchemaGenerator, SchemaOptions, get_schema_identifier, register_schema
 from strong_typing.serialization import json_dump_string, object_to_json
 
 from .operations import EndpointOperation, HTTPMethod, get_endpoint_events, get_endpoint_operations
@@ -208,7 +216,7 @@ class ExampleBuilder:
         if sample_transformer:
             self.sample_transformer = sample_transformer
         else:
-            self.sample_transformer = lambda sample: sample  # noqa: E731
+            self.sample_transformer = lambda sample: sample
 
     def _get_value(self, example: Any) -> JsonType:
         return self.sample_transformer(object_to_json(example))
@@ -221,7 +229,7 @@ class ExampleBuilder:
 
         name: Optional[str] = None
 
-        if type(example).__str__ is not object.__str__:
+        if type(example).__str__ is not object.__str__:  # type: ignore[comparison-overlap]
             friendly_name = str(example)
             if friendly_name.isprintable():
                 name = friendly_name
@@ -315,7 +323,7 @@ class ResponseBuilder:
 
     def _build_response(
         self,
-        response_type: type,
+        response_type: Optional[type],
         description: str,
         examples: Optional[list[Any]] = None,
     ) -> Response:

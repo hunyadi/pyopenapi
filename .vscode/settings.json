@@ -15,6 +15,7 @@
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "cSpell.words": [
+        "Levente",
         "pyopenapi",
         "pypi",
         "Sigstore",
