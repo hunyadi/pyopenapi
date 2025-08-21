@@ -23,5 +23,6 @@ class WebMethod:
 
     route: Optional[str] = None
     public: bool = False
+    deprecated: bool = False
     request_examples: Optional[list[Any]] = None
     response_examples: Optional[list[Any]] = None
