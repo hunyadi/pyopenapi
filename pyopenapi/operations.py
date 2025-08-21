@@ -74,7 +74,7 @@ class EndpointOperation:
     """
     Type information and metadata associated with an endpoint operation.
 
-    "param defining_class: The most specific class that defines the endpoint operation.
+    :param defining_class: The most specific class that defines the endpoint operation.
     :param name: The short name of the endpoint operation.
     :param func_name: The name of the function to invoke when the operation is triggered.
     :param func_ref: The callable to invoke when the operation is triggered.
@@ -86,7 +86,7 @@ class EndpointOperation:
     :param response_type: The Python type of the data that is transmitted in the response body.
     :param http_method: The HTTP method used to invoke the endpoint such as POST, GET or PUT.
     :param public: True if the operation can be invoked without prior authentication.
-    :param deprecated: True if operation is deprecated
+    :param deprecated: True if consumers should refrain from using the operation.
     :param request_examples: Sample requests that the operation might take.
     :param response_examples: Sample responses that the operation might produce.
     """

@@ -32,7 +32,7 @@ classifiers = [
 ]
 dependencies = [
     "aiohttp >= 3.12",
-    "json_strong_typing >= 0.3.9"
+    "json_strong_typing >= 0.4"
 ]
 dynamic = ["version"]
 

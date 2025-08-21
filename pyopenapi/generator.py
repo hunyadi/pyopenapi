@@ -533,8 +533,8 @@ class Generator:
             requestBody=requestBody,
             responses=responses,
             callbacks=callbacks,
+            deprecated=op.deprecated,
             security=[] if op.public else None,
-            deprecated = op.deprecated
         )
 
     def generate(self) -> Document:

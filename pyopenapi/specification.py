@@ -237,6 +237,9 @@ class TagGroup:
     A ReDoc extension to provide information about groups of tags.
 
     Exposed via the vendor-specific property "x-tagGroups" of the top-level object.
+
+    :param name: Group name.
+    :param tags: Tags that are members of this group.
     """
 
     name: str
@@ -249,6 +252,16 @@ class Document:
     This class is a Python dataclass adaptation of the OpenAPI Specification.
 
     For details, see <https://swagger.io/specification/>
+
+    :param openapi: Version number of the OpenAPI Specification that the OpenAPI document uses.
+    :param info: Provides metadata about the API.
+    :param servers: An array of objects that provide connectivity information to a target server.
+    :param paths: The available paths and operations for the API.
+    :param jsonSchemaDialect: The default value for the `$schema` keyword within schema objects in this document, in the form of a URI.
+    :param components: An element to hold various objects for the OpenAPI description.
+    :param security: A declaration of which security mechanisms can be used across the API.
+    :param tags: A list of tags used by the OpenAPI description with additional metadata.
+    :param tagGroups: Provides information about a group of tags. (Extension to OpenAPI.)
     """
 
     openapi: str

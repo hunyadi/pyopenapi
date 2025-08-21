@@ -20,7 +20,7 @@ try:
 
     def save_with_highlight(f: TextIO, code: str, format: str) -> None:
         lexer = get_lexer_by_name(format)
-        formatter: Formatter = HtmlFormatter()  # type: ignore[type-arg]
+        formatter: Formatter = HtmlFormatter()
         style = formatter.get_style_defs(".highlight")
         f.writelines(
             [

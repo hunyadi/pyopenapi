@@ -15,9 +15,13 @@
         "editor.defaultFormatter": "charliermarsh.ruff"
     },
     "cSpell.words": [
+        "ABNF",
+        "dataclasses",
         "Levente",
         "pyopenapi",
         "pypi",
+        "redoc",
+        "setuptools",
         "Sigstore",
         "webmethod"
     ]

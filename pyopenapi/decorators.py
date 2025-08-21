@@ -46,7 +46,13 @@ def webmethod(
         response_examples = [response_example]
 
     def wrap(cls: F) -> F:
-        cls.__webmethod__ = WebMethod(route=route, public=public or False, deprecated=deprecated or False, request_examples=request_examples, response_examples=response_examples)  # type: ignore[attr-defined]
+        cls.__webmethod__ = WebMethod(  # type: ignore[attr-defined]
+            route=route,
+            public=public or False,
+            deprecated=deprecated or False,
+            request_examples=request_examples,
+            response_examples=response_examples,
+        )
         return cls
 
     return wrap
