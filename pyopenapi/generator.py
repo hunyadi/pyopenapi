@@ -534,6 +534,7 @@ class Generator:
             responses=responses,
             callbacks=callbacks,
             security=[] if op.public else None,
+            deprecated = op.deprecated
         )
 
     def generate(self) -> Document:

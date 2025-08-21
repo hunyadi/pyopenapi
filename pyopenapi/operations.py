@@ -86,6 +86,7 @@ class EndpointOperation:
     :param response_type: The Python type of the data that is transmitted in the response body.
     :param http_method: The HTTP method used to invoke the endpoint such as POST, GET or PUT.
     :param public: True if the operation can be invoked without prior authentication.
+    :param deprecated: True if operation is deprecated
     :param request_examples: Sample requests that the operation might take.
     :param response_examples: Sample responses that the operation might produce.
     """
@@ -102,6 +103,7 @@ class EndpointOperation:
     response_type: type
     http_method: HTTPMethod
     public: bool
+    deprecated: bool
     request_examples: Optional[list[Any]] = None
     response_examples: Optional[list[Any]] = None
 
@@ -201,12 +203,14 @@ def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[E
             route = webmethod.route
             route_params = _get_route_parameters(route) if route is not None else None
             public = webmethod.public
+            deprecated = webmethod.deprecated
             request_examples = webmethod.request_examples
             response_examples = webmethod.response_examples
         else:
             route = None
             route_params = None
             public = False
+            deprecated = False
             request_examples = None
             response_examples = None
 
@@ -308,6 +312,7 @@ def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[E
                 response_type=response_type,
                 http_method=http_method,
                 public=public,
+                deprecated=deprecated,
                 request_examples=request_examples if use_examples else None,
                 response_examples=response_examples if use_examples else None,
             )

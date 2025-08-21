@@ -18,6 +18,7 @@ F = TypeVar("F", bound=Callable[..., Any])
 def webmethod(
     route: Optional[str] = None,
     public: Optional[bool] = False,
+    deprecated: Optional[bool] = False,
     request_example: Optional[Any] = None,
     response_example: Optional[Any] = None,
     request_examples: Optional[list[Any]] = None,
@@ -45,7 +46,7 @@ def webmethod(
         response_examples = [response_example]
 
     def wrap(cls: F) -> F:
-        cls.__webmethod__ = WebMethod(route=route, public=public or False, request_examples=request_examples, response_examples=response_examples)  # type: ignore[attr-defined]
+        cls.__webmethod__ = WebMethod(route=route, public=public or False, deprecated=deprecated or False, request_examples=request_examples, response_examples=response_examples)  # type: ignore[attr-defined]
         return cls
 
     return wrap

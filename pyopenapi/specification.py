@@ -121,6 +121,7 @@ class Operation:
     requestBody: Optional[RequestBody] = None
     callbacks: Optional[dict[str, "Callback"]] = None
     security: Optional[list["SecurityRequirement"]] = None
+    deprecated: Optional[bool] = None
 
 
 @dataclass
