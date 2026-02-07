@@ -15,6 +15,9 @@ on:
         required: true
         default: false
 
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: 1
+
 jobs:
   build:
     name: Build distribution
@@ -22,15 +25,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.9"
+          python-version: "3.10"
       - name: Set up build dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip --disable-pip-version-check install -r requirements.txt
+          python -m pip install -r requirements.txt
 
       # Generate and publish website content
       - name: Generate website content
@@ -45,7 +48,7 @@ jobs:
       # Generate and publish PyPI package
       - name: Build PyPI package
         run: |
-          python -m build --sdist --wheel
+          python -m build
       - name: Save PyPI package as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -59,20 +62,20 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     runs-on: ubuntu-latest
     steps:
       - name: Fetch source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Set up build dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip --disable-pip-version-check install -r requirements.txt
+          python -m pip install -r requirements.txt
       - name: Run unit tests
         run: |
           python -m unittest discover -s tests
@@ -115,12 +118,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Download the distribution
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v7
       with:
         name: pyopenapi-dist
         path: dist/
     - name: Sign the distribution with Sigstore
-      uses: sigstore/gh-action-sigstore-python@v3.0.0
+      uses: sigstore/gh-action-sigstore-python@v3.2.0
       with:
         inputs: |
           ./dist/*.tar.gz
@@ -145,7 +148,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download the distribution
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: pyopenapi-dist
           path: dist/

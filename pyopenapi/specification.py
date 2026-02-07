@@ -1,7 +1,7 @@
 """
 Generate an OpenAPI specification from a Python class definition
 
-Copyright 2022-2025, Levente Hunyadi
+Copyright 2021-2026, Levente Hunyadi
 
 :see: https://github.com/hunyadi/pyopenapi
 """
@@ -9,7 +9,7 @@ Copyright 2022-2025, Levente Hunyadi
 import dataclasses
 import enum
 from dataclasses import dataclass
-from typing import Any, ClassVar, Optional, Union
+from typing import Any, ClassVar, Optional
 
 from strong_typing.core import JsonType as JsonType
 from strong_typing.core import Schema, StrictJsonType
@@ -29,9 +29,6 @@ class Ref:
 @dataclass
 class SchemaRef(Ref):
     ref_type: ClassVar[str] = "schemas"
-
-
-SchemaOrRef = Union[Schema, SchemaRef]
 
 
 @dataclass
@@ -74,9 +71,9 @@ class Info:
 
 @dataclass
 class MediaType:
-    schema: Optional[SchemaOrRef] = None
+    schema: Optional[Schema | SchemaRef] = None
     example: Optional[Any] = None
-    examples: Optional[dict[str, Union["Example", ExampleRef]]] = None
+    examples: Optional[dict[str, "Example | ExampleRef"]] = None
 
 
 @dataclass
@@ -106,13 +103,13 @@ class Parameter:
     in_: ParameterLocation
     description: Optional[str] = None
     required: Optional[bool] = None
-    schema: Optional[SchemaOrRef] = None
+    schema: Optional[Schema | SchemaRef] = None
     example: Optional[Any] = None
 
 
 @dataclass
 class Operation:
-    responses: dict[str, Union[Response, ResponseRef]]
+    responses: dict[str, Response | ResponseRef]
     tags: Optional[list[str]] = None
     summary: Optional[str] = None
     description: Optional[str] = None

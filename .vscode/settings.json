@@ -16,11 +16,14 @@
     },
     "cSpell.words": [
         "ABNF",
+        "aiohttp",
         "dataclasses",
+        "errorlevel",
         "Levente",
         "pyopenapi",
-        "pypi",
-        "redoc",
+        "PyPI",
+        "Redoc",
+        "setlocal",
         "setuptools",
         "Sigstore",
         "webmethod"

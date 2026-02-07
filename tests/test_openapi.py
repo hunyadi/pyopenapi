@@ -14,14 +14,13 @@ from pyopenapi.utility import Specification
 
 try:
     from pygments import highlight
-    from pygments.formatter import Formatter
     from pygments.formatters import HtmlFormatter
     from pygments.lexers import get_lexer_by_name
 
     def save_with_highlight(f: TextIO, code: str, format: str) -> None:
         lexer = get_lexer_by_name(format)
-        formatter: Formatter = HtmlFormatter()
-        style = formatter.get_style_defs(".highlight")
+        formatter = HtmlFormatter()
+        style = formatter.get_style_defs(".highlight")  # type: ignore[no-untyped-call]
         f.writelines(
             [
                 "<!DOCTYPE html>",

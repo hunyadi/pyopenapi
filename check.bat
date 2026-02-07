@@ -1,20 +1,25 @@
 @echo off
 
+setlocal
+set PYTHON=python
+
 rem Run static type checker and verify formatting guidelines
-python -m ruff check
+%PYTHON% -m ruff check
 if errorlevel 1 goto error
-python -m ruff format --check
+%PYTHON% -m ruff format --check
 if errorlevel 1 goto error
-python -m mypy pyopenapi
+%PYTHON% -m mypy pyopenapi
 if errorlevel 1 goto error
-python -m mypy tests
+%PYTHON% -m mypy tests
 if errorlevel 1 goto error
 
 rem Run unit tests
-python -m unittest discover tests
+%PYTHON% -m unittest discover tests
 if errorlevel 1 goto error
 
-goto :EOF
+goto EOF
 
 :error
-exit /b 1
+exit /b %errorlevel%
+
+:EOF

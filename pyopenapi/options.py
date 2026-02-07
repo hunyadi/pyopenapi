@@ -1,7 +1,7 @@
 """
 Generate an OpenAPI specification from a Python class definition
 
-Copyright 2022-2025, Levente Hunyadi
+Copyright 2021-2026, Levente Hunyadi
 
 :see: https://github.com/hunyadi/pyopenapi
 """
@@ -9,14 +9,14 @@ Copyright 2022-2025, Levente Hunyadi
 import dataclasses
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Callable, ClassVar, Optional, Union
+from typing import Any, Callable, ClassVar, Optional
 
 from .specification import Info, SecurityScheme, Server
 from .specification import SecuritySchemeAPI as SecuritySchemeAPI
 from .specification import SecuritySchemeHTTP as SecuritySchemeHTTP
 from .specification import SecuritySchemeOpenIDConnect as SecuritySchemeOpenIDConnect
 
-HTTPStatusCode = Union[HTTPStatus, int, str]
+HTTPStatusCode = HTTPStatus | int | str
 
 
 @dataclass
@@ -39,10 +39,10 @@ class Options:
     info: Info
     version: tuple[int, int, int] = (3, 1, 0)
     default_security_scheme: Optional[SecurityScheme] = None
-    extra_types: Union[list[type], dict[str, list[type]], None] = None
+    extra_types: list[type[Any]] | dict[str, list[type[Any]]] | None = None
     use_examples: bool = True
-    success_responses: dict[type, HTTPStatusCode] = dataclasses.field(default_factory=dict)
-    error_responses: dict[type, HTTPStatusCode] = dataclasses.field(default_factory=dict)
+    success_responses: dict[type[Any], HTTPStatusCode] = dataclasses.field(default_factory=dict[type[Any], HTTPStatusCode])
+    error_responses: dict[type[Any], HTTPStatusCode] = dataclasses.field(default_factory=dict[type[Any], HTTPStatusCode])
     error_wrapper: bool = False
     property_description_fun: Optional[Callable[[type, str, str], str]] = None
     captions: Optional[dict[str, str]] = None

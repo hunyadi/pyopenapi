@@ -1,7 +1,7 @@
 """
 Generate an OpenAPI specification from a Python class definition
 
-Copyright 2022-2025, Levente Hunyadi
+Copyright 2021-2026, Levente Hunyadi
 
 :see: https://github.com/hunyadi/pyopenapi
 """
@@ -12,14 +12,15 @@ import inspect
 import typing
 import uuid
 from dataclasses import dataclass
-from typing import Any, Callable, Iterable, Iterator, Optional, Union
+from types import NoneType
+from typing import Any, Callable, Iterable, Iterator, Optional
 
 from strong_typing.inspection import get_signature, is_type_enum, is_type_optional, unwrap_optional_type
 
 from .metadata import WebMethod
 
 
-def split_prefix(s: str, sep: str, prefix: Union[str, Iterable[str]]) -> tuple[Optional[str], str]:
+def split_prefix(s: str, sep: str, prefix: str | Iterable[str]) -> tuple[Optional[str], str]:
     """
     Recognizes a prefix at the beginning of a string.
 
@@ -42,11 +43,11 @@ def split_prefix(s: str, sep: str, prefix: Union[str, Iterable[str]]) -> tuple[O
     return None, s
 
 
-def _get_annotation_type(annotation: Union[type, str], callable: Callable[..., Any]) -> type:
+def _get_annotation_type(annotation: type[Any] | str, callable: Callable[..., Any]) -> type[Any]:
     "Maps a string (forward) reference to a type, as if using `from __future__ import annotations`."
 
     if isinstance(annotation, str):
-        return typing.cast(type, eval(annotation, callable.__globals__))
+        return typing.cast(type[Any], eval(annotation, callable.__globals__))
     else:
         return annotation
 
@@ -62,7 +63,7 @@ class HTTPMethod(enum.Enum):
     PATCH = "PATCH"
 
 
-OperationParameter = tuple[str, type]
+OperationParameter = tuple[str, type[Any]]
 
 
 class ValidationError(TypeError):
@@ -91,7 +92,7 @@ class EndpointOperation:
     :param response_examples: Sample responses that the operation might produce.
     """
 
-    defining_class: type
+    defining_class: type[Any]
     name: str
     func_name: str
     func_ref: Callable[..., Any]
@@ -99,8 +100,8 @@ class EndpointOperation:
     path_params: list[OperationParameter]
     query_params: list[OperationParameter]
     request_param: Optional[OperationParameter]
-    event_type: Optional[type]
-    response_type: type
+    event_type: Optional[type[Any]]
+    response_type: type[Any]
     http_method: HTTPMethod
     public: bool
     deprecated: bool
@@ -136,7 +137,7 @@ def _get_route_parameters(route: str) -> list[str]:
     return extractor.keys
 
 
-def _get_endpoint_functions(endpoint: type, prefixes: list[str]) -> Iterator[tuple[str, str, str, Callable[..., Any]]]:
+def _get_endpoint_functions(endpoint: type[Any], prefixes: list[str]) -> Iterator[tuple[str, str, str, Callable[..., Any]]]:
     if not inspect.isclass(endpoint):
         raise ValidationError(f"object is not a class type: {endpoint}")
 
@@ -149,7 +150,7 @@ def _get_endpoint_functions(endpoint: type, prefixes: list[str]) -> Iterator[tup
         yield prefix, operation_name, func_name, func_ref
 
 
-def _get_defining_class(member_fn: str, derived_cls: type) -> type:
+def _get_defining_class(member_fn: str, derived_cls: type[Any]) -> type[Any]:
     "Find the class in which a member function is first defined in a class inheritance hierarchy."
 
     # iterate in reverse member resolution order to find most specific class first
@@ -161,7 +162,7 @@ def _get_defining_class(member_fn: str, derived_cls: type) -> type:
     raise ValidationError(f"cannot find defining class for {member_fn} in {derived_cls}")
 
 
-def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[EndpointOperation]:
+def get_endpoint_operations(endpoint: type[Any], use_examples: bool = True) -> list[EndpointOperation]:
     """
     Extracts a list of member functions in a class eligible for HTTP interface binding.
 
@@ -181,7 +182,7 @@ def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[E
     :param use_examples: Whether to return examples associated with member functions.
     """
 
-    result = []
+    result: list[EndpointOperation] = []
 
     for prefix, operation_name, func_name, func_ref in _get_endpoint_functions(
         endpoint,
@@ -217,8 +218,8 @@ def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[E
         # inspect function signature for path and query parameters, and request/response payload type
         signature = get_signature(func_ref)
 
-        path_params = []
-        query_params = []
+        path_params: list[tuple[str, type[Any]]] = []
+        query_params: list[tuple[str, type[Any]]] = []
         request_param = None
 
         for param_name, parameter in signature.parameters.items():
@@ -233,7 +234,7 @@ def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[E
                 raise ValidationError(f"parameter '{param_name}' in function '{func_name}' has no type annotation")
 
             if is_type_optional(param_type):
-                inner_type: type = unwrap_optional_type(param_type)
+                inner_type: type[Any] = unwrap_optional_type(param_type)
             else:
                 inner_type = param_type
 
@@ -276,7 +277,7 @@ def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[E
         # where YieldType is the event type, SendType is None, and ReturnType is the immediate response type to the request
         if typing.get_origin(return_type) is collections.abc.Generator:
             event_type, send_type, response_type = typing.get_args(return_type)
-            if send_type is not type(None):
+            if send_type is not NoneType:
                 raise ValidationError(
                     f"function '{func_name}' has a return type Generator[Y,S,R] and therefore looks like an event but has an explicit send type"
                 )
@@ -324,7 +325,7 @@ def get_endpoint_operations(endpoint: type, use_examples: bool = True) -> list[E
     return result
 
 
-def get_endpoint_events(endpoint: type) -> dict[str, type]:
+def get_endpoint_events(endpoint: type[Any]) -> dict[str, type[Any]]:
     results = {}
 
     for decl in typing.get_type_hints(endpoint).values():
@@ -342,7 +343,7 @@ def get_endpoint_events(endpoint: type) -> dict[str, type]:
             continue
 
         # check if signature is Callable[[...], None]
-        if not issubclass(return_type, type(None)):
+        if not issubclass(return_type, NoneType):
             continue
 
         # check if signature is Callable[[EventType], None]

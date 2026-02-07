@@ -1,7 +1,7 @@
 """
 Generate an OpenAPI specification from a Python class definition
 
-Copyright 2022-2025, Levente Hunyadi
+Copyright 2021-2026, Levente Hunyadi
 
 :see: https://github.com/hunyadi/pyopenapi
 """
@@ -36,7 +36,6 @@ from .specification import (
     RequestBody,
     Response,
     ResponseRef,
-    SchemaOrRef,
     SchemaRef,
     Tag,
     TagGroup,
@@ -74,14 +73,13 @@ register_schema(
 def http_status_to_string(status_code: HTTPStatusCode) -> str:
     "Converts an HTTP status code to a string."
 
-    if isinstance(status_code, HTTPStatus):
-        return str(status_code.value)
-    elif isinstance(status_code, int):
-        return str(status_code)
-    elif isinstance(status_code, str):
-        return status_code
-    else:
-        raise TypeError("expected: HTTP status code")
+    match status_code:
+        case HTTPStatus():
+            return str(status_code.value)
+        case int():
+            return str(status_code)
+        case str():
+            return status_code
 
 
 class SchemaBuilder:
@@ -92,7 +90,7 @@ class SchemaBuilder:
         self.schema_generator = schema_generator
         self.schemas = {}
 
-    def classdef_to_schema(self, typ: type) -> Schema:
+    def classdef_to_schema(self, typ: type[Any]) -> Schema:
         """
         Converts a type to a JSON schema.
         For nested types found in the type hierarchy, adds the type to the schema registry in the OpenAPI specification section `components`.
@@ -106,12 +104,12 @@ class SchemaBuilder:
 
         return type_schema
 
-    def classdef_to_named_schema(self, name: str, typ: type) -> Schema:
+    def classdef_to_named_schema(self, name: str, typ: type[Any]) -> Schema:
         schema = self.classdef_to_schema(typ)
         self._add_ref(name, schema)
         return schema
 
-    def classdef_to_ref(self, typ: type) -> SchemaOrRef:
+    def classdef_to_ref(self, typ: type[Any]) -> Schema | SchemaRef:
         """
         Converts a type to a JSON schema, and if possible, returns a schema reference.
         For composite types (such as classes), adds the type to the schema registry in the OpenAPI specification section `components`.
@@ -145,20 +143,20 @@ class SchemaBuilder:
 
 class ContentBuilder:
     schema_builder: SchemaBuilder
-    schema_transformer: Optional[Callable[[SchemaOrRef], SchemaOrRef]]
+    schema_transformer: Optional[Callable[[Schema | SchemaRef], Schema | SchemaRef]]
     sample_transformer: Optional[Callable[[JsonType], JsonType]]
 
     def __init__(
         self,
         schema_builder: SchemaBuilder,
-        schema_transformer: Optional[Callable[[SchemaOrRef], SchemaOrRef]] = None,
+        schema_transformer: Optional[Callable[[Schema | SchemaRef], Schema | SchemaRef]] = None,
         sample_transformer: Optional[Callable[[JsonType], JsonType]] = None,
     ) -> None:
         self.schema_builder = schema_builder
         self.schema_transformer = schema_transformer
         self.sample_transformer = sample_transformer
 
-    def build_content(self, payload_type: type, examples: Optional[list[Any]] = None) -> dict[str, MediaType]:
+    def build_content(self, payload_type: type[Any], examples: Optional[list[Any]] = None) -> dict[str, MediaType]:
         "Creates the content subtree for a request or response."
 
         if is_generic_list(payload_type):
@@ -170,10 +168,10 @@ class ContentBuilder:
 
         return {media_type: self.build_media_type(item_type, examples)}
 
-    def build_media_type(self, item_type: type, examples: Optional[list[Any]] = None) -> MediaType:
+    def build_media_type(self, item_type: type[Any], examples: Optional[list[Any]] = None) -> MediaType:
         schema = self.schema_builder.classdef_to_ref(item_type)
         if self.schema_transformer:
-            schema_transformer: Callable[[SchemaOrRef], SchemaOrRef] = self.schema_transformer
+            schema_transformer: Callable[[Schema | SchemaRef], Schema | SchemaRef] = self.schema_transformer
             schema = schema_transformer(schema)
 
         if not examples:
@@ -187,12 +185,12 @@ class ContentBuilder:
             examples=self._build_examples(examples),
         )
 
-    def _build_examples(self, examples: list[Any]) -> dict[str, Union[Example, ExampleRef]]:
+    def _build_examples(self, examples: list[Any]) -> dict[str, Example | ExampleRef]:
         "Creates a set of several examples for a media type."
 
         builder = ExampleBuilder(self.sample_transformer)
 
-        results: dict[str, Union[Example, ExampleRef]] = {}
+        results: dict[str, Example | ExampleRef] = {}
         for example in examples:
             name, value = builder.get_named(example)
             results[name] = Example(value=value)
@@ -252,7 +250,7 @@ class ResponseOptions:
     :param default_status_code: HTTP status code assigned to responses that have no mapping.
     """
 
-    type_descriptions: dict[type, str]
+    type_descriptions: dict[type[Any], str]
     examples: Optional[list[Any]]
     status_catalog: dict[type, HTTPStatusCode]
     default_status_code: HTTPStatusCode
@@ -261,8 +259,8 @@ class ResponseOptions:
 @dataclass
 class StatusResponse:
     status_code: str
-    types: list[type] = dataclasses.field(default_factory=list)
-    examples: list[Any] = dataclasses.field(default_factory=list)
+    types: list[type[Any]] = dataclasses.field(default_factory=list[type[Any]])
+    examples: list[Any] = dataclasses.field(default_factory=list[Any])
 
 
 class ResponseBuilder:
@@ -291,12 +289,12 @@ class ResponseBuilder:
 
         return dict(sorted(status_responses.items()))
 
-    def build_response(self, options: ResponseOptions) -> dict[str, Union[Response, ResponseRef]]:
+    def build_response(self, options: ResponseOptions) -> dict[str, Response | ResponseRef]:
         """
         Groups responses that have the same status code.
         """
 
-        responses: dict[str, Union[Response, ResponseRef]] = {}
+        responses: dict[str, Response | ResponseRef] = {}
         status_responses = self._get_status_responses(options)
         for status_code, status_response in status_responses.items():
             response_types = tuple(status_response.types)
@@ -323,7 +321,7 @@ class ResponseBuilder:
 
     def _build_response(
         self,
-        response_type: Optional[type],
+        response_type: Optional[type[Any]],
         description: str,
         examples: Optional[list[Any]] = None,
     ) -> Response:
@@ -338,7 +336,7 @@ class ResponseBuilder:
             return Response(description=description)
 
 
-def schema_error_wrapper(schema: SchemaOrRef) -> Schema:
+def schema_error_wrapper(schema: Schema | SchemaRef) -> Schema:
     "Wraps an error output schema into a top-level error schema."
 
     return {
@@ -360,12 +358,12 @@ def sample_error_wrapper(error: JsonType) -> JsonType:
 
 
 class Generator:
-    endpoint: type
+    endpoint: type[Any]
     options: Options
     schema_builder: SchemaBuilder
     responses: dict[str, Response]
 
-    def __init__(self, endpoint: type, options: Options) -> None:
+    def __init__(self, endpoint: type[Any], options: Options) -> None:
         self.endpoint = endpoint
         self.options = options
         schema_generator = JsonSchemaGenerator(
@@ -380,14 +378,14 @@ class Generator:
 
     def _build_type_tag(self, ref: str, schema: Schema) -> Tag:
         definition = f'<SchemaDefinition schemaRef="#/components/schemas/{ref}" />'
-        title = typing.cast(str, schema.get("title"))
-        description = typing.cast(str, schema.get("description"))
+        title = typing.cast(str | None, schema.get("title"))
+        description = typing.cast(str | None, schema.get("description"))
         return Tag(
             name=ref,
             description="\n\n".join(s for s in (title, description, definition) if s is not None),
         )
 
-    def _build_extra_tag_groups(self, extra_types: dict[str, list[type]]) -> dict[str, list[Tag]]:
+    def _build_extra_tag_groups(self, extra_types: dict[str, list[type[Any]]]) -> dict[str, list[Tag]]:
         """
         Creates a dictionary of tag group captions as keys, and tag lists as values.
 
@@ -429,7 +427,7 @@ class Generator:
         query_parameters = []
         for param_name, param_type in op.query_params:
             if is_type_optional(param_type):
-                inner_type: type = unwrap_optional_type(param_type)
+                inner_type: type[Any] = unwrap_optional_type(param_type)
                 required = False
             else:
                 inner_type = param_type
@@ -462,7 +460,9 @@ class Generator:
         # success response types
         if doc_string.returns is None and is_type_union(op.response_type):
             # split union of return types into a list of response types
-            success_type_docstring: dict[type, Docstring] = {typing.cast(type, item): parse_type(item) for item in unwrap_union_types(op.response_type)}
+            success_type_docstring: dict[type[Any], Docstring] = {
+                typing.cast(type[Any], item): parse_type(item) for item in unwrap_union_types(op.response_type)
+            }
             success_type_descriptions = {
                 item: doc_string.short_description for item, doc_string in success_type_docstring.items() if doc_string.short_description
             }
@@ -539,7 +539,7 @@ class Generator:
 
     def generate(self) -> Document:
         paths: dict[str, PathItem] = {}
-        endpoint_classes: set[type] = set()
+        endpoint_classes: set[type[Any]] = set()
         for op in get_endpoint_operations(self.endpoint, use_examples=self.options.use_examples):
             endpoint_classes.add(op.defining_class)
 
@@ -566,7 +566,7 @@ class Generator:
 
         operation_tags: list[Tag] = []
         for cls in endpoint_classes:
-            doc_string = parse_type(cls)
+            doc_string = parse_type(cls)  # type: ignore[arg-type]
             operation_tags.append(
                 Tag(
                     name=cls.__name__,

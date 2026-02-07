@@ -2,7 +2,7 @@ import datetime
 import enum
 import uuid
 from dataclasses import dataclass
-from typing import Callable, Generator, Optional, Protocol, Union
+from typing import Callable, Generator, Optional, Protocol
 
 from strong_typing.schema import json_schema_type
 
@@ -337,7 +337,7 @@ class PeopleCatalog(Protocol):
             Teacher("Vacska", "Mati", "Négyszögletű Kerek Erdő"),
         ],
     )
-    def get_member_by_name(self, family: str, given: str, /) -> Union[Student, Teacher]:
+    def get_member_by_name(self, family: str, given: str, /) -> Student | Teacher:
         """
         Find a member by their name.
 

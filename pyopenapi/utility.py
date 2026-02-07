@@ -1,7 +1,7 @@
 """
 Generate an OpenAPI specification from a Python class definition
 
-Copyright 2022-2025, Levente Hunyadi
+Copyright 2021-2026, Levente Hunyadi
 
 :see: https://github.com/hunyadi/pyopenapi
 """

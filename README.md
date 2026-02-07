@@ -132,7 +132,7 @@ OpenAPI supports specifying [examples](https://spec.openapis.org/oas/latest.html
             Teacher("Vacska", "Mati", "Négyszögletű Kerek Erdő"),
         ],
     )
-    def get_member_by_name(self, family: str, given: str, /) -> Union[Student, Teacher]:
+    def get_member_by_name(self, family: str, given: str, /) -> Student | Teacher:
         ...
 ```
 

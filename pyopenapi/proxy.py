@@ -1,7 +1,7 @@
 """
 Generate an OpenAPI specification from a Python class definition
 
-Copyright 2022-2025, Levente Hunyadi
+Copyright 2021-2026, Levente Hunyadi
 
 :see: https://github.com/hunyadi/pyopenapi
 """
@@ -99,7 +99,7 @@ class OperationProxy:
             data = None
 
         # make HTTP request
-        status, response = await make_request(self.op.http_method, endpoint_proxy.base_url, path, query, data)
+        _status, response = await make_request(self.op.http_method, endpoint_proxy.base_url, path, query, data)
 
         # process HTTP response
         if response:
