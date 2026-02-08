@@ -6,7 +6,7 @@ Copyright 2021-2026, Levente Hunyadi
 :see: https://github.com/hunyadi/pyopenapi
 """
 
-from typing import Any, Callable, Optional, TypeVar
+from typing import Any, Callable, TypeVar
 
 from .metadata import WebMethod
 from .options import *  # noqa: F403
@@ -16,13 +16,13 @@ F = TypeVar("F", bound=Callable[..., Any])
 
 
 def webmethod(
-    route: Optional[str] = None,
-    public: Optional[bool] = False,
-    deprecated: Optional[bool] = False,
-    request_example: Optional[Any] = None,
-    response_example: Optional[Any] = None,
-    request_examples: Optional[list[Any]] = None,
-    response_examples: Optional[list[Any]] = None,
+    route: str | None = None,
+    public: bool = False,
+    deprecated: bool = False,
+    request_example: Any | None = None,
+    response_example: Any | None = None,
+    request_examples: list[Any] | None = None,
+    response_examples: list[Any] | None = None,
 ) -> Callable[[F], F]:
     """
     Decorator that supplies additional metadata to an endpoint operation function.

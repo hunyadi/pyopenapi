@@ -9,14 +9,16 @@ Copyright 2021-2026, Levente Hunyadi
 import dataclasses
 import hashlib
 import ipaddress
+import operator
 import typing
 from dataclasses import dataclass
+from functools import reduce
 from http import HTTPStatus
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable
 
 from strong_typing.core import JsonType, Schema
 from strong_typing.docstring import Docstring, parse_type
-from strong_typing.inspection import is_generic_list, is_type_optional, is_type_union, unwrap_generic_list, unwrap_optional_type, unwrap_union_types
+from strong_typing.inspection import is_type_optional, is_type_union, unwrap_optional_type, unwrap_union_types
 from strong_typing.name import python_type_to_name
 from strong_typing.schema import JsonSchemaGenerator, SchemaOptions, get_schema_identifier, register_schema
 from strong_typing.serialization import json_dump_string, object_to_json
@@ -143,32 +145,32 @@ class SchemaBuilder:
 
 class ContentBuilder:
     schema_builder: SchemaBuilder
-    schema_transformer: Optional[Callable[[Schema | SchemaRef], Schema | SchemaRef]]
-    sample_transformer: Optional[Callable[[JsonType], JsonType]]
+    schema_transformer: Callable[[Schema | SchemaRef], Schema | SchemaRef] | None
+    sample_transformer: Callable[[JsonType], JsonType] | None
 
     def __init__(
         self,
         schema_builder: SchemaBuilder,
-        schema_transformer: Optional[Callable[[Schema | SchemaRef], Schema | SchemaRef]] = None,
-        sample_transformer: Optional[Callable[[JsonType], JsonType]] = None,
+        schema_transformer: Callable[[Schema | SchemaRef], Schema | SchemaRef] | None = None,
+        sample_transformer: Callable[[JsonType], JsonType] | None = None,
     ) -> None:
         self.schema_builder = schema_builder
         self.schema_transformer = schema_transformer
         self.sample_transformer = sample_transformer
 
-    def build_content(self, payload_type: type[Any], examples: Optional[list[Any]] = None) -> dict[str, MediaType]:
+    def build_content(self, payload_type: type[Any], examples: list[Any] | None = None) -> dict[str, MediaType]:
         "Creates the content subtree for a request or response."
 
-        if is_generic_list(payload_type):
+        if typing.get_origin(payload_type) is list:
             media_type = "application/jsonl"
-            item_type = unwrap_generic_list(payload_type)
+            (item_type,) = typing.get_args(payload_type)  # unpack single tuple element
         else:
             media_type = "application/json"
             item_type = payload_type
 
         return {media_type: self.build_media_type(item_type, examples)}
 
-    def build_media_type(self, item_type: type[Any], examples: Optional[list[Any]] = None) -> MediaType:
+    def build_media_type(self, item_type: type[Any], examples: list[Any] | None = None) -> MediaType:
         schema = self.schema_builder.classdef_to_ref(item_type)
         if self.schema_transformer:
             schema_transformer: Callable[[Schema | SchemaRef], Schema | SchemaRef] = self.schema_transformer
@@ -209,7 +211,7 @@ class ExampleBuilder:
 
     def __init__(
         self,
-        sample_transformer: Optional[Callable[[JsonType], JsonType]] = None,
+        sample_transformer: Callable[[JsonType], JsonType] | None = None,
     ) -> None:
         if sample_transformer:
             self.sample_transformer = sample_transformer
@@ -225,7 +227,7 @@ class ExampleBuilder:
     def get_named(self, example: Any) -> tuple[str, JsonType]:
         value = self._get_value(example)
 
-        name: Optional[str] = None
+        name: str | None = None
 
         if type(example).__str__ is not object.__str__:  # type: ignore[comparison-overlap]
             friendly_name = str(example)
@@ -251,7 +253,7 @@ class ResponseOptions:
     """
 
     type_descriptions: dict[type[Any], str]
-    examples: Optional[list[Any]]
+    examples: list[Any] | None
     status_catalog: dict[type, HTTPStatusCode]
     default_status_code: HTTPStatusCode
 
@@ -298,11 +300,11 @@ class ResponseBuilder:
         status_responses = self._get_status_responses(options)
         for status_code, status_response in status_responses.items():
             response_types = tuple(status_response.types)
-            if len(response_types) > 1:
-                composite_response_type: type = Union[response_types]  # type: ignore
+            composite_response_type: type[Any] | None
+            if len(response_types) > 0:
+                composite_response_type = reduce(operator.or_, response_types)
             else:
-                (response_type,) = response_types
-                composite_response_type = response_type
+                composite_response_type = None
 
             description = " **OR** ".join(
                 filter(
@@ -321,9 +323,9 @@ class ResponseBuilder:
 
     def _build_response(
         self,
-        response_type: Optional[type[Any]],
+        response_type: type[Any] | None,
         description: str,
-        examples: Optional[list[Any]] = None,
+        examples: list[Any] | None = None,
     ) -> Response:
         "Creates a response subtree."
 
@@ -424,7 +426,7 @@ class Generator:
         ]
 
         # parameters passed in URL component query string
-        query_parameters = []
+        query_parameters: list[Parameter] = []
         for param_name, param_type in op.query_params:
             if is_type_optional(param_type):
                 inner_type: type[Any] = unwrap_optional_type(param_type)
@@ -588,12 +590,11 @@ class Generator:
         # types that are explicitly declared
         extra_tag_groups: dict[str, list[Tag]] = {}
         if self.options.extra_types is not None:
-            if isinstance(self.options.extra_types, list):
-                extra_tag_groups = self._build_extra_tag_groups({"AdditionalTypes": self.options.extra_types})
-            elif isinstance(self.options.extra_types, dict):
-                extra_tag_groups = self._build_extra_tag_groups(self.options.extra_types)
-            else:
-                raise TypeError(f"type mismatch for collection of extra types: {type(self.options.extra_types)}")
+            match self.options.extra_types:
+                case list():
+                    extra_tag_groups = self._build_extra_tag_groups({"AdditionalTypes": self.options.extra_types})
+                case dict():
+                    extra_tag_groups = self._build_extra_tag_groups(self.options.extra_types)
 
         # list all operations and types
         tags: list[Tag] = []
@@ -603,7 +604,7 @@ class Generator:
         for extra_tag_group in extra_tag_groups.values():
             tags.extend(extra_tag_group)
 
-        tag_groups = []
+        tag_groups: list[TagGroup] = []
         if operation_tags:
             tag_groups.append(
                 TagGroup(

@@ -13,14 +13,14 @@ from pyopenapi.specification import Info, SecuritySchemeHTTP, Server
 from pyopenapi.utility import Specification
 
 try:
-    from pygments import highlight
+    from pygments import highlight  # pyright: ignore[reportUnknownVariableType]
     from pygments.formatters import HtmlFormatter
-    from pygments.lexers import get_lexer_by_name
+    from pygments.lexers import get_lexer_by_name  # pyright: ignore[reportUnknownVariableType]
 
     def save_with_highlight(f: TextIO, code: str, format: str) -> None:
         lexer = get_lexer_by_name(format)
-        formatter = HtmlFormatter()
-        style = formatter.get_style_defs(".highlight")  # type: ignore[no-untyped-call]
+        formatter = HtmlFormatter()  # pyright: ignore[reportUnknownVariableType]
+        style = formatter.get_style_defs(".highlight")  # type: ignore[no-untyped-call]  # pyright: ignore[reportUnknownVariableType, reportUnknownMemberType]
         f.writelines(
             [
                 "<!DOCTYPE html>",
@@ -33,7 +33,7 @@ try:
                 "<body>",
             ]
         )
-        highlight(code, lexer, formatter, outfile=f)
+        highlight(code, lexer, formatter, outfile=f)  # pyright: ignore[reportUnknownArgumentType]
         f.writelines(["</body>", "</html>"])
 
 except ImportError:

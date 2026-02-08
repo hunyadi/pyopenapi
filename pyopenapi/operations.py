@@ -13,14 +13,14 @@ import typing
 import uuid
 from dataclasses import dataclass
 from types import NoneType
-from typing import Any, Callable, Iterable, Iterator, Optional
+from typing import Any, Callable, Iterable, Iterator
 
 from strong_typing.inspection import get_signature, is_type_enum, is_type_optional, unwrap_optional_type
 
 from .metadata import WebMethod
 
 
-def split_prefix(s: str, sep: str, prefix: str | Iterable[str]) -> tuple[Optional[str], str]:
+def split_prefix(s: str, sep: str, prefix: str | Iterable[str]) -> tuple[str | None, str]:
     """
     Recognizes a prefix at the beginning of a string.
 
@@ -96,17 +96,17 @@ class EndpointOperation:
     name: str
     func_name: str
     func_ref: Callable[..., Any]
-    route: Optional[str]
+    route: str | None
     path_params: list[OperationParameter]
     query_params: list[OperationParameter]
-    request_param: Optional[OperationParameter]
-    event_type: Optional[type[Any]]
+    request_param: OperationParameter | None
+    event_type: type[Any] | None
     response_type: type[Any]
     http_method: HTTPMethod
     public: bool
     deprecated: bool
-    request_examples: Optional[list[Any]] = None
-    response_examples: Optional[list[Any]] = None
+    request_examples: list[Any] | None = None
+    response_examples: list[Any] | None = None
 
     def get_route(self) -> str:
         if self.route is not None:
@@ -199,7 +199,7 @@ def get_endpoint_operations(endpoint: type[Any], use_examples: bool = True) -> l
         ],
     ):
         # extract routing information from function metadata
-        webmethod: Optional[WebMethod] = getattr(func_ref, "__webmethod__", None)
+        webmethod: WebMethod | None = getattr(func_ref, "__webmethod__", None)
         if webmethod is not None:
             route = webmethod.route
             route_params = _get_route_parameters(route) if route is not None else None
@@ -326,7 +326,7 @@ def get_endpoint_operations(endpoint: type[Any], use_examples: bool = True) -> l
 
 
 def get_endpoint_events(endpoint: type[Any]) -> dict[str, type[Any]]:
-    results = {}
+    results: dict[str, type[Any]] = {}
 
     for decl in typing.get_type_hints(endpoint).values():
         # check if signature is Callable[...]
@@ -339,7 +339,7 @@ def get_endpoint_events(endpoint: type[Any]) -> dict[str, type[Any]]:
         if len(args) != 2:
             continue
         params_type, return_type = args
-        if not isinstance(params_type, list):
+        if typing.get_origin(params_type) is not list:
             continue
 
         # check if signature is Callable[[...], None]

@@ -33,7 +33,7 @@ jobs:
       - name: Set up build dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install .[proxy,dev]
 
       # Generate and publish website content
       - name: Generate website content
@@ -75,7 +75,7 @@ jobs:
       - name: Set up build dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install .[proxy,dev]
       - name: Run unit tests
         run: |
           python -m unittest discover -s tests

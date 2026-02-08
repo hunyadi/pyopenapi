@@ -9,7 +9,7 @@ Copyright 2021-2026, Levente Hunyadi
 import dataclasses
 from dataclasses import dataclass
 from http import HTTPStatus
-from typing import Any, Callable, ClassVar, Optional
+from typing import Any, Callable, ClassVar
 
 from .specification import Info, SecurityScheme, Server
 from .specification import SecuritySchemeAPI as SecuritySchemeAPI
@@ -38,14 +38,14 @@ class Options:
     server: Server
     info: Info
     version: tuple[int, int, int] = (3, 1, 0)
-    default_security_scheme: Optional[SecurityScheme] = None
+    default_security_scheme: SecurityScheme | None = None
     extra_types: list[type[Any]] | dict[str, list[type[Any]]] | None = None
     use_examples: bool = True
     success_responses: dict[type[Any], HTTPStatusCode] = dataclasses.field(default_factory=dict[type[Any], HTTPStatusCode])
     error_responses: dict[type[Any], HTTPStatusCode] = dataclasses.field(default_factory=dict[type[Any], HTTPStatusCode])
     error_wrapper: bool = False
-    property_description_fun: Optional[Callable[[type, str, str], str]] = None
-    captions: Optional[dict[str, str]] = None
+    property_description_fun: Callable[[type, str, str], str] | None = None
+    captions: dict[str, str] | None = None
 
     default_captions: ClassVar[dict[str, str]] = {
         "Operations": "Operations",

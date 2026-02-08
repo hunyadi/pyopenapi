@@ -1,6 +1,6 @@
 import unittest
 from dataclasses import dataclass
-from typing import Optional, Protocol, TypeVar
+from typing import Protocol, TypeVar
 
 from strong_typing.core import JsonType
 
@@ -49,7 +49,7 @@ class TestOpenAPI(unittest.IsolatedAsyncioTestCase):
         self,
         response: HTTPBinResponse,
         params: dict[str, str],
-        headers: Optional[dict[str, str]] = None,
+        headers: dict[str, str] | None = None,
     ) -> None:
         self.assertIsInstance(response, HTTPBinResponse)
         self.assertDictEqual(response.args, params)

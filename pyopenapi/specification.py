@@ -9,7 +9,7 @@ Copyright 2021-2026, Levente Hunyadi
 import dataclasses
 import enum
 from dataclasses import dataclass
-from typing import Any, ClassVar, Optional
+from typing import Any, ClassVar
 
 from strong_typing.core import JsonType as JsonType
 from strong_typing.core import Schema, StrictJsonType
@@ -48,45 +48,45 @@ class ExampleRef(Ref):
 
 @dataclass
 class Contact:
-    name: Optional[str] = None
-    url: Optional[URL] = None
-    email: Optional[str] = None
+    name: str | None = None
+    url: URL | None = None
+    email: str | None = None
 
 
 @dataclass
 class License:
     name: str
-    url: Optional[URL] = None
+    url: URL | None = None
 
 
 @dataclass
 class Info:
     title: str
     version: str
-    description: Optional[str] = None
-    termsOfService: Optional[str] = None
-    contact: Optional[Contact] = None
-    license: Optional[License] = None
+    description: str | None = None
+    termsOfService: str | None = None
+    contact: Contact | None = None
+    license: License | None = None
 
 
 @dataclass
 class MediaType:
-    schema: Optional[Schema | SchemaRef] = None
-    example: Optional[Any] = None
-    examples: Optional[dict[str, "Example | ExampleRef"]] = None
+    schema: Schema | SchemaRef | None = None
+    example: Any | None = None
+    examples: dict[str, "Example | ExampleRef"] | None = None
 
 
 @dataclass
 class RequestBody:
     content: dict[str, MediaType]
-    description: Optional[str] = None
-    required: Optional[bool] = None
+    description: str | None = None
+    required: bool | None = None
 
 
 @dataclass
 class Response:
     description: str
-    content: Optional[dict[str, MediaType]] = None
+    content: dict[str, MediaType] | None = None
 
 
 @enum.unique
@@ -101,38 +101,38 @@ class ParameterLocation(enum.Enum):
 class Parameter:
     name: str
     in_: ParameterLocation
-    description: Optional[str] = None
-    required: Optional[bool] = None
-    schema: Optional[Schema | SchemaRef] = None
-    example: Optional[Any] = None
+    description: str | None = None
+    required: bool | None = None
+    schema: Schema | SchemaRef | None = None
+    example: Any | None = None
 
 
 @dataclass
 class Operation:
     responses: dict[str, Response | ResponseRef]
-    tags: Optional[list[str]] = None
-    summary: Optional[str] = None
-    description: Optional[str] = None
-    operationId: Optional[str] = None
-    parameters: Optional[list[Parameter]] = None
-    requestBody: Optional[RequestBody] = None
-    callbacks: Optional[dict[str, "Callback"]] = None
-    security: Optional[list["SecurityRequirement"]] = None
-    deprecated: Optional[bool] = None
+    tags: list[str] | None = None
+    summary: str | None = None
+    description: str | None = None
+    operationId: str | None = None
+    parameters: list[Parameter] | None = None
+    requestBody: RequestBody | None = None
+    callbacks: dict[str, "Callback"] | None = None
+    security: list["SecurityRequirement"] | None = None
+    deprecated: bool | None = None
 
 
 @dataclass
 class PathItem:
-    summary: Optional[str] = None
-    description: Optional[str] = None
-    get: Optional[Operation] = None
-    put: Optional[Operation] = None
-    post: Optional[Operation] = None
-    delete: Optional[Operation] = None
-    options: Optional[Operation] = None
-    head: Optional[Operation] = None
-    patch: Optional[Operation] = None
-    trace: Optional[Operation] = None
+    summary: str | None = None
+    description: str | None = None
+    get: Operation | None = None
+    put: Operation | None = None
+    post: Operation | None = None
+    delete: Operation | None = None
+    options: Operation | None = None
+    head: Operation | None = None
+    patch: Operation | None = None
+    trace: Operation | None = None
 
     def update(self, other: "PathItem") -> None:
         "Merges another instance of this class into this object."
@@ -149,16 +149,16 @@ Callback = dict[str, PathItem]
 
 @dataclass
 class Example:
-    summary: Optional[str] = None
-    description: Optional[str] = None
-    value: Optional[Any] = None
-    externalValue: Optional[URL] = None
+    summary: str | None = None
+    description: str | None = None
+    value: Any | None = None
+    externalValue: URL | None = None
 
 
 @dataclass
 class Server:
     url: URL
-    description: Optional[str] = None
+    description: str | None = None
 
 
 @enum.unique
@@ -189,9 +189,9 @@ class SecuritySchemeAPI(SecurityScheme):
 @dataclass(init=False)
 class SecuritySchemeHTTP(SecurityScheme):
     scheme: str
-    bearerFormat: Optional[str] = None
+    bearerFormat: str | None = None
 
-    def __init__(self, description: str, scheme: str, bearerFormat: Optional[str] = None) -> None:
+    def __init__(self, description: str, scheme: str, bearerFormat: str | None = None) -> None:
         super().__init__(SecuritySchemeType.HTTP, description)
         self.scheme = scheme
         self.bearerFormat = bearerFormat
@@ -208,13 +208,13 @@ class SecuritySchemeOpenIDConnect(SecurityScheme):
 
 @dataclass
 class Components:
-    schemas: Optional[dict[str, Schema]] = None
-    responses: Optional[dict[str, Response]] = None
-    parameters: Optional[dict[str, Parameter]] = None
-    examples: Optional[dict[str, Example]] = None
-    requestBodies: Optional[dict[str, RequestBody]] = None
-    securitySchemes: Optional[dict[str, SecurityScheme]] = None
-    callbacks: Optional[dict[str, Callback]] = None
+    schemas: dict[str, Schema] | None = None
+    responses: dict[str, Response] | None = None
+    parameters: dict[str, Parameter] | None = None
+    examples: dict[str, Example] | None = None
+    requestBodies: dict[str, RequestBody] | None = None
+    securitySchemes: dict[str, SecurityScheme] | None = None
+    callbacks: dict[str, Callback] | None = None
 
 
 SecurityScope = str
@@ -224,8 +224,8 @@ SecurityRequirement = dict[str, list[SecurityScope]]
 @dataclass
 class Tag:
     name: str
-    description: Optional[str] = None
-    displayName: Optional[str] = None
+    description: str | None = None
+    displayName: str | None = None
 
 
 @dataclass
@@ -265,8 +265,8 @@ class Document:
     info: Info
     servers: list[Server]
     paths: dict[str, PathItem]
-    jsonSchemaDialect: Optional[str] = None
-    components: Optional[Components] = None
-    security: Optional[list[SecurityRequirement]] = None
-    tags: Optional[list[Tag]] = None
-    tagGroups: Optional[list[TagGroup]] = None
+    jsonSchemaDialect: str | None = None
+    components: Components | None = None
+    security: list[SecurityRequirement] | None = None
+    tags: list[Tag] | None = None
+    tagGroups: list[TagGroup] | None = None

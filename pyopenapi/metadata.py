@@ -7,7 +7,7 @@ Copyright 2021-2026, Levente Hunyadi
 """
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -22,8 +22,8 @@ class WebMethod:
     :param response_examples: Sample responses that the operation might produce. Pass a list of objects, not JSON.
     """
 
-    route: Optional[str] = None
+    route: str | None = None
     public: bool = False
     deprecated: bool = False
-    request_examples: Optional[list[Any]] = None
-    response_examples: Optional[list[Any]] = None
+    request_examples: list[Any] | None = None
+    response_examples: list[Any] | None = None

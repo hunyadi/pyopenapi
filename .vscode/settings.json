@@ -20,6 +20,7 @@
         "dataclasses",
         "errorlevel",
         "Levente",
+        "Pygments",
         "pyopenapi",
         "PyPI",
         "Redoc",

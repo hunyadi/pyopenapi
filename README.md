@@ -7,7 +7,7 @@
 * supports standard and asynchronous functions (`async def`)
 * maps function name prefixes such as `get_` or `create_` to HTTP GET, POST, PUT, DELETE, PATCH
 * handles both simple and composite types (`int`, `str`, `Enum`, `@dataclass`)
-* handles generic types (`list[T]`, `dict[K, V]`, `Optional[T]`, `Union[T1, T2, T3]`)
+* handles generic types (`list[T]`, `dict[K, V]`, `T | None`, `T1 | T2 | T3`)
 * maps Python positional-only and keyword-only arguments (of simple types) to path and query parameters, respectively
 * maps composite types to HTTP request body
 * supports user-defined routes, request and response samples with decorator `@webmethod`

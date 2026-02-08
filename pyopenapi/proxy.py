@@ -7,7 +7,8 @@ Copyright 2021-2026, Levente Hunyadi
 """
 
 import json
-from typing import Any, Callable, Optional, TypeVar
+import typing
+from typing import Any, Callable, TypeVar
 
 import aiohttp
 from strong_typing.inspection import get_signature
@@ -21,7 +22,7 @@ async def make_request(
     server: str,
     path: str,
     query: dict[str, str],
-    data: Optional[str],
+    data: str | None,
 ) -> tuple[int, str]:
     "Makes an asynchronous HTTP request and returns the response."
 
@@ -136,5 +137,5 @@ def make_proxy_class(api: type[T]) -> type[T]:
 
     ops = get_endpoint_operations(api)
     properties = {op.func_name: _get_operation_proxy(op) for op in ops}
-    proxy = type(f"{api.__name__}Proxy", (api, EndpointProxy), properties)
-    return proxy
+    proxy = type(f"{api.__name__}Proxy", (api, EndpointProxy), properties)  # pyright: ignore[reportGeneralTypeIssues]
+    return typing.cast(type[T], proxy)

@@ -2,7 +2,7 @@ import datetime
 import enum
 import uuid
 from dataclasses import dataclass
-from typing import Callable, Generator, Optional, Protocol
+from typing import Callable, Generator, Protocol
 
 from strong_typing.schema import json_schema_type
 
@@ -209,7 +209,7 @@ class Person:
 class Student(Person):
     "A student at a university."
 
-    birth_date: Optional[datetime.date] = None
+    birth_date: datetime.date | None = None
 
 
 @json_schema_type
@@ -296,6 +296,11 @@ class JobManagement(Protocol):
         channel, e.g. a websocket connection or an HTTP callback.
         """
 
+        yield StatusEvent(uuid.uuid4(), Status.Created)
+        yield StatusEvent(uuid.uuid4(), Status.Running)
+        yield StatusEvent(uuid.uuid4(), Status.Stopped)
+        return StatusResponse(uuid.uuid4(), "Successfully completed.")
+
     # a list of out-of-band events triggered by the endpoint asynchronously
     data_event: Callable[[DataEvent], None]
 
@@ -328,6 +333,7 @@ class PeopleCatalog(Protocol):
 
     @webmethod(
         route="/member/name/{family}/{given}",
+        # spellchecker:disable
         response_examples=[
             Student("Szörnyeteg", "Lajos"),
             Student("Ló", "Szerafin"),
@@ -336,6 +342,7 @@ class PeopleCatalog(Protocol):
             Teacher("Mikka", "Makka", "Négyszögletű Kerek Erdő"),
             Teacher("Vacska", "Mati", "Négyszögletű Kerek Erdő"),
         ],
+        # spellchecker:enable
     )
     def get_member_by_name(self, family: str, given: str, /) -> Student | Teacher:
         """

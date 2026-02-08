@@ -39,6 +39,13 @@ dynamic = ["version"]
 proxy = [
     "aiohttp >= 3.13"
 ]
+dev = [
+    "build",
+    "PyYAML",
+    "Pygments",
+    "types-PyYAML",
+    "types-Pygments"
+]
 
 [project.urls]
 "Homepage" = "https://github.com/hunyadi/pyopenapi"
