@@ -41,6 +41,8 @@ proxy = [
 ]
 dev = [
     "build",
+    "mypy",
+    "ruff",
     "PyYAML",
     "Pygments",
     "types-PyYAML",

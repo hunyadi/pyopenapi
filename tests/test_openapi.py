@@ -6,11 +6,10 @@ from http import HTTPStatus
 from typing import TextIO
 from uuid import UUID
 
-from endpoint import AuthenticationError, BadRequestError, Endpoint, InternalServerError, NotFoundError, Student, Teacher, ValidationError
-
 from pyopenapi.options import Options
 from pyopenapi.specification import Info, SecuritySchemeHTTP, Server
 from pyopenapi.utility import Specification
+from tests.endpoint import AuthenticationError, BadRequestError, Endpoint, InternalServerError, NotFoundError, Student, Teacher, ValidationError
 
 try:
     from pygments import highlight  # pyright: ignore[reportUnknownVariableType]
